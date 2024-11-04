@@ -1,0 +1,416 @@
+const crypto = require("crypto");
+const User = require("../models/userModel");
+const Admin = require("../models/adminModel");
+const { catchAsync } = require("../utils/helpers");
+const AppError = require("../utils/appError");
+const { verifyJwt } = require("../utils/jwt.js");
+const { createSendToken } = require("../utils/helpers");
+
+exports.authenticate = catchAsync(async (req, _res, next) => {
+  console.log("in authenticate");
+  let token =
+    (req.headers.authorization?.startsWith("Bearer") &&
+      req.headers.authorization.split(" ")[1]) ||
+    (typeof req.headers.cookie === "string"
+      ? req.headers.cookie.split("=")[1]
+      : undefined);
+
+  console.log(token);
+
+  console.log(token);
+  if (token === "null" || !token)
+    throw new AppError("You are not logged in! Please log in", 401);
+
+  const decoded = await verifyJwt(token);
+
+  console.log("decoded", decoded.id);
+  const freshUser =
+    (await User.findById(decoded.id).select("+role")) ||
+    (await Admin.findById(decoded.id).select("+role"));
+
+  if (!freshUser)
+    throw new AppError("The user belonging to this token does not exist.", 401);
+
+  if (freshUser.changePasswordAfter(decoded.iat))
+    throw new AppError(
+      "User recently changed password! Please log in again",
+      401
+    );
+
+  req.user = freshUser;
+
+  next();
+});
+
+exports.authenicateAdmin = catchAsync(async () => {});
+exports.authenticateUser = catchAsync(async () => {});
+
+exports.authorize = (...roles) =>
+  catchAsync(async (req, _res, next) => {
+    if (!roles.includes(req.user.role))
+      throw new AppError(
+        "You do not have permission to perform this action",
+        403
+      );
+
+    next();
+  });
+
+exports.verifyToken = (_req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Successfully authenticated",
+  });
+};
+
+exports.getUser = catchAsync(async (req, res) => {
+  if (!req.body.email) throw new AppError("Please provide an email", 400);
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) throw new AppError("User does not exist", 404);
+  res.status(200).json({
+    message: "success",
+    data: { user },
+  });
+});
+
+module.exports.userSignIn = catchAsync(async function (req, res) {
+  let user = await User.findOne({
+    email: req.body.email,
+    authType: "credentials",
+  });
+
+  if (user)
+    throw new AppError(
+      "You are already signed up with credentials. Please login with your credentials",
+      400
+    );
+
+  user = await User.findOne({
+    email: req.body.email,
+  });
+
+  if (!user)
+    user = await new User(req.body).save({
+      validateBeforeSave: false,
+    });
+
+  createSendToken(user, 200, res);
+});
+
+exports.userLogin = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    throw new AppError("Please provide email and password", 400);
+
+  const user = await User.findOne({ email, authType: "credentials" }).select(
+    "+password"
+  );
+
+  if (!user || !(await user.correctPassword(password, user.password)))
+    throw new AppError("Incorrect email or password", 401);
+
+  await createSendToken(user, 200, res);
+});
+
+exports.userSignUp = catchAsync(async (req, res) => {
+  let user = await User.findOne({ email: req.body.email });
+
+  if (user && user.authType === "credentials")
+    throw new AppError("Account already registered. Please log in", 409);
+
+  if (user && user.authType !== "credentials")
+    throw new AppError(
+      `Account already registered. Please sign in using ${user.authType}`,
+      409
+    );
+
+  const newUser = await User.create({ ...req.body, authType: "credentials" });
+  console.log(newUser);
+  user = await User.findById(newUser._id);
+
+  await createSendToken(user, 201, res);
+});
+
+exports.adminSignUp = catchAsync(async (req, res) => {
+  let admin = await Admin.findOne({ email: req.body.email });
+
+  if (admin && admin.authType === "credentials")
+    throw new AppError("Account already registered. Please log in", 409);
+
+  if (admin && admin.authType !== "credentials")
+    throw new AppError(
+      `Account already registered. Please sign in using ${admin.authType}`,
+      409
+    );
+
+  const newAdmin = await Admin.create({ ...req.body, authType: "credentials" });
+
+  await createSendToken(newAdmin, 201, res);
+});
+
+module.exports.adminSignIn = catchAsync(async function (req, res) {
+  let admin = await Admin.findOne({
+    email: req.body.email,
+    authType: "credentials",
+  });
+
+  if (admin)
+    throw new AppError(
+      "You are already signed up with credentials. Please login with your credentials",
+      400
+    );
+
+  admin = await Admin.findOne({
+    email: req.body.email,
+  });
+
+  if (!admin)
+    admin = await new Admin(req.body).save({
+      validateBeforeSave: false,
+    });
+
+  console.log("signin");
+
+  createSendToken(admin, 200, res);
+});
+
+exports.adminLogin = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    throw new AppError("Please provide email and password!", 400);
+
+  const admin = await Admin.findOne({ email, authType: "credentials" }).select(
+    "+password"
+  );
+
+  if (!admin || !(await admin.correctPassword(password, admin.password)))
+    throw new AppError("Incorrect email or password", 401);
+
+  await createSendToken(admin, 200, res);
+});
+
+module.exports.forgotUserPassword = catchAsync(async function (req, res) {
+  // find the userId based on email
+  const { email } = req.body;
+  if (!email) throw new AppError("Please provide an email", 400);
+
+  const user = await User.findOne({ email });
+
+  if (user && user.authType !== "credentials") {
+    throw new AppError(
+      `Your account is registered using ${user.authType}. Password reset is only available for accounts with 'credentials' authentication.`,
+      400
+    );
+  }
+
+  if (!user) throw new AppError("There is no user with email", 404);
+
+  const resetToken = user.createPasswordResetToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  // if user found
+  // send them a reset token.
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+
+  console.log(resetURL);
+  // try {
+  //   await sendEmail({
+  //     email: guest.email,
+  //     subject: "Your password reset token (valid for 10 min)",
+  //     message,
+  //   });
+
+  res.status(200).json({
+    status: "success",
+    message: "Token sent to email!",
+  });
+  // } catch (err) {
+  //   console.log(err);
+  //   guest.passwordResetToken = undefined;
+  //   guest.passwordResetTokenExpires = undefined;
+  //   await guest.save();
+
+  //   throw new AppError(
+  //     "There was an error sending the email. Try again later!",
+  //     500
+  //   );
+  // }
+});
+
+exports.resetUserPassword = catchAsync(async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpires: { $gt: Date.now() },
+  });
+
+  if (!user) throw new AppError("Token is invalid or has expired!", 400);
+
+  if (!password) throw new AppError("Please provide your password", 400);
+
+  if (!confirmPassword)
+    throw new AppError("Please confirm your new password", 400);
+
+  // if (!(await user.correctPassword(currPassword, user.password))) {
+  //   throw new AppError("Password is incorrect", 400);
+  // }
+  if (await user.correctPassword(password, user.password)) {
+    throw new AppError("New password cannot be the same as old password", 400);
+  }
+
+  user.password = password;
+  user.confirmPassword = confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpires = undefined;
+  await user.save({ validateBeforeSave: true });
+
+  createSendToken(user, 200, res);
+});
+
+module.exports.forgotAdminPassword = catchAsync(async function (req, res) {
+  // find the userId based on email
+  const { email } = req.body;
+  console.log(email);
+  if (!email) throw new AppError("Please provide an email", 400);
+
+  const admin = await Admin.findOne({ email });
+
+  console.log(admin);
+
+  if (admin && admin.authType !== "credentials") {
+    throw new AppError(
+      `Your account is registered using ${admin.authType}. Password reset is only available for accounts with 'credentials' authentication.`,
+      400
+    );
+  }
+
+  console.log(admin);
+
+  if (!admin) throw new AppError("There is no user with this email", 404);
+
+  const resetToken = admin.createPasswordResetToken();
+
+  await admin.save({ validateBeforeSave: false });
+
+  // if user found
+  // send them a reset token.
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+
+  console.log(resetURL);
+  // try {
+  //   await sendEmail({
+  //     email: guest.email,
+  //     subject: "Your password reset token (valid for 10 min)",
+  //     message,
+  //   });
+
+  res.status(200).json({
+    status: "success",
+    message: "Token sent to email!",
+  });
+  // } catch (err) {
+  //   console.log(err);
+  //   guest.passwordResetToken = undefined;
+  //   guest.passwordResetTokenExpires = undefined;
+  //   await guest.save();
+
+  //   throw new AppError(
+  //     "There was an error sending the email. Try again later!",
+  //     500
+  //   );
+  // }
+});
+
+exports.resetAdminPassword = catchAsync(async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const admin = await Admin.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpires: { $gt: Date.now() },
+  });
+
+  if (!admin) throw new AppError("Token is invalid or has expired!", 400);
+
+  if (!password) throw new AppError("Please provide your password", 400);
+
+  if (!confirmPassword)
+    throw new AppError("Please confirm your new password", 400);
+
+  // if (!(await user.correctPassword(currPassword, user.password))) {
+  //   throw new AppError("Password is incorrect", 400);
+  // }
+  if (await admin.correctPassword(password, admin.password)) {
+    throw new AppError("New password cannot be the same as old password", 400);
+  }
+
+  admin.password = password;
+  admin.confirmPassword = confirmPassword;
+  admin.passwordResetToken = undefined;
+  admin.passwordResetTokenExpires = undefined;
+  await admin.save({ validateBeforeSave: true });
+
+  createSendToken(admin, 200, res);
+});
+
+exports.updateMyPassword = catchAsync(async (req, res) => {
+  let user;
+  console.log("i am here");
+  if (req.user.role === "user") {
+    user = await User.findById(req.user.id).select("+password");
+  } else if (req.user.role === "admin") {
+    user = await Admin.findById(req.user.id).select("+password");
+  }
+
+  if (user && user.authType !== "credentials") {
+    throw new AppError(
+      `Your account is registered using ${user.authType}. Update password is only available for accounts with 'credentials' authentication.`,
+      400
+    );
+  }
+  if (!user) throw new AppError("User not found", 404);
+
+  const { currPassword, password, confirmPassword } = req.body;
+
+  if (!currPassword)
+    throw new AppError("Please provide your current password", 400);
+
+  if (!password) throw new AppError("Please provide your new password", 400);
+
+  if (!confirmPassword)
+    throw new AppError("Please confirm your new password", 400);
+
+  if (!(await user.correctPassword(currPassword, user.password))) {
+    throw new AppError("Password is incorrect", 400);
+  }
+  if (await user.correctPassword(password, user.password)) {
+    throw new AppError("New password cannot be the same as old password", 400);
+  }
+  user.password = password;
+  user.confirmPassword = confirmPassword;
+  await user.save({ validateBeforeSave: true });
+
+  createSendToken(user, 200, res);
+});
+
+exports.refreshToken = catchAsync(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  createSendToken(user, 200, res);
+});
