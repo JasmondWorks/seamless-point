@@ -1,0 +1,433 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --clr-brand-pry: #0daced;
+  --clr-brand-pry--light: #f0f9ff;
+  --clr-brand-pry--dark: #0b4c6f;
+  --clr-brand-sec: #f2844c;
+  --clr-brand-sec--light: #fef5ee;
+  --clr-green: #00a42e;
+  --clr-green--light: #bfe8ca;
+  --clr-red: #c00505;
+  --clr-red--light: #ecbdbe;
+  --clr-orange: #f2844c;
+  --clr-orange--light: #fde9d7;
+  --clr-blue: #0daced;
+  --clr-blue--light: #e0f3fe;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8.5px;
+  height: 8.5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply bg-neutral-200 rounded-lg;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-400 rounded-full;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-400;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1rem;
+}
+
+.container-custom {
+  max-width: 70em;
+  margin: 0 auto;
+  padding: 0 2em;
+}
+
+.rounded-big {
+  @apply rounded-2xl;
+}
+.rounded-small {
+  @apply rounded-xl;
+}
+.card {
+  @apply rounded-xl;
+  box-shadow: 4px 4px 5px rgba(0 0 0 /0.18);
+}
+.text-muted {
+  @apply text-black text-opacity-20;
+}
+.text-light {
+  @apply text-neutral-400;
+}
+.headline {
+  @apply text-4xl lg:text-5xl font-bold !leading-snug text-center;
+}
+
+.section-heading {
+  @apply text-2xl lg:text-3xl font-bold text-center mb-10 leading-snug;
+}
+.section-subheading {
+  @apply text-lg font-bold;
+}
+
+.section-heading.light {
+  @apply font-light;
+}
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ========================================== TAILWIND STYLES */
+@layer base {
+  /* Remove scrollbar */
+  .remove-scrollbar::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    border-radius: 0px;
+  }
+
+  .remove-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .remove-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 0px;
+  }
+
+  .remove-scrollbar::-webkit-scrollbar-thumb:hover {
+    /* background: #1e2238; */
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* ===== UTILITIES */
+  /* ===== TYPOGRAPHY */
+  .text-36-bold {
+    @apply text-[36px] leading-[40px] font-bold;
+  }
+
+  .text-24-bold {
+    @apply text-[24px] leading-[28px] font-bold;
+  }
+
+  .text-32-bold {
+    @apply text-[32px] leading-[36px] font-bold;
+  }
+
+  .text-18-bold {
+    @apply text-[18px] leading-[24px] font-bold;
+  }
+
+  .text-16-semibold {
+    @apply text-[16px] leading-[20px] font-semibold;
+  }
+
+  .text-16-regular {
+    @apply text-[16px] leading-[20px] font-normal;
+  }
+
+  .text-14-medium {
+    @apply text-[14px] leading-[18px] font-medium;
+  }
+
+  .text-14-regular {
+    @apply text-[14px] leading-[18px] font-normal;
+  }
+
+  .text-12-regular {
+    @apply text-[12px] leading-[16px] font-normal;
+  }
+
+  .text-12-semibold {
+    @apply text-[12px] leading-[16px] font-semibold;
+  }
+  /* =====  SHADCN OVERRIDES */
+  .shad-primary-btn {
+    @apply bg-green-500 text-white !important;
+  }
+
+  .shad-danger-btn {
+    @apply bg-red-700 text-white !important;
+  }
+
+  .shad-gray-btn {
+    @apply border border-neutral-500 cursor-pointer bg-neutral-400 text-white !important;
+  }
+
+  .shad-input-label {
+    @apply text-14-medium text-neutral-500 !important;
+  }
+
+  .shad-input {
+    @apply bg-white placeholder:text-neutral-500 border-neutral-300 h-11 focus-visible:ring-0 focus-visible:ring-offset-0  !important;
+  }
+
+  .shad-input-icon {
+    @apply bg-neutral-400 placeholder:text-neutral-600 border-neutral-500 h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+  }
+
+  .shad-textArea {
+    @apply bg-white placeholder:text-neutral-600 border-neutral-300 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+  }
+
+  .shad-combobox-item {
+    @apply data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 !important;
+  }
+
+  .shad-combobox-trigger {
+    @apply h-11 !important;
+  }
+
+  .shad-select-trigger {
+    @apply bg-white  placeholder:text-neutral-500  border-neutral-300 h-11 focus:ring-0 focus:ring-offset-0 !important;
+  }
+
+  .shad-select-content {
+    @apply bg-white border-neutral-300 !important;
+  }
+
+  .shad-dialog {
+    @apply bg-neutral-400 border-neutral-500 !important;
+  }
+
+  .shad-dialog button {
+    @apply focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
+  }
+
+  .shad-error {
+    @apply text-red-400 !important;
+  }
+
+  .shad-table {
+    @apply rounded-lg overflow-hidden !important;
+  }
+
+  .shad-table-row-header {
+    @apply border-b border-dark-400 text-light-200 hover:bg-transparent !important;
+  }
+
+  .shad-table-row {
+    @apply border-b border-dark-400 text-light-200 !important;
+  }
+
+  .shad-otp {
+    @apply w-full flex justify-between !important;
+  }
+
+  .shad-otp-slot {
+    @apply text-36-bold justify-center flex border border-neutral-500 rounded-lg size-16 gap-4 !important;
+  }
+
+  .shad-alert-dialog {
+    @apply space-y-5 bg-neutral-400 border-neutral-500 outline-none !important;
+  }
+
+  .shad-sheet-content button {
+    @apply top-2 focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
+  }
+
+  /* =====  REACT PHONE NUMBER INPUT OVERRIDES */
+  .input-phone {
+    @apply mt-2 h-11 text-sm border bg-white placeholder:text-neutral-600 border-neutral-300 relative rounded-md !important;
+  }
+  .input-phone input {
+    @apply rounded-md px-3 pl-14 h-full  outline-none w-full !important;
+    /* focus-visible:ring-1 focus-visible:ring-black */
+  }
+
+  .input-phone .PhoneInputCountry {
+    @apply absolute bottom-[50%] translate-y-[50%] px-3 h-full;
+  }
+  .input-phone .PhoneInputCountry:focus {
+    @apply bg-neutral-800;
+  }
+
+  /* =====  REACT DATE PICKER OVERRIDES */
+  .date-picker {
+    @apply overflow-hidden border-transparent w-full placeholder:text-neutral-600  h-11 text-14-medium rounded-md outline-none !important;
+  }
+}
+
+/* =====  REACT-DATEPICKER OVERRIDES */
+.react-datepicker-wrapper.date-picker {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+}
+.react-datepicker__header {
+  background-color: #fff !important;
+  border-bottom-color: rgba(0 0 0 /0.12) !important;
+}
+.react-datepicker {
+  border-color: rgba(0 0 0 /0.12) !important;
+  font-family: "__Plus_Jakarta_Sans_2fe2d6",
+    "__Plus_Jakarta_Sans_Fallback_2fe2d6" !important;
+}
+.react-datepicker__day,
+.react-datepicker__day-name {
+  --size: 35px;
+  width: var(--size) !important;
+  height: var(--size) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.react-datepicker__day {
+  color: #555 !important;
+}
+.react-datepicker,
+.react-datepicker__time,
+.react-datepicker__header,
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker-time__header {
+  font-weight: 500 !important;
+}
+.react-datepicker__day-name,
+.react-datepicker__time-name {
+  font-weight: 700 !important;
+}
+.react-datepicker__navigation {
+  top: 1rem !important;
+}
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--clr-brand-sec) !important;
+  color: #fff !important;
+}
+
+.react-datepicker__triangle {
+  stroke: rgba(0 0 0 /0.12) !important;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: #363a3d !important;
+}
+.react-datepicker__input-container {
+  background-color: #fff;
+  height: 100%;
+}
+.react-datepicker__input-container input {
+  background-color: #fff !important;
+  color: inherit;
+  width: 100%;
+  height: 100%;
+  padding: 0 0.75rem !important;
+  outline: none;
+}
+
+.react-datepicker__day--selected {
+  background-color: var(--clr-brand-sec) !important;
+  color: #ffffff !important;
+  border-radius: 4px;
+}
+
+h2.react-datepicker__current-month {
+  font-size: 1.15rem;
+  padding: 0.5rem 0 !important;
+  font-weight: 900 !important;
+  color: #333 !important;
+}
+.react-datepicker__navigation-icon::before {
+  border-color: #aaa !important;
+}
+.react-datepicker__day--outside-month {
+  color: #ccc !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: #24ae7c !important;
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid #363a3d !important;
+}
+
+.react-datepicker__time-list-item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* =====  REACT PHONE NUMBER INPUT OVERRIDES */
+.PhoneInputInput {
+  outline: none;
+  margin-left: 4px;
+  background: #1a1d21;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.PhoneInputInput::placeholder {
+  color: #1a1d21;
+}

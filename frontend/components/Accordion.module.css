@@ -1,0 +1,17 @@
+.accordionItem svg {
+  stroke: #888;
+  color: #888;
+
+  --size: 1.5rem;
+  height: var(--size);
+  width: var(--size);
+}
+.accordionItem[data-state="open"] svg {
+  stroke: #fff;
+  color: #fff;
+}
+
+.accordionItem button {
+  text-align: left;
+  align-items: flex-start;
+}
