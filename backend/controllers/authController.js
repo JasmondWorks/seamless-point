@@ -10,12 +10,15 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
   let token =
     (req.headers.authorization?.startsWith("Bearer") &&
       req.headers.authorization.split(" ")[1]) ||
-    (typeof req.headers.cookie === "string"
+    (req.headers.cookie.startsWith("jwt") &&
+    typeof req.headers.cookie === "string"
       ? req.headers.cookie.split("=")[1]
       : undefined);
 
   if (token === "null" || !token)
     throw new AppError("You are not logged in! Please log in", 401);
+
+  console.log("Token is", token);
 
   const decoded = await verifyJwt(token);
 
