@@ -10,7 +10,7 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
   let token =
     (req.headers.authorization?.startsWith("Bearer") &&
       req.headers.authorization.split(" ")[1]) ||
-    (req.headers.cookie.startsWith("jwt") &&
+    (req.headers.cookie?.startsWith("jwt") &&
     typeof req.headers.cookie === "string"
       ? req.headers.cookie.split("=")[1]
       : undefined);
