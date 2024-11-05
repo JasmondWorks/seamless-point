@@ -16,8 +16,8 @@ router.patch("/resetPassword/:token", authController.resetUserPassword);
 
 router.get(
   "/myDeliveries",
-  user.authenticate,
-  user.authorize("user"),
+  authController.authenticate,
+  authController.authorize("user"),
   userController.getMyDeliveries
 );
 
