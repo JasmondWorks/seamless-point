@@ -36,7 +36,12 @@ const userSchema = new mongoose.Schema({
       values: ["credentials", "google", "twitter", "facebook"],
       message: "Authtype is either: credentials, google, twitter or facebook ",
     },
+    default: "credentials",
     required: [true, "Please specify the authType"],
+  },
+  balance: {
+    type: Number,
+    default: 0,
   },
 
   role: { type: String, default: "user" },

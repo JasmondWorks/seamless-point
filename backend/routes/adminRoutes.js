@@ -5,7 +5,12 @@ const router = express.Router();
 
 router.post("/login", authController.adminLogin);
 
-router.post("/signup", authController.adminSignUp);
+router.post(
+  "/signup",
+  authController.authenticate,
+  authController.authorizeRootAdmin,
+  authController.adminSignUp
+);
 
 router.post("/signIn", authController.adminSignIn);
 

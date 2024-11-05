@@ -7,7 +7,6 @@ const { verifyJwt } = require("../utils/jwt.js");
 const { createSendToken } = require("../utils/helpers");
 
 exports.authenticate = catchAsync(async (req, _res, next) => {
-  console.log("in authenticate");
   let token =
     (req.headers.authorization?.startsWith("Bearer") &&
       req.headers.authorization.split(" ")[1]) ||
@@ -15,9 +14,6 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
       ? req.headers.cookie.split("=")[1]
       : undefined);
 
-  console.log(token);
-
-  console.log(token);
   if (token === "null" || !token)
     throw new AppError("You are not logged in! Please log in", 401);
 
@@ -56,6 +52,15 @@ exports.authorize = (...roles) =>
     next();
   });
 
+exports.authorizeRootAdmin = catchAsync(async (req, _res, next) => {
+  if (!req.user.isRoot)
+    throw new AppError(
+      "You do not have the priviledge as root admin to perform this action"
+    );
+
+  next();
+});
+
 exports.verifyToken = (_req, res) => {
   res.status(200).json({
     status: "success",
@@ -88,6 +93,8 @@ module.exports.userSignIn = catchAsync(async function (req, res) {
   user = await User.findOne({
     email: req.body.email,
   });
+
+  console.log(user, req.body.email);
 
   if (!user)
     user = await new User(req.body).save({
@@ -125,7 +132,7 @@ exports.userSignUp = catchAsync(async (req, res) => {
     );
 
   const newUser = await User.create({ ...req.body, authType: "credentials" });
-  console.log(newUser);
+
   user = await User.findById(newUser._id);
 
   await createSendToken(user, 201, res);
@@ -143,7 +150,14 @@ exports.adminSignUp = catchAsync(async (req, res) => {
       409
     );
 
-  const newAdmin = await Admin.create({ ...req.body, authType: "credentials" });
+  const existingAdmins = await Admin.find();
+  const isRoot = !existingAdmins.length ? true : false;
+
+  const newAdmin = await Admin.create({
+    ...req.body,
+    authType: "credentials",
+    isRoot,
+  });
 
   await createSendToken(newAdmin, 201, res);
 });
