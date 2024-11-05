@@ -56,6 +56,7 @@ const adminSchema = new mongoose.Schema({
       message: "Authtype is either: credentials, google, twitter or facebook ",
     },
   },
+  isRoot: { type: Boolean, default: false },
 
   active: { type: Boolean, default: true, select: false },
   passwordChangedAt: Date,

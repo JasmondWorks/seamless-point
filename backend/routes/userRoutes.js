@@ -1,5 +1,6 @@
 const express = require("express");
 const authController = require("../controllers/authController");
+const userController = require("../controllers/userController");
 
 const router = express.Router();
 
@@ -13,6 +14,13 @@ router.post("/forgotPassword", authController.forgotUserPassword);
 
 router.patch("/resetPassword/:token", authController.resetUserPassword);
 
+router.get(
+  "/myDeliveries",
+  authController.authenticate,
+  authController.authorize("user"),
+  userController.getMyDeliveries
+);
+
 router.patch(
   "/updateMyPassword",
   authController.authenticate,
@@ -20,10 +28,32 @@ router.patch(
   authController.updateMyPassword
 );
 
-// router.get("/me", authController.authenticate, authController.authorize("guest"), authController.Me);
+router.get(
+  "/me",
+  authController.authenticate,
+  authController.authorize("user"),
+  userController.Me
+);
 
-// router.patch("/updateMe", authController.authenticate, authController.authorize("guest"), authController.updateMe);
+router.patch(
+  "/updateMe",
+  authController.authenticate,
+  authController.authorize("user"),
+  userController.updateMe
+);
 
-// router.get("/", authController.authenticate, authController.authorize("admin"), guestController.getAllGuest);
+router.delete(
+  "/deleteMe",
+  authController.authenticate,
+  authController.authorize("user"),
+  userController.deleteMe
+);
+
+router.get(
+  "/",
+  authController.authenticate,
+  authController.authorize("admin"),
+  userController.getAllUser
+);
 
 module.exports = router;
