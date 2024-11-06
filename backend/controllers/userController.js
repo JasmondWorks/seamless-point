@@ -2,16 +2,8 @@ const Delivery = require("../models/deliveryModel");
 const User = require("../models/userModel");
 const APIFEATURES = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
-const { catchAsync } = require("../utils/helpers");
+const { catchAsync, filterObj } = require("../utils/helpers");
 const { sendSuccessResponseData } = require("../utils/helpers");
-
-const filterObj = function (obj, ...allowedFields) {
-  const newObject = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObject[el] = obj[el];
-  });
-  return newObject;
-};
 
 module.exports.getAllUser = catchAsync(async function (req, res) {
   const apiFeatures = new APIFEATURES(User, req.query)

@@ -18,8 +18,6 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
   if (token === "null" || !token)
     throw new AppError("You are not logged in! Please log in", 401);
 
-  console.log("Token is", token);
-
   const decoded = await verifyJwt(token);
 
   console.log("decoded", decoded.id);
@@ -41,9 +39,6 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
   next();
 });
 
-exports.authenicateAdmin = catchAsync(async () => {});
-exports.authenticateUser = catchAsync(async () => {});
-
 exports.authorize = (...roles) =>
   catchAsync(async (req, _res, next) => {
     if (!roles.includes(req.user.role))
@@ -55,6 +50,76 @@ exports.authorize = (...roles) =>
     next();
   });
 
+exports.verifyToken = (_req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Successfully authenticated",
+  });
+};
+
+exports.authenicateAdmin = catchAsync(async (req, res) => {
+  let token =
+    (req.headers.authorization?.startsWith("Bearer") &&
+      req.headers.authorization.split(" ")[1]) ||
+    (req.headers.cookie?.startsWith("jwt") &&
+    typeof req.headers.cookie === "string"
+      ? req.headers.cookie.split("=")[1]
+      : undefined);
+
+  if (token === "null" || !token)
+    throw new AppError("You are not logged in! Please log in", 401);
+
+  const decoded = await verifyJwt(token);
+
+  console.log("decoded", decoded.id);
+  const freshUser = await Admin.findById(decoded.id);
+
+  if (!freshUser)
+    throw new AppError("The user belonging to this token does not exist.", 401);
+
+  if (freshUser.changePasswordAfter(decoded.iat))
+    throw new AppError(
+      "User recently changed password! Please log in again",
+      401
+    );
+
+  res.status(200).json({
+    status: "success",
+    message: "Admin successfully authenticated",
+  });
+});
+
+exports.authenticateUser = catchAsync(async (req, res) => {
+  let token =
+    (req.headers.authorization?.startsWith("Bearer") &&
+      req.headers.authorization.split(" ")[1]) ||
+    (req.headers.cookie?.startsWith("jwt") &&
+    typeof req.headers.cookie === "string"
+      ? req.headers.cookie.split("=")[1]
+      : undefined);
+
+  if (token === "null" || !token)
+    throw new AppError("You are not logged in! Please log in", 401);
+
+  const decoded = await verifyJwt(token);
+
+  const freshUser = await User.findById(decoded.id);
+
+  if (!freshUser)
+    throw new AppError("The user belonging to this token does not exist.", 401);
+
+  if (freshUser.changePasswordAfter(decoded.iat))
+    throw new AppError(
+      "User recently changed password! Please log in again",
+      401
+    );
+
+  res.status(200).json({
+    status: "success",
+    message: "User Successfully authenticated",
+  });
+});
+
 exports.authorizeRootAdmin = catchAsync(async (req, _res, next) => {
   if (!req.user.isRoot)
     throw new AppError(
@@ -63,13 +128,6 @@ exports.authorizeRootAdmin = catchAsync(async (req, _res, next) => {
 
   next();
 });
-
-exports.verifyToken = (_req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "Successfully authenticated",
-  });
-};
 
 exports.getUser = catchAsync(async (req, res) => {
   if (!req.body.email) throw new AppError("Please provide an email", 400);

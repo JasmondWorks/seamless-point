@@ -40,6 +40,10 @@ const deliverySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  streetNumber: {
+    type: String,
+    required: true,
+  },
   aptUnit: {
     type: String,
   },
@@ -59,7 +63,7 @@ const deliverySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  summary: {
+  instructions: {
     type: String,
   },
   toCountry: {

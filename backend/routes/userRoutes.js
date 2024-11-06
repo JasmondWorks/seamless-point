@@ -14,6 +14,8 @@ router.post("/forgotPassword", authController.forgotUserPassword);
 
 router.patch("/resetPassword/:token", authController.resetUserPassword);
 
+router.get("/authenticate", authController.authenticateUser);
+
 router.get(
   "/myDeliveries",
   authController.authenticate,
@@ -28,26 +30,23 @@ router.patch(
   authController.updateMyPassword
 );
 
-router.get(
-  "/me",
-  authController.authenticate,
-  authController.authorize("user"),
-  userController.Me
-);
-
-router.patch(
-  "/updateMe",
-  authController.authenticate,
-  authController.authorize("user"),
-  userController.updateMe
-);
-
-router.delete(
-  "/deleteMe",
-  authController.authenticate,
-  authController.authorize("user"),
-  userController.deleteMe
-);
+router
+  .route("/me")
+  .get(
+    authController.authenticate,
+    authController.authorize("user"),
+    userController.Me
+  )
+  .patch(
+    authController.authenticate,
+    authController.authorize("admin"),
+    userController.updateMe
+  )
+  .delete(
+    authController.authenticate,
+    authController.authorize("admin"),
+    userController.deleteMe
+  );
 
 router.get(
   "/",

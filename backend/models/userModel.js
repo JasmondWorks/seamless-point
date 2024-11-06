@@ -3,6 +3,8 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
+const phoneNumberRegex = /^\+?[1-9]\d{1,14}$/;
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -11,6 +13,16 @@ const userSchema = new mongoose.Schema({
   lastName: {
     type: String,
     // required: [true, "Please provide a last name"],
+  },
+  phoneNumber: {
+    type: String,
+    required: [true, "Please provide your phone number"],
+    validate: {
+      validator: function (v) {
+        return phoneNumberRegex.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
   },
   dob: {
     type: Date,
@@ -43,7 +55,15 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-
+  city: {
+    type: String,
+  },
+  street: {
+    type: String,
+  },
+  streetNumber: {
+    type: String,
+  },
   role: { type: String, default: "user" },
   password: {
     type: String,
