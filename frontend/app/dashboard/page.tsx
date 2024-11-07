@@ -7,7 +7,7 @@ import BalanceDisplay from "./components/BalanceDisplay";
 import ActionButton from "./components/ActionButton";
 import Button, { ButtonVariant } from "@/components/Button";
 import Link from "next/link";
-import { useApp } from "../contexts/AppContext";
+import { useApp } from "../../contexts/AppContext";
 
 export default function DashboardPage() {
   // const role = useUserRole();

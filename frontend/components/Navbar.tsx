@@ -1,9 +1,9 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button, { ButtonVariant } from "./Button";
 import { usePathname } from "next/navigation";
 import { IoMenu } from "react-icons/io5";
-import { useApp } from "@/app/contexts/AppContext";
+import { useApp } from "@/contexts/AppContext";
 import { Bell } from "lucide-react";
 import Image from "next/image";
 
@@ -17,15 +17,28 @@ const siteRoutes = [
 export default function Navbar() {
   //   const pathname = usePathname();
   const { user } = useApp();
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const pathname = usePathname();
   const isDashboardPage = pathname.startsWith("/dashboard");
 
+  useEffect(() => {
+    const handleScroll = () => {
+      // Check if page has been scrolled down
+      setHasScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div
-      className={`flex items-center justify-between h-16 px-5 fixed top-0 bg-white w-full z-50 ${
-        isDashboardPage ? "border-b border-neutral-200" : ""
-      }`}
+      className={`flex items-center justify-between h-16 px-5 fixed top-0 bg-white w-full z-50 
+        ${
+          isDashboardPage ? "border-b border-neutral-200" : ""
+        } transition-shadow duration-300 
+        ${hasScrolled ? "shadow-md" : ""} bg-white`}
     >
       <Link href="/">
         <BrandLogo />

@@ -21,6 +21,7 @@ interface Props {
   isPrimaryDark?: boolean;
   isBig?: boolean;
   type?: string;
+  onClick?: any;
 }
 
 export default function Button({
