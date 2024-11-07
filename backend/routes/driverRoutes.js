@@ -12,4 +12,10 @@ router
   )
   .post(authController.authenticate, driverController.createDriver);
 
+router.get(
+  "/:id",
+  authController.authenticate,
+  authController.authorize("admin"),
+  driverController.getDriver
+);
 module.exports = router;

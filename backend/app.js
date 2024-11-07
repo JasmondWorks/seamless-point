@@ -13,6 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const deliveryRoutes = require("./routes/deliveryRoutes");
 const driverRoutes = require("./routes/driverRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 dotenv.config({ path: "./config.env" });
 
@@ -46,6 +47,8 @@ app.use("/api/v1/admins", adminRoutes);
 app.use("/api/v1/delivery", deliveryRoutes);
 
 app.use("/api/v1/drivers", driverRoutes);
+
+app.use("/api/v1/notifications", notificationRoutes);
 
 app.get("/", (_req, res) => {
   res.send("<h1>Deployment Check</h1>");

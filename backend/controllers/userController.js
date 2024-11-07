@@ -68,7 +68,7 @@ module.exports.Me = catchAsync(async function (req, res) {
   sendSuccessResponseData(res, "user", user);
 });
 
-module.exports.getMyDeliveries = catchAsync(async function (req, res) {
+module.exports.getMyDelivery = catchAsync(async function (req, res) {
   const apiFeatures = new APIFEATURES(
     Delivery.find({ user: req.user.id }),
     req.query

@@ -10,7 +10,24 @@ router
     authController.authorize("admin"),
     deliveryController.getAllDelivery
   )
-  .post(authController.authenticate, deliveryController.createDelivery);
+  .post(
+    authController.authenticate,
+    authController.authorize("user"),
+    deliveryController.createDelivery
+  );
+
+router
+  .route("/:id")
+  .patch(
+    authController.authenticate,
+    authController.authorize("admin", "user"),
+    deliveryController.updateDelivery
+  )
+  .delete(
+    authController.authenticate,
+    authController.authorize("admin", "user"),
+    deliveryController.deleteDelivery
+  );
 
 router.patch(
   "/:id/assignDriver",
@@ -18,4 +35,19 @@ router.patch(
   authController.authorize("admin"),
   deliveryController.assignDriver
 );
+
+router.patch(
+  "/:id/completed",
+  authController.authenticate,
+  authController.authorize("admin"),
+  deliveryController.completed
+);
+
+router.patch(
+  "/:id/cancelled",
+  authController.authenticate,
+  authController.authorize("admin", "user"),
+  deliveryController.cancelled
+);
+
 module.exports = router;

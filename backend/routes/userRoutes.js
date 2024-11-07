@@ -1,6 +1,7 @@
 const express = require("express");
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
+const notificationController = require("../controllers/notificationController");
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get(
   "/myDeliveries",
   authController.authenticate,
   authController.authorize("user"),
-  userController.getMyDeliveries
+  userController.getMyDelivery
 );
 
 router.patch(
@@ -47,6 +48,20 @@ router
     authController.authorize("admin"),
     userController.deleteMe
   );
+
+router.get(
+  "/me/delivery",
+  authController.authenticate,
+  authController.authorize("user"),
+  userController.getMyDelivery
+);
+
+router.get(
+  "/me/notifications",
+  authController.authenticate,
+  authController.authorize("user"),
+  notificationController.getMyNotifications
+);
 
 router.get(
   "/",
