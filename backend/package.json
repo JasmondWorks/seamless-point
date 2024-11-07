@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js",
+    "start:dev": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js"
   },
   "keywords": [],
@@ -12,9 +12,22 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "mongoose": "^8.7.1"
+    "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^5.13.22",
+    "nanoid": "^3.3.7",
+    "nodemailer": "^6.9.14",
+    "uuid": "^11.0.2",
+    "validator": "^13.12.0",
+    "xss-clean": "^0.1.4"
   }
 }
