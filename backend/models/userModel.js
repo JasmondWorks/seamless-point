@@ -5,91 +5,95 @@ const crypto = require("crypto");
 
 const phoneNumberRegex = /^\+?[1-9]\d{1,14}$/;
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, "Please provide a first name"],
-  },
-  lastName: {
-    type: String,
-    // required: [true, "Please provide a last name"],
-  },
-  phoneNumber: {
-    type: String,
-    required: [true, "Please provide your phone number"],
-    validate: {
-      validator: function (v) {
-        return phoneNumberRegex.test(v);
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: [true, "Please provide a first name"],
+    },
+    lastName: {
+      type: String,
+      // required: [true, "Please provide a last name"],
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, "Please provide your phone number"],
+      validate: {
+        validator: function (v) {
+          return phoneNumberRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid phone number!`,
       },
-      message: (props) => `${props.value} is not a valid phone number!`,
     },
-  },
-  dob: {
-    type: Date,
-    // required: [true, "Please provide a DOB"],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ["Male", "Female"],
-      message: "Gender is either: Male or Female",
+    dob: {
+      type: Date,
+      // required: [true, "Please provide a DOB"],
     },
-  },
-  email: {
-    type: String,
-    validate: [validator.isEmail, "Please provide a valid email"],
+    gender: {
+      type: String,
+      enum: {
+        values: ["Male", "Female"],
+        message: "Gender is either: Male or Female",
+      },
+    },
+    email: {
+      type: String,
+      validate: [validator.isEmail, "Please provide a valid email"],
 
-    required: [true, "Please provide a valid email"],
-    unique: true,
-  },
-  authType: {
-    type: String,
-    enum: {
-      values: ["credentials", "google", "twitter", "facebook"],
-      message: "Authtype is either: credentials, google, twitter or facebook ",
+      required: [true, "Please provide a valid email"],
+      unique: true,
     },
-    default: "credentials",
-    required: [true, "Please specify the authType"],
-  },
-  balance: {
-    type: Number,
-    default: 0,
-  },
-  city: {
-    type: String,
-  },
-  street: {
-    type: String,
-  },
-  streetNumber: {
-    type: String,
-  },
-  role: { type: String, default: "user" },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: [8, "Password must be at least 8 characters"],
-  },
-  confirmPassword: {
-    type: String,
-    validate: {
-      validator: function (el) {
-        return el === this.password;
+    authType: {
+      type: String,
+      enum: {
+        values: ["credentials", "google", "twitter", "facebook"],
+        message:
+          "Authtype is either: credentials, google, twitter or facebook ",
       },
-      message: "Passwords do not match!",
+      default: "credentials",
+      required: [true, "Please specify the authType"],
     },
-    required: [true, "Please confirm your password"],
+    balance: {
+      type: Number,
+      default: 0,
+    },
+    city: {
+      type: String,
+    },
+    street: {
+      type: String,
+    },
+    streetNumber: {
+      type: String,
+    },
+    role: { type: String, default: "user" },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: [8, "Password must be at least 8 characters"],
+    },
+    confirmPassword: {
+      type: String,
+      validate: {
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords do not match!",
+      },
+      required: [true, "Please confirm your password"],
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpires: Date,
+    latestTokenAssignedAt: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
   },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetTokenExpires: Date,
-  latestTokenAssignedAt: Date,
-  active: {
-    type: Boolean,
-    default: true,
-    select: false,
-  },
-});
+  { timestamps: true }
+);
 
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });

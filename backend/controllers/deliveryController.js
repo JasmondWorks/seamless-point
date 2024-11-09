@@ -1,5 +1,6 @@
 const Delivery = require("../models/deliveryModel");
 const Driver = require("../models/driverModel");
+const Notifications = require("../models/notificationModel");
 const APIFEATURES = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
 const { catchAsync, sendSuccessResponseData } = require("../utils/helpers");
@@ -7,7 +8,7 @@ const { catchAsync, sendSuccessResponseData } = require("../utils/helpers");
 module.exports.createDelivery = catchAsync(async (req, res) => {
   // Add logic to check available balance before creating a delivery
 
-  const newDelivery = await Delivery.create(req.body);
+  const newDelivery = await Delivery.create({ ...req.body, user: req.user.id });
 
   sendSuccessResponseData(res, "delivery", newDelivery);
 });
@@ -24,6 +25,21 @@ module.exports.getAllDelivery = catchAsync(async (req, res) => {
   const deliveries = await apiFeatures.query;
 
   sendSuccessResponseData(res, "delivery", deliveries, totalCount);
+});
+
+module.exports.getUserDelivery = catchAsync(async function (req, res) {
+  const apiFeatures = new APIFEATURES(
+    Delivery.find({ user: req.params.id }),
+    req.query
+  )
+    .filter()
+    .limitFields()
+    .sort()
+    .paginate();
+
+  const deliveries = await apiFeatures.query;
+
+  sendSuccessResponseData(res, "deliveries", deliveries);
 });
 
 module.exports.getDelivery = catchAsync(async (req, res) => {
@@ -111,7 +127,13 @@ module.exports.assignDriver = catchAsync(async (req, res) => {
 
   await delivery.save({ validateBeforeSave: true });
 
-  // send email to user that their package has been assigned a rider
+  // send email and notification to user that their package has been assigned a rider
+
+  await Notifications.create({
+    user: delivery.user,
+    title: "Delivery Confirmed!",
+    message: "A driver has been assigned, and your package is on its way.",
+  });
 
   sendSuccessResponseData(res, "delivery", delivery);
 });
@@ -127,39 +149,73 @@ module.exports.completed = catchAsync(async (req, res) => {
   delivery.status = "completed";
 
   await driver.save({ validateBeforeSave: true });
+
   await delivery.save({ validateBeforeSave: true });
+
+  await Notifications.create({
+    user: delivery.user,
+    title: "Delivery Successful!",
+    message:
+      "Your package has been delivered. Thank you for choosing our service.",
+    status: "success",
+  });
 
   sendSuccessResponseData(res, "delivery", delivery);
 
-  // Send an email to inform the user about the status of their delivery
+  // Send an email and notification to inform the user about the status of their delivery
 });
 
 module.exports.cancelled = catchAsync(async (req, res) => {
   const delivery = await Delivery.findOne({ trackingId: req.params.id });
+
+  const driverId = delivery.driver;
+
   if (!delivery) throw new AppError("This delivery dosen't exist", 404);
 
-  delivery.status = "cancelled";
-
-  if (user.role === "admin") {
+  if (req.user.role === "admin") {
     // allow admin to cancel deliveries that are already processed but cannot be completed for some reason
-    if (delivery.driver) {
-      const driver = await Driver.findById(delivery.driver);
+
+    if (driverId) {
+      const driver = await Driver.findById(driverId);
+
       if (!driver) throw new AppError("No Driver was found with that ID", 404);
 
-      delivery.driver = "";
+      delivery.driver = undefined;
       driver.status = "available";
+
+      await Notifications.create({
+        user: delivery.user,
+        title: "Delivery Cancelled",
+        message:
+          "We're sorry, but your delivery was cancelled. Please contact support if you need assistance.",
+        status: "warning",
+      });
 
       await driver.save({ validateBeforeSave: true });
     }
   } else {
-    if (delivery.status !== "unconfirmed")
+    if (delivery.status !== "unconfirmed") {
       throw new AppError(
         "This delivery has already been processed and cannot be cancelled. If you are sure you want to cancel your delivery contact support.",
         400
       );
+    }
+
+    await Notifications.create({
+      user: delivery.user,
+      title: "Delivery Cancelled",
+      message:
+        "Your delivery has been successfully cancelled as per your request. Reach out to support if you need further assistance.",
+      status: "info",
+    });
   }
 
+  // send email and notification
+
+  delivery.status = "cancelled";
   await delivery.save({ validateBeforeSave: true });
+
+  sendSuccessResponseData(res, "delivery", delivery);
 });
 
 module.exports.deleteDelivery = catchAsync(async (req, res) => {
@@ -171,11 +227,11 @@ module.exports.deleteDelivery = catchAsync(async (req, res) => {
 
   if (delivery.status !== "unconfirmed")
     throw new AppError(
-      "This delivery has already been processed and cannot be deleted",
+      "This delivery has already been processed and cannot be deleted. If you wish to cancel your delivery, please contact support",
       400
     );
 
   await Delivery.findOneAndDelete({ trackingId: req.params.id });
 
-  res.status(200).json({});
+  sendSuccessResponseData(res);
 });

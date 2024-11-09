@@ -2,6 +2,7 @@ const express = require("express");
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
 const notificationController = require("../controllers/notificationController");
+const deliveryController = require("../controllers/deliveryController");
 
 const router = express.Router();
 
@@ -16,13 +17,6 @@ router.post("/forgotPassword", authController.forgotUserPassword);
 router.patch("/resetPassword/:token", authController.resetUserPassword);
 
 router.get("/authenticate", authController.authenticateUser);
-
-router.get(
-  "/myDeliveries",
-  authController.authenticate,
-  authController.authorize("user"),
-  userController.getMyDelivery
-);
 
 router.patch(
   "/updateMyPassword",
@@ -60,8 +54,32 @@ router.get(
   "/me/notifications",
   authController.authenticate,
   authController.authorize("user"),
-  notificationController.getMyNotifications
+  userController.getMyNotifications
 );
+
+// router.get(
+//   "/me/transactions",
+//   authController.authenticate,
+//   authController.authorize("user"),
+//   notificationController.getMyNotifications
+// );
+
+router.get(
+  "/:id/delivery",
+  authController.authenticate,
+  authController.authorize("admin"),
+  deliveryController.getUserDelivery
+);
+
+router.get(
+  "/:id/notifications",
+  authController.authenticate,
+  authController.authorize("admin"),
+  notificationController.getUserNotifications
+);
+
+// Transactions
+// router.get("/:id/transactions", () => {});
 
 router.get(
   "/",

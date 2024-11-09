@@ -10,12 +10,27 @@ router
     authController.authorize("admin"),
     driverController.getAllDrivers
   )
-  .post(authController.authenticate, driverController.createDriver);
+  .post(
+    authController.authenticate,
+    authController.authorizeRootAdmin,
+    driverController.createDriver
+  );
 
-router.get(
-  "/:id",
-  authController.authenticate,
-  authController.authorize("admin"),
-  driverController.getDriver
-);
+router
+  .route("/:id")
+  .get(
+    authController.authenticate,
+    authController.authorize("admin"),
+    driverController.getDriver
+  )
+  .patch(
+    authController.authenticate,
+    authController.authorize("admin", "user"),
+    driverController.updateDriver
+  )
+  .delete(
+    authController.authenticate,
+    authController.authorizeRootAdmin,
+    driverController.deleteDriver
+  );
 module.exports = router;

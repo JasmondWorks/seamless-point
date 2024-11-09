@@ -1,9 +1,9 @@
 const { catchAsync, sendSuccessResponseData } = require("../utils/helpers");
-const ApiFeatures = require("../utils/apiFeatures");
+const APIFEATURES = require("../utils/apiFeatures");
 const Notifications = require("../models/notificationModel");
 
 module.exports.getAllNotifications = catchAsync(async (req, res) => {
-  const apiFeatures = new ApiFeatures(Notifications, req.query)
+  const apiFeatures = new APIFEATURES(Notifications, req.query)
     .filter()
     .limitFields()
     .sort()
@@ -13,15 +13,18 @@ module.exports.getAllNotifications = catchAsync(async (req, res) => {
 
   const notifications = await apiFeatures.query;
 
-  console.log(notifications);
   sendSuccessResponseData(res, "notifications", notifications, totalCount);
 });
 
-module.exports.getMyNotifications = catchAsync(async (req, res) => {
-  const apiFeatures = new ApiFeatures(
-    Notifications.find({ user: req.user.id }),
+module.exports.getUserNotifications = catchAsync(async function (req, res) {
+  const apiFeatures = new APIFEATURES(
+    Notifications.find({ user: req.params.id }),
     req.query
-  );
+  )
+    .filter()
+    .limitFields()
+    .sort()
+    .paginate();
 
   const notifications = await apiFeatures.query;
 

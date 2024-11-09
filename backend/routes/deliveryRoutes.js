@@ -18,6 +18,11 @@ router
 
 router
   .route("/:id")
+  .get(
+    authController.authenticate,
+    authController.authorize("admin", "user"),
+    deliveryController.getDelivery
+  )
   .patch(
     authController.authenticate,
     authController.authorize("admin", "user"),

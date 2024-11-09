@@ -21,7 +21,7 @@ const sendSuccessResponseData = (res, dataName, data, totalCount) => {
   res.status(200).json({
     ...(totalCount !== undefined && totalCount !== null ? { totalCount } : {}),
     status: "success",
-    results: data.length,
+    results: data?.length,
     data: responseData,
   });
 };

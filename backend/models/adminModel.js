@@ -5,64 +5,68 @@ const bcrypt = require("bcryptjs");
 
 const phoneNumberRegex = /^\+?[1-9]\d{1,14}$/;
 
-const adminSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, "Please tell us your first name"],
-  },
-  lastName: {
-    type: String,
-    required: [true, "Please tell us your last name"],
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide your email"],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, "Please provide a valid email"],
-  },
+const adminSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: [true, "Please tell us your first name"],
+    },
+    lastName: {
+      type: String,
+      required: [true, "Please tell us your last name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide your email"],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, "Please provide a valid email"],
+    },
 
-  phoneNumber: {
-    type: String,
-    required: [true, "Please provide your phone number"],
-    validate: {
-      validator: function (v) {
-        return phoneNumberRegex.test(v);
+    phoneNumber: {
+      type: String,
+      required: [true, "Please provide your phone number"],
+      validate: {
+        validator: function (v) {
+          return phoneNumberRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid phone number!`,
       },
-      message: (props) => `${props.value} is not a valid phone number!`,
     },
-  },
-  image: String,
-  role: { type: String, default: "admin" },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: [8, "Password must be at least 8 characters"],
-  },
-  confirmPassword: {
-    type: String,
-    validate: {
-      validator: function (el) {
-        return el === this.password;
+    image: String,
+    role: { type: String, default: "admin" },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: [8, "Password must be at least 8 characters"],
+    },
+    confirmPassword: {
+      type: String,
+      validate: {
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords do not match!",
       },
-      message: "Passwords do not match!",
+      required: [true, "Please confirm your password"],
     },
-    required: [true, "Please confirm your password"],
-  },
-  authType: {
-    type: String,
-    enum: {
-      values: ["credentials", "google", "twitter", "facebook"],
-      message: "Authtype is either: credentials, google, twitter or facebook ",
+    authType: {
+      type: String,
+      enum: {
+        values: ["credentials", "google", "twitter", "facebook"],
+        message:
+          "Authtype is either: credentials, google, twitter or facebook ",
+      },
     },
-  },
-  isRoot: { type: Boolean, default: false },
+    isRoot: { type: Boolean, default: false },
 
-  active: { type: Boolean, default: true, select: false },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetTokenExpires: Date,
-});
+    active: { type: Boolean, default: true, select: false },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpires: Date,
+  },
+  { timestamps: true }
+);
 
 // Pre-save middleware to hash password
 adminSchema.pre("save", async function (next) {

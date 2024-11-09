@@ -1,4 +1,5 @@
 const Delivery = require("../models/deliveryModel");
+const Notifications = require("../models/notificationModel");
 const User = require("../models/userModel");
 const APIFEATURES = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
@@ -46,8 +47,7 @@ module.exports.deleteMe = catchAsync(async (req, res) => {
 });
 
 module.exports.getUser = catchAsync(async function (req, res) {
-  const userId = req.params.id;
-  const user = await User.findById(userId);
+  const user = await User.findById(req.params.id);
   if (!user) throw new AppError("No user was found", 404);
 
   sendSuccessResponseData(res, "user", user);
@@ -83,20 +83,50 @@ module.exports.getMyDelivery = catchAsync(async function (req, res) {
   sendSuccessResponseData(res, "deliveries", deliveries);
 });
 
-module.exports.getUserDeliveries = catchAsync(async function (req, res) {
+module.exports.getMyNotifications = catchAsync(async function (req, res) {
   const apiFeatures = new APIFEATURES(
-    Delivery.find({ user: req.params.guestId }),
+    Notifications.find({ user: req.user.id }),
     req.query
   )
     .filter()
-    .limitFields()
     .sort()
-    .paginate();
+    .paginate()
+    .limitFields();
 
-  const deliveries = await apiFeatures.query;
+  const notifications = await apiFeatures.query;
 
-  sendSuccessResponseData(res, "deliveries", deliveries);
+  sendSuccessResponseData(res, "notifications", notifications);
 });
+
+// module.exports.getMyTransactions = catchAsync(async function (req, res) {
+//   const apiFeatures = new APIFEATURES(
+//     Transactions.find({ user: req.user.id }),
+//     req.query
+//   )
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .limitFields();
+
+//   const transactions = await apiFeatures.query;
+
+//   sendSuccessResponseData(res, "transactions", transactions);
+// });
+
+// module.exports.getUserTransactions = catchAsync(async function (req, res) {
+//   const apiFeatures = new APIFEATURES(
+//     Transactions.find({ user: req.params.guestId }),
+//     req.query
+//   )
+//     .filter()
+//     .limitFields()
+//     .sort()
+//     .paginate();
+
+//   const deliveries = await apiFeatures.query;
+
+//   sendSuccessResponseData(res, "deliveries", deliveries);
+// });
 
 // module.exports.updateGuest = catchAsync(async function (req, res) {
 //   return res.status(500).json({
