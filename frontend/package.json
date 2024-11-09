@@ -32,6 +32,7 @@
     "react-datepicker": "^7.5.0",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
+    "react-hot-toast": "^2.4.1",
     "react-phone-input-2": "^2.15.1",
     "react-phone-number-input": "^3.4.9",
     "react-slick": "^0.30.2",

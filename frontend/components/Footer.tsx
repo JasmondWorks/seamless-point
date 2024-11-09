@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { BrandLogo } from "./Navbar";
 import {
@@ -7,8 +9,14 @@ import {
   FaTwitter,
 } from "react-icons/fa";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isDashboardPage = pathname.startsWith("/dashboard");
+
+  if (isDashboardPage) return null;
+
   return (
     <footer className="bg-neutral-50 py-12">
       <div className="container-custom">
