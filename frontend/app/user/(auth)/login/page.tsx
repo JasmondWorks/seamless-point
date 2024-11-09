@@ -34,7 +34,7 @@ export default function SignIn() {
 
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", JSON.stringify(token));
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       toast.error(error.message);
     }
