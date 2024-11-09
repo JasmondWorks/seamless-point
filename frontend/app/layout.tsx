@@ -3,16 +3,16 @@ import "./globals.css";
 
 import { Toaster } from "react-hot-toast";
 
-import { Plus_Jakarta_Sans } from "@next/font/google";
+// import { Plus_Jakarta_Sans } from "@next/font/google";
 import Navbar from "../components/Navbar";
 import Footer from "@/components/Footer";
 import { AppProvider } from "../contexts/AppContext";
 import { AuthProvider } from "../contexts/AuthContext";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "600", "500", "700"], // Specify weights as needed
-});
+// const plusJakartaSans = Plus_Jakarta_Sans({
+//   subsets: ["latin"],
+//   weight: ["200", "300", "400", "600", "500", "700"], // Specify weights as needed
+// });
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -26,9 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${plusJakartaSans.className} antialiased overflow-x-hidden`}
-      >
+      <body className={`antialiased overflow-x-hidden`}>
         <AuthProvider>
           <AppProvider>
             <div
