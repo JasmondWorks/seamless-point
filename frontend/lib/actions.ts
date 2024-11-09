@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const URL = "https://seamless-point-one.vercel.app/api/v1";
 
 // Create User function with proper error handling
 export async function createUser(userDetails: any) {
   try {
     console.log(userDetails); // To check if the correct userDetails are passed
-    const response = await axios.post(`${baseUrl}/users`, userDetails); // Await the axios post request
+    const response = await axios.post(`${URL}/users`, userDetails); // Await the axios post request
     console.log(response); // Log the response for debugging
     return response.data; // Return the response data
   } catch (error) {
@@ -19,18 +19,27 @@ export async function createUser(userDetails: any) {
 }
 
 // Sign In User function with async/await
-export async function signInUser(userDetails: any) {
+export async function loginUser(userDetails: {
+  email: string;
+  password: string;
+}) {
   try {
-    const response = await axios.get(`${baseUrl}/signin`, {
-      params: userDetails, // Assuming userDetails are passed as query params
+    const response = await fetch(`${URL}/users/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
     });
-    console.log(response.data); // Log the response for debugging
-    return response.data; // Return the data received
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.log(`Axios error: ${error.message}`, error.response?.data);
-    } else {
-      console.log(`Non-Axios error: ${error}`);
-    }
-  }
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
+
+    const {
+      token,
+      data: { user },
+    } = data;
+
+    return { token, user };
+  } catch (error) {}
 }
