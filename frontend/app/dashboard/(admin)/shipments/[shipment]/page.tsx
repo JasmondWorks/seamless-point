@@ -4,10 +4,10 @@ import Card from "@/components/Card";
 import { title } from "process";
 import React from "react";
 
-export function generateStaticParams() {
-  // Temporary placeholder data
-  return [{ shipment: "example-id" }];
-}
+// export function generateStaticParams() {
+//   // Temporary placeholder data
+//   return [{ shipment: "example-id" }];
+// }
 
 export default function ShipmentDetails() {
   // const step = {
