@@ -13,6 +13,7 @@ import { Form } from "@/components/ui/form";
 import { createUser, loginUser } from "@/lib/actions";
 import ButtonFormSubmit from "@/components/ButtonFormSubmit";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function SignIn() {
   const form = useForm<z.infer<typeof baseUserSchema>>({
@@ -26,9 +27,17 @@ export default function SignIn() {
   async function onSubmit(data: z.infer<typeof baseUserSchema>) {
     console.log(data);
 
-    const res = await loginUser(data);
+    try {
+      const res = await loginUser(data);
+      const { user, token } = res;
+      console.log(res);
 
-    console.log(res);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", JSON.stringify(token));
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   }
 
   return (

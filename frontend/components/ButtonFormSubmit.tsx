@@ -17,7 +17,6 @@ export default function ButtonFormSubmit({
   icon,
   isReversed,
 }: Props) {
-  console.log("clicked");
   return (
     <Button
       onClick={onClick}
