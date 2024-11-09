@@ -24,11 +24,13 @@ export default function Home() {
                 Equipping business owners, eCommerce merchants, and individuals
                 with a platform to send and receive items locally
               </p>
-              <Button
-                variant={ButtonVariant.fill}
-                isPrimary
-                text="Start Shipping"
-              />
+              <Link href="/dashboard" className="inline-block">
+                <Button
+                  variant={ButtonVariant.fill}
+                  isPrimary
+                  text="Start Shipping"
+                />
+              </Link>
             </div>
             <svg
               className="hidden lg:block w-full h-auto max-w-xl scale-x-[-1] lg:scale-x-100"
