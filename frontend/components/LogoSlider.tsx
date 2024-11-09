@@ -63,35 +63,15 @@ export default function LogoSlider() {
 
   return (
     <Slider {...settings}>
-      {logos.map((logo, index) => (
+      {logos.map((logo) => (
         <Image
-          className="h-24 object-contain"
+          className="h-24 object-contain mb-5"
           width={100}
           height={100}
           src={`/assets/images/${logo}`}
           alt="logo"
         />
-        // <div>
-        // </div>
       ))}
-      {/* <div>
-        <h3>1</h3>
-      </div>
-      <div>
-        <h3>2</h3>
-      </div>
-      <div>
-        <h3>3</h3>
-      </div>
-      <div>
-        <h3>4</h3>
-      </div>
-      <div>
-        <h3>5</h3>
-      </div>
-      <div>
-        <h3>6</h3>
-      </div> */}
     </Slider>
   );
 }

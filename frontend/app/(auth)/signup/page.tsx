@@ -722,7 +722,10 @@ export default function SignUp() {
           style={{ boxShadow: "0 0 7px rgba(0 0 0 /.12)" }}
         >
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="px-16 py-8 space-y-8">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="px-16 py-8 space-y-8"
+            >
               <div className="flex gap-4 justify-center flex-wrap lg:flex-nowrap">
                 <Button
                   className="text-sm !px-3"
@@ -831,11 +834,13 @@ export default function SignUp() {
                 />
                 <p className="mt-5 flex items-center justify-center leading-snug gap-2">
                   Already have an account?{" "}
-                  <Button
-                    variant={ButtonVariant.link}
-                    className="underline px-0 py-0"
-                    text="Login here"
-                  />
+                  <Link href="/login">
+                    <Button
+                      variant={ButtonVariant.link}
+                      className="underline px-0 py-0"
+                      text="Login here"
+                    />
+                  </Link>
                 </p>
               </div>
             </form>

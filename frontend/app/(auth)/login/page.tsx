@@ -808,17 +808,19 @@ export default function SignIn() {
               </div>
               <div>
                 <ButtonFormSubmit
-                  text="Sign up"
+                  text="Sign in"
                   isReversed
                   icon={<FaChevronRight />}
                 />
                 <p className="mt-5 flex items-center justify-center leading-snug gap-2">
                   Don't have an account?{" "}
-                  <Button
-                    variant={ButtonVariant.link}
-                    className="underline !py-0 !h-0"
-                    text="Sign up now"
-                  />
+                  <Link href="/signup">
+                    <Button
+                      variant={ButtonVariant.link}
+                      className="underline !py-0 !h-0"
+                      text="Sign up now"
+                    />
+                  </Link>
                 </p>
               </div>
             </form>
