@@ -30,23 +30,23 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${plusJakartaSans.className} antialiased`}>
-        <div
-        // style={
-        //   isDashboardPage
-        //     ? { display: "grid", gridTemplateRows: "auto 1fr" }
-        //     : {}
-        // }
-        // className={`${isDashboardPage ? "min-h-screen" : ""}`}
-        >
-          <AuthProvider>
-            <AppProvider>
+      <body className={`${plusJakartaSans.className} antialiased overflow-x-hidden`}>
+        <AuthProvider>
+          <AppProvider>
+            <div
+            // style={
+            //   isDashboardPage
+            //     ? { display: "grid", gridTemplateRows: "auto 1fr" }
+            //     : {}
+            // }
+            // className={`${isDashboardPage ? "min-h-screen" : ""}`}
+            >
               <Navbar />
-              {children}
-            </AppProvider>
-          </AuthProvider>
-        </div>
-        {!isDashboardPage && <Footer />}
+              <div className="mt-16">{children}</div>
+            </div>
+            {!isDashboardPage && <Footer />}
+          </AppProvider>
+        </AuthProvider>
       </body>
     </html>
   );

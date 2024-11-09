@@ -3,6 +3,7 @@ import Button, { ButtonVariant } from "@/components/Button";
 import ButtonFormSubmit from "@/components/ButtonFormSubmit";
 
 import ImageSkillsGallery from "@/components/ImageSkillsGallery";
+import LogoSlider from "@/components/LogoSlider";
 import OurServices from "@/components/OurServices";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -1318,13 +1319,7 @@ export default function Home() {
       </section>
       <section className="py-3">
         <h2 className="light section-heading">Meet Our Partners</h2>
-        <div className="flex justify-center gap-10 p-5 flex-wrap">
-          {Array.from({ length: 15 }, (_, i) => (
-            <div className="bg-neutral-300 p-4" key={i}>
-              Logo {i + 1}
-            </div>
-          ))}
-        </div>
+        <LogoSlider />
       </section>
       <section className="py-16">
         <div className="container-custom">
@@ -1386,7 +1381,7 @@ export default function Home() {
         className="py-16"
         style={{
           background:
-            "var(--clr-brand-sec--light)  url('/assets/faq-illustration.png') no-repeat bottom right / 20%",
+            "var(--clr-brand-sec--light)  url('/assets/images/faq-illustration.png') no-repeat bottom right / 20%",
         }}
       >
         <div className="container-custom">
