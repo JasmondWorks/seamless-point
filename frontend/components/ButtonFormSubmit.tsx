@@ -2,7 +2,21 @@ import React from "react";
 import Button, { ButtonVariant } from "./Button";
 import clsx from "clsx";
 
-export default function ButtonFormSubmit({ text, className = "", onClick }) {
+interface Props {
+  text: string;
+  className?: string;
+  icon?: React.ReactNode;
+  onClick?: any;
+  isReversed: boolean;
+}
+
+export default function ButtonFormSubmit({
+  text,
+  className = "",
+  onClick,
+  icon,
+  isReversed,
+}: Props) {
   return (
     <Button
       onClick={onClick}
@@ -10,6 +24,8 @@ export default function ButtonFormSubmit({ text, className = "", onClick }) {
       className={clsx("py-10 h-12 font-normal w-full", className)}
       isRoundedLarge
       variant={ButtonVariant.fill}
+      isReversed={isReversed}
+      icon={icon}
     />
   );
 }

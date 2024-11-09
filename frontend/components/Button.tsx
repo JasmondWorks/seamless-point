@@ -14,7 +14,7 @@ interface Props {
   children?: React.ReactNode;
   text?: string;
   className?: string;
-  icon?: string | ReactElement;
+  icon?: React.ReactNode;
   isReversed?: boolean;
   isRoundedLarge?: boolean;
   isPrimary?: boolean;
@@ -43,7 +43,7 @@ export default function Button({
       type={type}
       onClick={onClick}
       className={clsx(
-        "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4", // Common classes
+        "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-12", // Common classes
         {
           "py-10": isBig,
           "bg-white text-brandSec":

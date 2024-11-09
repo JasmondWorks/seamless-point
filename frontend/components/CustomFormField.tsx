@@ -79,15 +79,6 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     case FormFieldType.INPUT:
       return (
         <div className="flex rounded-md border border-dark-500 bg-dark-400">
-          {/* {props.iconSrc && (
-            <Image
-              src={props.iconSrc}
-              height={24}
-              width={24}
-              alt={props.iconAlt || "icon"}
-              className="ml-2"
-            />
-          )} */}
           <FormControl>
             <Input
               placeholder={props.placeholder}
@@ -102,11 +93,6 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         <div className="flex bg-dark-400 items-center relative">
           <FormControl>
             <Input
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault(); // Prevent the Enter key from triggering the form submit
-                }
-              }}
               type={isPasswordVisible ? "text" : "password"}
               placeholder={
                 isPasswordVisible ? "123abc<>?.!" : props.placeholder
@@ -116,6 +102,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             />
           </FormControl>
           <button
+            tabIndex={0}
             onClick={(e) => {
               e.preventDefault();
               setIsPasswordVisible((cur) => !cur);

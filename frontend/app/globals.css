@@ -420,13 +420,13 @@ h2.react-datepicker__current-month {
 }
 
 /* =====  REACT PHONE NUMBER INPUT OVERRIDES */
-.PhoneInputInput {
+/* .PhoneInputInput {
   outline: none;
   margin-left: 4px;
   background: #1a1d21;
   font-size: 14px;
   font-weight: 500;
-}
+} */
 
 .PhoneInputInput::placeholder {
   color: #1a1d21;

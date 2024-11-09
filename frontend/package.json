@@ -34,7 +34,9 @@
     "react-hook-form": "^7.53.0",
     "react-phone-input-2": "^2.15.1",
     "react-phone-number-input": "^3.4.9",
+    "react-slick": "^0.30.2",
     "react-toastify": "^10.0.6",
+    "slick-carousel": "^1.8.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
