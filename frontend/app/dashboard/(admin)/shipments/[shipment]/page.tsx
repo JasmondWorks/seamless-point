@@ -4,12 +4,10 @@ import Card from "@/components/Card";
 import { title } from "process";
 import React from "react";
 
-// export async function generateStaticParams() {
-//   return categories.map((category) => ({
-//     category: urlParser(category.title), // Only return the category ID/slug for the URL
-//   }));
-// }
-
+export function generateStaticParams() {
+  // Temporary placeholder data
+  return [{ shipment: "example-id" }];
+}
 
 export default function ShipmentDetails() {
   // const step = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useApp } from "@/app/contexts/AppContext";
+import { useApp } from "@/contexts/AppContext";
 import styles from "./Navbar.module.css";
 
 import Link from "next/link";

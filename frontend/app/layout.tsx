@@ -7,7 +7,8 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import Navbar from "../components/Navbar";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
-import { AppProvider } from "./contexts/AppContext";
+import { AppProvider } from "../contexts/AppContext";
+import { AuthProvider } from "../contexts/AuthContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -38,10 +39,12 @@ export default function RootLayout({
         // }
         // className={`${isDashboardPage ? "min-h-screen" : ""}`}
         >
-          <AppProvider>
-            <Navbar />
-            {children}
-          </AppProvider>
+          <AuthProvider>
+            <AppProvider>
+              <Navbar />
+              {children}
+            </AppProvider>
+          </AuthProvider>
         </div>
         {!isDashboardPage && <Footer />}
       </body>

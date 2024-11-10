@@ -6,6 +6,7 @@ import ImageSkillsGallery from "@/components/ImageSkillsGallery";
 import OurServices from "@/components/OurServices";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -1348,12 +1349,14 @@ export default function Home() {
                 facilitate the seamless shipment of parcels and packages and the
                 offering of services by individuals state-wide.
               </p>
-              <Button
-                text="Start Shipping"
-                variant={ButtonVariant.outline}
-                isPrimary
-                isRoundedLarge
-              />
+              <Link className="inline-block" href="/dashboard">
+                <Button
+                  text="Start Shipping"
+                  variant={ButtonVariant.outline}
+                  isPrimary
+                  isRoundedLarge
+                />
+              </Link>
             </div>
           </div>
         </div>

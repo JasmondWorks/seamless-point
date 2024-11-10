@@ -1,12 +1,19 @@
 import React from "react";
 import Navbar from "./components/Navbar";
 import Image from "next/image";
+import useAuth from "@/hooks/useAuth";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // const isLoggedIn = useAuth(); // Check if the user is logged in, redirect if not
+
+  // if (!isLoggedIn) {
+  //   return <div>Redirecting...</div>; // Show a loading spinner or message while checking login state
+  // }
+
   return (
     <div
       // style={{ height: "calc(100vh - 4rem)" }}
