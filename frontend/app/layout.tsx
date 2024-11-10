@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { Plus_Jakarta_Sans } from "@next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import Navbar from "../components/Navbar";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";

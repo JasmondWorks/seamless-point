@@ -54,7 +54,7 @@ module.exports.updateDelivery = catchAsync(async (req, res) => {
 
   if (status)
     throw new AppError(
-      "This route is not meant for status updates. Use /assignDriver, /complete",
+      "This route is not meant for status updates. Use /assignDriver, /cancelled, /complete",
       400
     );
 
@@ -69,8 +69,11 @@ module.exports.updateDelivery = catchAsync(async (req, res) => {
 
   if (!delivery) throw new AppError("Delivery could not be found", 404);
 
-  if (delivery.status !== "unconfirmed") {
-    throw new AppError("You cannot update this delivery", 400);
+  if (delivery.status !== "unconfirmed" && req.user.role === "user") {
+    throw new AppError(
+      `You cannot update a ${delivery.status} delivery. Reach out to support if you need assistance.`,
+      400
+    );
   }
 
   sendSuccessResponseData(res, "delivery", delivery);
@@ -81,9 +84,17 @@ module.exports.assignDriver = catchAsync(async (req, res) => {
 
   if (!driverId) throw new AppError("Please specify a driver");
 
-  const delivery = await Delivery.findOne({ trackingId: req.params.id });
+  const delivery = await Delivery.findOne({
+    trackingId: req.params.id,
+  }).populate("user");
 
   if (!delivery) throw new AppError("Delivery does not exist", 404);
+
+  if (delivery.status !== "unconfirmed")
+    throw new AppError(
+      `You cannot assign a driver to a ${delivery.status} delivery.`,
+      400
+    );
 
   // To assign a driver;
   //1.  Check if the driver exists
@@ -113,8 +124,8 @@ module.exports.assignDriver = catchAsync(async (req, res) => {
 
   await delivery.save({ validateBeforeSave: true });
 
-  // send email and notification to user that their package has been assigned a rider
-  await new Email().sendDeliveryOngoing("olaoluwaolorede8@gmail.com");
+  // send email and notification to user that their package has been assigned a driver
+  new Email(delivery.user).sendDeliveryOngoing();
 
   await Notifications.create({
     user: delivery.user,
@@ -126,7 +137,14 @@ module.exports.assignDriver = catchAsync(async (req, res) => {
 });
 
 module.exports.completed = catchAsync(async (req, res) => {
-  const delivery = await Delivery.findOne({ trackingId: req.params.id });
+  const delivery = await Delivery.findOne({
+    trackingId: req.params.id,
+  }).populate("user");
+
+  if (delivery.status !== "ongoing")
+    throw new AppError(
+      `You cannot mark a delivery that is ${delivery.status} as conpleted.`
+    );
 
   const driver = await Driver.findById(delivery.driver);
 
@@ -139,6 +157,8 @@ module.exports.completed = catchAsync(async (req, res) => {
 
   await delivery.save({ validateBeforeSave: true });
 
+  new Email(delivery.user).sendDeliveryComplete();
+
   await Notifications.create({
     user: delivery.user,
     title: "Delivery Successful!",
@@ -148,12 +168,13 @@ module.exports.completed = catchAsync(async (req, res) => {
   });
 
   sendSuccessResponseData(res, "delivery", delivery);
-
-  // Send an email and notification to inform the user about the status of their delivery
 });
 
 module.exports.cancelled = catchAsync(async (req, res) => {
-  const delivery = await Delivery.findOne({ trackingId: req.params.id });
+  // only unconfirmed and ongoing can be cancelled
+  const delivery = await Delivery.findOne({
+    trackingId: req.params.id,
+  }).populate("user");
 
   const driverId = delivery.driver;
 
@@ -162,13 +183,21 @@ module.exports.cancelled = catchAsync(async (req, res) => {
   if (req.user.role === "admin") {
     // allow admin to cancel deliveries that are already processed but cannot be completed for some reason
 
+    if (delivery.status === "completed")
+      throw new AppError(
+        "You cannot cancel a delivery that is already marked completed",
+        400
+      );
+
     if (driverId) {
       const driver = await Driver.findById(driverId);
 
       if (!driver) throw new AppError("No Driver was found with that ID", 404);
 
       delivery.driver = undefined;
-      driver.status = "available";
+      delivery.status = driver.status = "available";
+
+      new Email(delivery.user).sendDeliveryCancelled();
 
       await Notifications.create({
         user: delivery.user,

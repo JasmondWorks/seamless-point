@@ -12,6 +12,7 @@ router
   )
   .post(
     authController.authenticate,
+    authController.authorize("admin"),
     authController.authorizeRootAdmin,
     driverController.createDriver
   );

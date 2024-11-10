@@ -19,21 +19,23 @@ class Email {
 
   async send({ file, subject, body = {} }) {
     const html = await ejs.renderFile(
-      path.join(__dirname, "../emails", `${file}.ejs`),
+      path.join(__dirname, "../emails/delivery/", `${file}.ejs`),
       {
         otp: body.otp,
         url: body.resetUrl,
         firstName: this.user.firstName,
+        trackingUrl: "#",
+        supportUrl: "#",
       }
     );
 
     try {
       await this.transporter.sendMail({
-        from: "noreply <seamlesspoint.est.24@gmail.com",
-        to,
+        from: "Seamless Point test@roware.xyz",
+        to: this.user.email,
         subject,
-        text,
         html,
+        text: htmlToText(html),
       });
       console.log("Message sent");
     } catch (error) {
@@ -42,38 +44,39 @@ class Email {
   }
 
   async sendWelcome() {
-    await this.send("welcome", "Welcome to the Payup Family 🎉");
+    await this.send({
+      file: "welcome",
+      subject: "Welcome to the Seamless Point Family 🎉",
+    });
   }
 
   async sendDeliveryComplete() {
     // Call the generic send method
-    await this.send({ file: "complete", subject: "Delivery Completed" });
-  }
-  async sendDeliveryFailed() {
-    // const subject = "Delivery Failed";
-    // const text = "Unfortunately, we could not complete your delivery.";
-    // const html = "<b>Unfortunately, we could not complete your delivery.</b>";
-
-    // // Call the generic send method
-    // await this.send({ to, subject, text, html });
-
     await this.send({
-      file: "failed",
+      file: "complete",
+      subject: "Delivery Completed",
+    });
+  }
+
+  async sendDeliveryFailed() {
+    await this.send({
+      file: "fail",
       subject: "Delivery Failed",
     });
   }
 
+  async sendDeliveryCancelled() {
+    await this.send({
+      file: "cancel",
+      subject: "Delivery Cancelled",
+    });
+  }
+
   async sendDeliveryOngoing() {
-    // const subject = "Delivery Ongoing";
-    // const text = "Your delivery has been assigned a driver.";
-    // const html = "<b>Your delivery has been assigned a driver.</b>";
-
-    // // Call the generic send method
-    // await this.send({ to, subject, text, html });
-
     await this.send({
       file: "ongoing",
       subject: "Delivery Ongoing",
+      body: { trackingURl: "#" },
     });
   }
 

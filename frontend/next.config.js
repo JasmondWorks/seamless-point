@@ -3,5 +3,7 @@ module.exports = {
   typescript: {
     ignoreBuildErrors: true, // Disables type checking during production builds
   },
-  output: "export",
+  images: {
+    unoptimized: true,
+  },
 };
