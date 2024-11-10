@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const phoneNumberRegex = /^\+?[1-9]\d{1,14}$/;
+
 const driverSchema = new mongoose.Schema(
   {
     firstname: {
@@ -12,16 +14,17 @@ const driverSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: true,
+      required: [true, "Please provide your phone number"],
+      validate: {
+        validator: function (v) {
+          return phoneNumberRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid phone number!`,
+      },
     },
     email: {
       type: String,
       required: true,
-    },
-    licenseNumber: {
-      type: String,
-      required: true,
-      unique: true,
     },
     vehicleType: {
       type: String,

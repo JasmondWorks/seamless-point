@@ -21,7 +21,7 @@ const sendSuccessResponseData = (res, dataName, data, totalCount) => {
   res.status(200).json({
     ...(totalCount !== undefined && totalCount !== null ? { totalCount } : {}),
     status: "success",
-    results: data.length,
+    results: data?.length,
     data: responseData,
   });
 };
@@ -63,8 +63,17 @@ const createSendToken = async (user, statusCode, res) => {
   });
 };
 
+const filterObj = function (obj, ...allowedFields) {
+  const newObject = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObject[el] = obj[el];
+  });
+  return newObject;
+};
+
 module.exports = {
   catchAsync,
   sendSuccessResponseData,
   createSendToken,
+  filterObj,
 };

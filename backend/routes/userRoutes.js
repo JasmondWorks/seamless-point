@@ -1,6 +1,8 @@
 const express = require("express");
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
+const notificationController = require("../controllers/notificationController");
+const deliveryController = require("../controllers/deliveryController");
 
 const router = express.Router();
 
@@ -14,12 +16,7 @@ router.post("/forgotPassword", authController.forgotUserPassword);
 
 router.patch("/resetPassword/:token", authController.resetUserPassword);
 
-router.get(
-  "/myDeliveries",
-  authController.authenticate,
-  authController.authorize("user"),
-  userController.getMyDeliveries
-);
+router.get("/authenticate", authController.authenticateUser);
 
 router.patch(
   "/updateMyPassword",
@@ -28,26 +25,61 @@ router.patch(
   authController.updateMyPassword
 );
 
+router
+  .route("/me")
+  .get(
+    authController.authenticate,
+    authController.authorize("user"),
+    userController.Me
+  )
+  .patch(
+    authController.authenticate,
+    authController.authorize("admin"),
+    userController.updateMe
+  )
+  .delete(
+    authController.authenticate,
+    authController.authorize("admin"),
+    userController.deleteMe
+  );
+
 router.get(
-  "/me",
+  "/me/delivery",
   authController.authenticate,
   authController.authorize("user"),
-  userController.Me
+  userController.getMyDelivery
 );
 
-router.patch(
-  "/updateMe",
+router.get(
+  "/me/notifications",
   authController.authenticate,
   authController.authorize("user"),
-  userController.updateMe
+  userController.getMyNotifications
 );
 
-router.delete(
-  "/deleteMe",
+// router.get(
+//   "/me/transactions",
+//   authController.authenticate,
+//   authController.authorize("user"),
+//   notificationController.getMyTransactions
+// );
+
+router.get(
+  "/:id/delivery",
   authController.authenticate,
-  authController.authorize("user"),
-  userController.deleteMe
+  authController.authorize("admin"),
+  userController.getUserDelivery
 );
+
+router.get(
+  "/:id/notifications",
+  authController.authenticate,
+  authController.authorize("admin"),
+  userController.getUserNotifications
+);
+
+// Transactions
+// router.get("/:id/transactions", () => {});
 
 router.get(
   "/",
