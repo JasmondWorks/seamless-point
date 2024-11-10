@@ -61,21 +61,21 @@ router.get(
 //   "/me/transactions",
 //   authController.authenticate,
 //   authController.authorize("user"),
-//   notificationController.getMyNotifications
+//   notificationController.getMyTransactions
 // );
 
 router.get(
   "/:id/delivery",
   authController.authenticate,
   authController.authorize("admin"),
-  deliveryController.getUserDelivery
+  userController.getUserDelivery
 );
 
 router.get(
   "/:id/notifications",
   authController.authenticate,
   authController.authorize("admin"),
-  notificationController.getUserNotifications
+  userController.getUserNotifications
 );
 
 // Transactions

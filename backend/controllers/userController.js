@@ -98,6 +98,36 @@ module.exports.getMyNotifications = catchAsync(async function (req, res) {
   sendSuccessResponseData(res, "notifications", notifications);
 });
 
+module.exports.getUserDelivery = catchAsync(async function (req, res) {
+  const apiFeatures = new APIFEATURES(
+    Delivery.find({ user: req.params.id }),
+    req.query
+  )
+    .filter()
+    .limitFields()
+    .sort()
+    .paginate();
+
+  const deliveries = await apiFeatures.query;
+
+  sendSuccessResponseData(res, "deliveries", deliveries);
+});
+
+module.exports.getUserNotifications = catchAsync(async function (req, res) {
+  const apiFeatures = new APIFEATURES(
+    Notifications.find({ user: req.params.id }),
+    req.query
+  )
+    .filter()
+    .limitFields()
+    .sort()
+    .paginate();
+
+  const notifications = await apiFeatures.query;
+
+  sendSuccessResponseData(res, "notifications", notifications);
+});
+
 // module.exports.getMyTransactions = catchAsync(async function (req, res) {
 //   const apiFeatures = new APIFEATURES(
 //     Transactions.find({ user: req.user.id }),

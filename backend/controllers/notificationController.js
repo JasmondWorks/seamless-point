@@ -16,21 +16,6 @@ module.exports.getAllNotifications = catchAsync(async (req, res) => {
   sendSuccessResponseData(res, "notifications", notifications, totalCount);
 });
 
-module.exports.getUserNotifications = catchAsync(async function (req, res) {
-  const apiFeatures = new APIFEATURES(
-    Notifications.find({ user: req.params.id }),
-    req.query
-  )
-    .filter()
-    .limitFields()
-    .sort()
-    .paginate();
-
-  const notifications = await apiFeatures.query;
-
-  sendSuccessResponseData(res, "notifications", notifications);
-});
-
 module.exports.getNotification = catchAsync(async (req, res) => {
   const notificationId = req.params.id;
 

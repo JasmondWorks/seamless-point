@@ -3,6 +3,7 @@ const Driver = require("../models/driverModel");
 const Notifications = require("../models/notificationModel");
 const APIFEATURES = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
+const Email = require("../utils/email");
 const { catchAsync, sendSuccessResponseData } = require("../utils/helpers");
 
 module.exports.createDelivery = catchAsync(async (req, res) => {
@@ -25,21 +26,6 @@ module.exports.getAllDelivery = catchAsync(async (req, res) => {
   const deliveries = await apiFeatures.query;
 
   sendSuccessResponseData(res, "delivery", deliveries, totalCount);
-});
-
-module.exports.getUserDelivery = catchAsync(async function (req, res) {
-  const apiFeatures = new APIFEATURES(
-    Delivery.find({ user: req.params.id }),
-    req.query
-  )
-    .filter()
-    .limitFields()
-    .sort()
-    .paginate();
-
-  const deliveries = await apiFeatures.query;
-
-  sendSuccessResponseData(res, "deliveries", deliveries);
 });
 
 module.exports.getDelivery = catchAsync(async (req, res) => {
@@ -128,6 +114,7 @@ module.exports.assignDriver = catchAsync(async (req, res) => {
   await delivery.save({ validateBeforeSave: true });
 
   // send email and notification to user that their package has been assigned a rider
+  await new Email().sendDeliveryOngoing("olaoluwaolorede8@gmail.com");
 
   await Notifications.create({
     user: delivery.user,
