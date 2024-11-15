@@ -1,20 +1,23 @@
 "use client";
 
+import Navbar from "@/app/_components/Navbar";
 import { usePathname } from "next/navigation";
-import Navbar from "./dashboard/components/Navbar";
 
 export default function NotFound() {
   const pathname = usePathname();
-  const isDashboardPage = pathname.startsWith("/dashboard");
+  // const isDashboardPage = pathname.startsWith("/dashboard");
 
-  if (isDashboardPage)
+  // if (isDashboardPage)
     return (
-      <div style={{minHeight: 'calc(100vh - 4rem'}} className="flex bg-neutral-50 mt-16">
+      <div
+        style={{ minHeight: "calc(100vh - 4rem" }}
+        className="flex bg-neutral-50 mt-16"
+      >
         <Navbar />
         <main
           style={{
             background:
-              "url('/assets/seamlesspoint-watermark.png') no-repeat fixed 98% 67%",
+              "url('/assets/images/seamlesspoint-watermark.png') no-repeat fixed 98% 67%",
           }}
           className="p-12 ml-20 lg:pe-28 flex-1"
         >
@@ -43,5 +46,5 @@ export default function NotFound() {
         </main>
       </div>
     );
-  return <div>404: Not found</div>;
+  // return <div>404: Not found</div>;
 }
