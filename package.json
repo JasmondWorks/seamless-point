@@ -6,7 +6,8 @@
     "start:dev_frontend": "cd ./frontend && npm run dev",
     "start:prod_frontend": "cd ./frontend && npm start",
     "start:dev": "npm run start:dev_backend && npm run start:dev_frontend",
-    "start:prod": "npm run start:prod_backend && npm run start:prod_frontend"
+    "start:prod": "npm run start:prod_backend && npm run start:prod_frontend",
+    "push-frontend": "git push origin-frontend"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
