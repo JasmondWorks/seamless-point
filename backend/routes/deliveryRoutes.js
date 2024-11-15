@@ -42,14 +42,14 @@ router.patch(
 );
 
 router.patch(
-  "/:id/completed",
+  "/:id/complete",
   authController.authenticate,
   authController.authorize("admin"),
   deliveryController.completed
 );
 
 router.patch(
-  "/:id/cancelled",
+  "/:id/cancel",
   authController.authenticate,
   authController.authorize("admin", "user"),
   deliveryController.cancelled

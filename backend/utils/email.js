@@ -19,7 +19,7 @@ class Email {
 
   async send({ file, subject, body = {} }) {
     const html = await ejs.renderFile(
-      path.join(__dirname, "../emails/delivery/", `${file}.ejs`),
+      path.join(__dirname, "../emails", `${file}.ejs`),
       {
         otp: body.otp,
         url: body.resetUrl,
