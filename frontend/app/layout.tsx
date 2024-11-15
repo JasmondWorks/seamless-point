@@ -3,16 +3,8 @@ import "./globals.css";
 
 import { Toaster } from "react-hot-toast";
 
-// import { Plus_Jakarta_Sans } from "@next/font/google";
-import Navbar from "../components/Navbar";
-import Footer from "@/components/Footer";
-import { AppProvider } from "../contexts/AppContext";
-import { AuthProvider } from "../contexts/AuthContext";
-
-// const plusJakartaSans = Plus_Jakarta_Sans({
-//   subsets: ["latin"],
-//   weight: ["200", "300", "400", "600", "500", "700"], // Specify weights as needed
-// });
+import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { UserAuthProvider } from "./_contexts/UserAuthContext";
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -25,25 +17,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`antialiased overflow-x-hidden`}>
-        <AuthProvider>
-          <AppProvider>
-            <div
-            // style={
-            //   isDashboardPage
-            //     ? { display: "grid", gridTemplateRows: "auto 1fr" }
-            //     : {}
-            // }
-            // className={`${isDashboardPage ? "min-h-screen" : ""}`}
-            >
-              <Navbar />
-              <div className="mt-16">{children}</div>
-            </div>
-            <Footer />
-          </AppProvider>
-        </AuthProvider>
-        <Toaster />
+    <html lang="en" className="text-[85%] md:text[90%] lg:text-[95%]">
+      <body className={`antialiased overflow-x-hidden no-scrollbar`}>
+        <UserAuthProvider>{children}</UserAuthProvider>
+        <Toaster
+          toastOptions={{
+            success: {
+              duration: 3000,
+              style: { background: "#4CAF50", color: "#fff" },
+            },
+            error: {
+              duration: 5000,
+              style: { background: "#F44336", color: "#fff" },
+            },
+            loading: {
+              duration: 3000,
+              style: { background: "#FF9800", color: "#fff" },
+            },
+          }}
+        />
       </body>
     </html>
   );

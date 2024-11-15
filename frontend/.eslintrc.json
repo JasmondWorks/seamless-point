@@ -3,9 +3,10 @@
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
     "react/no-unescaped-entities": "off",
-    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    // "@typescript-eslint/no-unused-vars": "warn",
-    // "react/no-unescaped-entities": "warn"
+    "@typescript-eslint/no-explicit-any": "error", // Disallow 'any' type
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"]
   }
 }
