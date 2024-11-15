@@ -3,7 +3,7 @@ import React from "react";
 import {
   deliveriesColumns,
   deliveriesData,
-} from "../components/table/deliveries";
+} from "@/app/_components/table/deliveries";
 
 export default function Deliveries() {
   return (

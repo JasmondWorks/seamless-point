@@ -1,5 +1,5 @@
-import BalanceDisplay from "@/app/user/dashboard/components/BalanceDisplay";
-import PrivacyPolicyBlock from "@/app/user/dashboard/components/PrivacyPolicyBlock";
+import BalanceDisplay from "@/app/_components/BalanceDisplay";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";

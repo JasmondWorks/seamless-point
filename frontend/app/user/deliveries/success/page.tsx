@@ -1,5 +1,5 @@
 import React from "react";
-import CopyPhoneNumber from "../../components/CopyPhoneNumber";
+import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
 
 export default function Success() {
   return (

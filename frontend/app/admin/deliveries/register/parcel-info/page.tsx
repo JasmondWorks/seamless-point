@@ -12,7 +12,6 @@ import {
   parcelItemSchema,
 } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import PrivacyPolicyBlock from "@/app/dashboard/components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -25,6 +24,7 @@ import { Label } from "@/app/_components/ui/label";
 import { formatCurrency } from "@/app/_lib/utils";
 import ParcelItemsinfo from "@/app/_components/ParcelItemsinfo";
 import { ConfirmDialog } from "@/app/_components/Dialogs/ConfirmDialog";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 
 const initialItems = [
   {

@@ -1,3 +1,4 @@
+"use server";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import DashboardNavbar from "@/app/_components/DashboardNavbar";
@@ -8,13 +9,13 @@ import Navbar from "../_components/Navbar";
 import { ScrollArea } from "../_components/ui/scroll-area";
 // import useAuth from "@/app/_hooks/useAuth";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoutes>
+    <ProtectedRoutes >
       <div className="h-screen flex flex-col">
         <Navbar />
         <div className="bg-neutral-50 flex-1 overflow-auto flex">

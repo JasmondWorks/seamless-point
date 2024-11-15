@@ -1,10 +1,10 @@
 import React from "react";
-import DepositAccountDetailsCard from "../components/DepositAccountDetailsCard";
+import DepositAccountDetailsCard from "@/app/_components/DepositAccountDetailsCard";
 import { Checkbox } from "@radix-ui/react-checkbox";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { Input } from "@/app/_components/ui/input";
-import PrivacyPolicyBlock from "../components/PrivacyPolicyBlock";
-import SelectDebitCardButton from "../components/SelectDebitCard";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
+import SelectDebitCardButton from "@/app/_components/SelectDebitCard";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 
 export default function Deposit() {

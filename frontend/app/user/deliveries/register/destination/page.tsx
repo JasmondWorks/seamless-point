@@ -12,7 +12,7 @@ import { Form } from "@/app/_components/ui/form";
 import { createUser } from "@/app/_lib/actions";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
-import PrivacyPolicyBlock from "@/app/dashboard/components/PrivacyPolicyBlock";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 
 export default function SignUp() {
   const form = useForm<z.infer<typeof deliverySourceSchema>>({

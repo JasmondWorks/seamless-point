@@ -10,9 +10,9 @@ import CustomFormField, {
 import { deliverySourceSchema, signUpSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
 import { createUser } from "@/app/_lib/actions";
-import PrivacyPolicyBlock from "@/app/dashboard/components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 
 export default function DeliverySource() {
   const form = useForm<z.infer<typeof deliverySourceSchema>>({
