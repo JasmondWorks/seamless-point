@@ -12,7 +12,8 @@ import {
   parcelItemSchema,
 } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import PrivacyPolicyBlock from "@/app/dashboard/components/PrivacyPolicyBlock";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
+
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
 import { useForm } from "react-hook-form";

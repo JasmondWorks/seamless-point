@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import BalanceDisplay from "../components/BalanceDisplay";
+
 import { Input } from "@/app/_components/ui/input";
-import SelectDebitCard from "../components/SelectDebitCard";
-import PrivacyPolicyBlock from "../components/PrivacyPolicyBlock";
+import SelectDebitCard from "@/app/_components/SelectDebitCard";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import {
@@ -18,6 +18,7 @@ import {
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import { AlertCircle, Check } from "lucide-react";
 import { Label } from "@/app/_components/ui/label";
+import BalanceDisplay from "@/app/_components/BalanceDisplay";
 
 export default function Withdraw() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

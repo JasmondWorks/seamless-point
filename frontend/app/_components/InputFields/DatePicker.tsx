@@ -5,14 +5,16 @@ import { FormControl } from "../ui/form";
 
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import CustomSelect from "../CustomSelect";
 
-export default function DatePicker() {
+export default function DatePicker({ props, field }) {
   const [startDate, setStartDate] = useState(new Date());
   // Generate years for the select dropdown
   const currentYear = startDate.getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => currentYear - 50 + i);
 
-  const handleYearChange = (year) => {
+  const handleYearChange = (year: number) => {
     const newDate = new Date(startDate);
     newDate.setFullYear(year);
     setStartDate(newDate);
@@ -34,7 +36,12 @@ export default function DatePicker() {
           showYearDropdown // Enables year dropdown
           dropdownMode="select" // Optional: uses a select dropdown instead of scrolling
           selected={field.value}
-          onChange={(date: Date) => field.onChange(date)}
+          onChange={(
+            date: Date | null,
+            event?:
+              | React.MouseEvent<HTMLElement>
+              | React.KeyboardEvent<HTMLElement>
+          ) => field.onChange(date)}
           timeInputLabel="Time:"
           dateFormat={props.dateFormat ?? "MM/dd/yyyy"}
           wrapperClassName="date-picker"
@@ -82,7 +89,7 @@ export default function DatePicker() {
             </select> */}
                 <CustomSelect
                   value={date.getFullYear()}
-                  onChange={(year) => changeYear(Number(year))}
+                  onChange={(year: number) => changeYear(Number(year))}
                   options={years}
                 />
               </span>

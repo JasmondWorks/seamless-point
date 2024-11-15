@@ -1,6 +1,6 @@
 import React from "react";
-// import StepsMarker from "../components/StepsMarker";
 import DeliveryStatuses from "../components/DeliveryStatuses";
+// import StepsMarker from "@/app/_components/StepsMarker";
 // export function generateStaticParams() {
 //   // Temporary placeholder data
 //   return [{ trackingNumber: "example-id" }];
