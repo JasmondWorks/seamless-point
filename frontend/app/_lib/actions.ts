@@ -198,3 +198,27 @@ export async function getUser() {
 
   return user;
 }
+export async function createDelivery(deliveryDetails: any) {
+  const token = getUserToken();
+
+  console.log(deliveryDetails);
+
+  const res = await fetch(`${URL}/delivery`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(deliveryDetails),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) throw new Error(data.message);
+
+  const {
+    data: { delivery },
+  } = data;
+
+  return delivery;
+}

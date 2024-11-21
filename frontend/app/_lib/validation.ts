@@ -6,6 +6,7 @@ export const emailSchema = z.object({
     .string({
       required_error: "Please provide an email address",
     })
+    .trim()
     .email("Please provide a valid email address"),
 });
 export const resetPasswordSchema = z
@@ -14,11 +15,13 @@ export const resetPasswordSchema = z
       .string({
         required_error: "Please provide a password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
     confirmPassword: z
       .string({
         required_error: "Please confirm your password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
   })
   .superRefine((data, ctx) => {
@@ -36,16 +39,19 @@ export const changePasswordSchema = z
       .string({
         required_error: "Please provide your current password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
     password: z
       .string({
         required_error: "Please provide a new password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
     confirmPassword: z
       .string({
         required_error: "Please confirm your new password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
   })
   .superRefine((data, ctx) => {
@@ -63,16 +69,19 @@ export const updateUserSchema = z
       .string({
         required_error: "Please provide a first name",
       })
+      .trim()
       .min(1, "Please provide a first name"),
     lastName: z
       .string({
         required_error: "Please provide a last name",
       })
+      .trim()
       .min(1, "Please provide a last name"),
     phoneNumber: z
       .string({
         required_error: "Phone number is required",
       })
+      .trim()
       .min(10, { message: "Phone number must be at least 10 digits long" })
       .regex(/^\+?\d{10,14}$/, {
         message: "Phone number must be valid and can include a country code",
@@ -81,11 +90,13 @@ export const updateUserSchema = z
       .string({
         required_error: "Please provide a password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
     confirmPassword: z
       .string({
         required_error: "Please confirm your password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
   })
   .superRefine((data, ctx) => {
@@ -103,6 +114,7 @@ export const baseUserSchema = z.object({
     .string({
       required_error: "Password is required",
     })
+    .trim()
     .min(8, "Password must be at least 8 characters"), // Ensure password length
 });
 
@@ -113,16 +125,19 @@ export const signUpSchema = baseUserSchema
       .string({
         required_error: "Please provide a first name",
       })
+      .trim()
       .min(1, "Please provide a first name"),
     lastName: z
       .string({
         required_error: "Please provide a last name",
       })
+      .trim()
       .min(1, "Please provide a last name"),
     phoneNumber: z
       .string({
         required_error: "Phone number is required",
       })
+      .trim()
       .min(10, { message: "Phone number must be at least 10 digits long" })
       .regex(/^\+?\d{10,14}$/, {
         message: "Phone number must be valid and can include a country code",
@@ -131,11 +146,13 @@ export const signUpSchema = baseUserSchema
       .string({
         required_error: "Please provide a password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
     confirmPassword: z
       .string({
         required_error: "Please confirm your password",
       })
+      .trim()
       .min(8, "Password must be at least 8 characters"),
   })
   .superRefine((data, ctx) => {
@@ -154,43 +171,57 @@ export const signInSchema = baseUserSchema;
 export const deliverySourceSchema = z.object({
   country: z
     .string({
-      required_error: "Please provide a first country",
+      required_error: "Please provide a country",
     })
+    .trim()
     .min(1, "Please provide a country"),
-  firstName: z
+  state: z
+    .string({
+      required_error: "Please provide a state",
+    })
+    .trim()
+    .min(1, "Please provide a country"),
+  firstname: z
     .string({
       required_error: "Please provide a first name",
     })
+    .trim()
     .min(1, "Please provide a first name"),
-  lastName: z
+  lastname: z
     .string({
       required_error: "Please provide a last name",
     })
+    .trim()
     .min(1, "Please provide a last name"),
   city: z
     .string({
       required_error: "Please provide a city",
     })
+    .trim()
     .min(1, "Please provide a city"),
   street: z
     .string({
       required_error: "Please provide a street",
     })
+    .trim()
     .min(1, "Please provide a street"),
-  unit: z
+  aptUnit: z
     .string({
       required_error: "Please provide an apartment/unit",
     })
+    .trim()
     .min(1, "Please provide an apartment/unit"),
   email: z
     .string({
       required_error: "Please provide a valid email",
     })
+    .trim()
     .email("Please provide a valid email"),
-  phone: z
+  phoneNumber: z
     .string({
       required_error: "Phone number is required",
     })
+    .trim()
     .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
     .regex(/^[+]?\d{10,14}$/, {
       message: "Phone number must be valid and can include a country code",
@@ -199,15 +230,80 @@ export const deliverySourceSchema = z.object({
     .string({
       required_error: "Please provide a delivery title",
     })
+    .trim()
     .min(1, "Please provide a delivery title"),
-  amountOfItems: z.number({
-    required_error: "Please specify the amount of items",
-  }),
-  deliverySummary: z
+  summary: z
     .string({
       required_error: "Please provide a delivery summary",
     })
+    .trim()
     .min(1, "Please provide a delivery summary"),
+  amountOfItems: z.number(),
+  instructions: z
+    .string({
+      required_error: "Please provide a delivery summary",
+    })
+    .trim()
+    .min(1, "Please provide a delivery summary"),
+});
+export const deliveryDestinationSchema = z.object({
+  toCountry: z
+    .string({
+      required_error: "Please provide a country",
+    })
+    .trim()
+    .min(1, "Please provide a country"),
+  toState: z
+    .string({
+      required_error: "Please provide a state",
+    })
+    .trim()
+    .min(1, "Please provide a country"),
+  toFirstname: z
+    .string({
+      required_error: "Please provide a first name",
+    })
+    .trim()
+    .min(1, "Please provide a first name"),
+  toLastname: z
+    .string({
+      required_error: "Please provide a last name",
+    })
+    .trim()
+    .min(1, "Please provide a last name"),
+  toCity: z
+    .string({
+      required_error: "Please provide a city",
+    })
+    .trim()
+    .min(1, "Please provide a city"),
+  toStreet: z
+    .string({
+      required_error: "Please provide a street",
+    })
+    .trim()
+    .min(1, "Please provide a street"),
+  toAptUnit: z
+    .string({
+      required_error: "Please provide an apt/unit",
+    })
+    .trim()
+    .min(1, "Please provide an apt/unit"),
+  toEmail: z
+    .string({
+      required_error: "Please provide a valid email",
+    })
+    .trim()
+    .email("Please provide a valid email"),
+  toPhone: z
+    .string({
+      required_error: "Phone number is required",
+    })
+    .trim()
+    .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
+    .regex(/^[+]?\d{10,14}$/, {
+      message: "Phone number must be valid and can include a country code",
+    }),
 });
 
 export const parcelItemSchema = z.object({
@@ -215,21 +311,25 @@ export const parcelItemSchema = z.object({
     .string({
       required_error: "Please provide an item name",
     })
+    .trim()
     .min(1, "Please provide an item name"),
   itemCategory: z
     .string({
       required_error: "Please provide an item category",
     })
+    .trim()
     .min(1, "Please provide an item category"),
   itemSubCategory: z
     .string({
       required_error: "Please provide an item subcategory",
     })
+    .trim()
     .min(1, "Please provide an item subcategory"),
   hsCode: z
     .string({
       // required_error: "HS code is required",
     })
+    .trim()
     .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
     .regex(/^[+]?\d{10,14}$/, {
       message: "Phone number must be valid and can include a country code",
@@ -252,11 +352,13 @@ export const parcelDocumentSchema = z.object({
     .string({
       required_error: "Please provide an item name",
     })
+    .trim()
     .min(1, "Please provide an item name"),
   itemDescription: z
     .string({
       required_error: "Please provide an item description",
     })
+    .trim()
     .min(1, "Please provide an item category"),
   weight: z.preprocess(
     (val) => (val === "" ? 1 : Number(val)), // Convert empty input to 1 as a default

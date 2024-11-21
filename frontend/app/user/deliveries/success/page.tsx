@@ -1,7 +1,8 @@
 import React from "react";
 import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
 
-export default function Success() {
+export default function Success({ searchParams }) {
+  const { trackingNum } = searchParams;
   return (
     <div className="text-center flex flex-col gap-10 items-center">
       <div>
@@ -49,7 +50,7 @@ export default function Success() {
         Track your package here
       </span>
       <div>
-        <CopyPhoneNumber />
+        <CopyPhoneNumber text={trackingNum} />
         <span className="text-left text-opacity-80">Copy tracking number</span>
       </div>
     </div>
