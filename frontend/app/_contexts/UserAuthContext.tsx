@@ -29,6 +29,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   function logout() {
     localStorage.removeItem("user");
     setUser(null);
+    Cookies.remove("token");
     // setAuthenticated(false);
   }
   function login(user: User | null, token: string) {
