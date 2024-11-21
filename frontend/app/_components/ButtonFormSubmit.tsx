@@ -25,7 +25,7 @@ export default function ButtonFormSubmit({
       disabled={isLoading}
       onClick={onClick}
       text={isLoading ? <Loader /> : text}
-      className={clsx("py-10 !h-11 font-normal w-full", className)}
+      className={clsx("py-10 !h-11 items-center font-normal w-full", className)}
       isRoundedLarge
       variant={ButtonVariant.fill}
       isReversed={isReversed}

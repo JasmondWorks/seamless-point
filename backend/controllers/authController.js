@@ -107,7 +107,7 @@ module.exports.userSignIn = catchAsync(async function (req, res) {
   createSendToken(user, 200, res);
 });
 
-exports.userLogin = catchAsync(async (req, res) => {
+exports.loginUser = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
     throw new AppError("Please provide email and password", 400);
@@ -122,7 +122,7 @@ exports.userLogin = catchAsync(async (req, res) => {
   await createSendToken(user, 200, res);
 });
 
-exports.userSignUp = catchAsync(async (req, res) => {
+exports.signupUser = catchAsync(async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
 
   if (user && user.authType === "credentials")
@@ -141,7 +141,7 @@ exports.userSignUp = catchAsync(async (req, res) => {
   await createSendToken(user, 201, res);
 });
 
-exports.adminSignUp = catchAsync(async (req, res) => {
+exports.signupAdmin = catchAsync(async (req, res) => {
   let admin = await Admin.findOne({ email: req.body.email });
 
   if (admin && admin.authType === "credentials")

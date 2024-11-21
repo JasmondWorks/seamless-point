@@ -3,24 +3,25 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Button, { ButtonVariant } from "./Button";
-import { usePathname } from "next/navigation";
-import { IoMenu } from "react-icons/io5";
-import { useApp } from "../_contexts/AppContext";
-import { Bell } from "lucide-react";
 import Image from "next/image";
+import { FiMenu } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 import { useUserAuth } from "../_contexts/UserAuthContext";
+import { Bell } from "lucide-react";
+import { usePathname } from "next/navigation";
 
-const siteRoutes = [
+const navLinks = [
   { title: "Home", href: "/" },
   { title: "About us", href: "/about-us" },
   { title: "Products", href: "/products" },
   { title: "F.A.Q", href: "/faqs" },
   { title: "Contact us", href: "/contact-us" },
 ];
-export default function Navbar() {
-  const { user } = useUserAuth();
-  // const user = null;
+export default function Navbar({ className = "" }) {
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [isNavShowing, setIsNavShowing] = useState(false);
+  const { user } = useUserAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,35 +35,106 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    setIsNavShowing(false);
+  }, [pathname]);
+
+  function handleShowNav() {
+    setIsNavShowing(true);
+  }
+  function handleHideNav() {
+    setIsNavShowing(false);
+  }
+
   return (
     <div
-      className={`flex items-center justify-between py-2 px-5 bg-white w-full z-50 
+      className={`flex flex-col md:flex-row md:items-center justify-between py-2 px-5 md:pb-2 bg-white w-full z-50 gap-x-12 md:gap-20 
         border-b border-neutral-200 transition-shadow duration-300 
-        ${hasScrolled ? "shadow-md" : ""} bg-white`}
+        ${hasScrolled ? "shadow-md" : ""} ${
+        isNavShowing ? "pb-5" : ""
+      } ${className}`}
     >
-      <Link href="/">
-        <BrandLogo />
-      </Link>
-      <div className="flex gap-5 items-center">
-        <div className="relative translate-y-1">
-          <Bell opacity={0.65} size={20} />
-          <div className="absolute top-0 font-bold right-0 translate-x-[20%] translate-y-[-40%] w-4 h-4 grid place-items-center rounded-full text-xs bg-orange-500 text-white">
-            2
+      <div
+        className={`flex items-center w-full ${
+          !user ? "md:w-fit" : ""
+        } justify-between`}
+      >
+        <Link href="/">
+          <BrandLogo />
+        </Link>
+        {!isNavShowing && !user && (
+          <button onClick={handleShowNav}>
+            <FiMenu className="text-3xl md:hidden" />
+          </button>
+        )}
+        {isNavShowing && !user && (
+          <button onClick={handleHideNav}>
+            <IoClose className="text-3xl md:hidden" />
+          </button>
+        )}
+        {user && (
+          <div className="flex items-center gap-8 md:gap-10">
+            <Link href="/user/notifications" className="relative">
+              <Bell className="text-neutral-600" />
+              <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
+                2
+              </span>
+            </Link>
+            <Image
+              width={50}
+              height={50}
+              alt="profile"
+              src="/assets/images/avatar.jpg"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+          </div>
+        )}
+      </div>
+      {!user && (
+        <div
+          className={`flex flex-col md:flex-row md:items-center flex-1 gap-y-5 ${
+            isNavShowing ? "block" : "hidden md:flex"
+          }`}
+        >
+          <nav className="flex-1 justify-start">
+            <ul className="flex flex-col md:flex-row md:items-center gap-x-8">
+              {navLinks.map((link) => (
+                <li
+                  key={link.href}
+                  className="text-center font-medium border-b md:border-b-transparent py-4 md:py-0 border-neutral-100"
+                >
+                  <Link href={link.href}>{link.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="font-medium flex w-full md:w-fit flex-col md:flex-row">
+            <Link href="/auth/user/login" className="inline-block">
+              <Button
+                variant={ButtonVariant.link}
+                className="w-full py-7 md:py-3"
+              >
+                Sign in
+              </Button>
+            </Link>
+            <Link href="/auth/user/signup" className="inline-block">
+              <Button
+                isRoundedLarge
+                variant={ButtonVariant.fill}
+                className="!bg-brandSec !text-white w-full py-7 md:py-3"
+              >
+                Sign up
+              </Button>
+            </Link>
           </div>
         </div>
-        <Link href="/dashboard">
-          <Image
-            className="h-10 w-10 rounded-full object-cover"
-            src="/assets/images/avatar.jpg"
-            width={100}
-            height={100}
-            alt="profile image"
-          />
-        </Link>
-      </div>
+      )}
     </div>
   );
 }
+
+function NavbarSignedIn() {}
+function NavbarSignedOut() {}
 export function BrandLogo({ type = "" }) {
   return (
     <>

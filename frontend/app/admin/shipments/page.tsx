@@ -1,6 +1,6 @@
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import Card from "@/app/_components/Card";
-import { DataTable } from "@/app/_components/DataTable";
+import { DataTable } from "@/app/_components/DeliveriesTable";
 import { Button } from "@/app/_components/ui/button";
 import { Input } from "@/app/_components/ui/input";
 import React from "react";

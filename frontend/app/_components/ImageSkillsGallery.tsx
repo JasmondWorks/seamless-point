@@ -2,7 +2,7 @@ import Image from "next/image";
 
 function ImageSkillsGallery() {
   return (
-    <div className="[grid-template-columns:repeat(auto-fit,minmax(120px,1fr))] grid gap-5 lg:gap-10">
+    <div className="[grid-template-columns:repeat(auto-fit,minmax(165px,1fr))] grid gap-5 lg:gap-10">
       {Array.from({ length: 6 }, (_, i) => (
         <Image
           key={i}

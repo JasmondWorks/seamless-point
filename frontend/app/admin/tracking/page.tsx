@@ -13,7 +13,7 @@ export default function TrackingHome() {
           <label htmlFor="trackingNumber">Tracking Number</label>
           <Input type="text" className="w-full h-11" />
         </div>
-        <Link href="/dashboard/tracking/123">
+        <Link href="/user/tracking/123">
           <ButtonFormSubmit text="CONTINUE" />
         </Link>
       </div>

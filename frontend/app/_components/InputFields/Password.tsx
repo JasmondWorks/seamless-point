@@ -16,9 +16,16 @@ export default function Password({ field, props }) {
           placeholder={isPasswordVisible ? "123abc<>?.!" : props.placeholder}
           {...field}
           className="shad-input pr-10"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              // Allow Enter to propagate and trigger form submission
+              e.stopPropagation();
+            }
+          }}
         />
       </FormControl>
       <button
+        type="button" // Prevent default "submit" behavior for the button
         tabIndex={0}
         onClick={(e) => {
           e.preventDefault();

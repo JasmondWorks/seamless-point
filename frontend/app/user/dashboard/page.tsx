@@ -18,7 +18,7 @@ export default function Dashboard() {
         <BalanceDisplay />
       </div>
       <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 py-10 lg:pr-20 [background-color: red]">
-        <Link href="/dashboard/deposit">
+        <Link href="/user/deposit">
           <ActionButton
             text="Deposit"
             icon={
@@ -37,7 +37,7 @@ export default function Dashboard() {
             }
           />
         </Link>
-        <Link href="/dashboard/withdraw">
+        <Link href="/user/withdraw">
           <ActionButton
             text="Withdraw"
             icon={
@@ -56,7 +56,7 @@ export default function Dashboard() {
             }
           />
         </Link>
-        <Link href="/dashboard/tracking">
+        <Link href="/user/tracking">
           <ActionButton
             text="Tracking"
             icon={
@@ -549,7 +549,7 @@ export default function Dashboard() {
             <hr />
           </div>
           <div className="p-5 border-t border-neutral-100">
-            <Link href="/dashboard/deliveries/register">
+            <Link href="/user/deliveries/register">
               <Button
                 className="font-light"
                 variant={ButtonVariant.fill}

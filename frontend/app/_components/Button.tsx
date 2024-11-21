@@ -71,7 +71,7 @@ export default function Button({
       )}
     >
       {icon && <span>{icon}</span>}
-      {text && <span>{text}</span>}
+      {text && <span className="flex items-center">{text}</span>}
       {!text && children}
     </button>
   );

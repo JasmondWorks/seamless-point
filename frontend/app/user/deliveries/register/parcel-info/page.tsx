@@ -108,7 +108,7 @@ export default function ParcelInfo() {
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
     // console.log(data);
     try {
-      //   createUser(data);
+      //   signupUser(data);
     } catch (error) {}
   }
   return (
@@ -182,10 +182,7 @@ export default function ParcelInfo() {
             fieldType={FormFieldType.FILE}
           />
           <PrivacyPolicyBlock />
-          <Link
-            className="block"
-            href="/dashboard/deliveries/register/destination"
-          >
+          <Link className="block" href="/user/deliveries/register/destination">
             <ButtonFormSubmit text="Continue" />
           </Link>
         </form>

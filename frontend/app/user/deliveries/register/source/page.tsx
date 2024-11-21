@@ -9,7 +9,7 @@ import CustomFormField, {
 
 import { deliverySourceSchema, signUpSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import { createUser } from "@/app/_lib/actions";
+import { signupUser } from "@/app/_lib/actions";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
@@ -31,7 +31,7 @@ export default function DeliverySource() {
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
     // console.log(data);
     try {
-      //   createUser(data);
+      //   signupUser(data);
     } catch (error) {}
   }
 
@@ -131,10 +131,7 @@ export default function DeliverySource() {
             />
           </div>
           <PrivacyPolicyBlock />
-          <Link
-            className="block"
-            href="/dashboard/deliveries/register/destination"
-          >
+          <Link className="block" href="/user/deliveries/register/destination">
             <ButtonFormSubmit text="Continue" />
           </Link>
         </form>

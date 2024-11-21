@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { authenticateUser } from "../_lib/actions";
+import Cookies from "js-cookie";
 
 type User = {
   id: string;
@@ -9,51 +11,59 @@ type User = {
 };
 
 type AuthType = {
-  user: User | undefined;
-  setUser: (user: User | undefined) => void;
-  token: string | undefined;
-  setToken: (token: string | undefined) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   isAuthenticating: boolean;
-  authenticated: boolean;
-  login: (user: User, token: string) => void;
+  // authenticated: boolean;
+  login: (user: User | null, token: string) => void;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthType | undefined>(undefined);
 
 export function UserAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | undefined>(undefined);
-  const [token, setToken] = useState<string | undefined>(undefined);
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
+  // const [authenticated, setAuthenticated] = useState(false);
 
   function logout() {
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    setUser(undefined);
-    setToken(undefined);
-    setAuthenticated(false);
+    setUser(null);
+    // setAuthenticated(false);
   }
-  function login(user: User, token: string) {
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("token", JSON.stringify(token));
-    setUser(user);
-    setToken(token);
-    setAuthenticated(true);
+  function login(user: User | null, token: string) {
+    const userFullDetails = { ...user, token };
+    user && localStorage.setItem("user", JSON.stringify(userFullDetails));
+    user && setUser(user);
+    Cookies.set("token", token);
+    // setAuthenticated(true);
   }
 
+  // Fetch stored token on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    async function authenticationInit(token: string) {
+      try {
+        // await authenticateUser(token);
+        // setAuthenticated(true);
+        console.log("authenticated");
+      } catch (error) {
+        // setAuthenticated(false);
+        logout();
+      } finally {
+        setIsAuthenticating(false);
+      }
+    }
 
-    if (storedUser && storedToken) {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
       const user = JSON.parse(storedUser);
-      const token = JSON.parse(storedToken);
+      const token = user.token;
+
+      authenticationInit(token);
 
       setUser(user);
-      setToken(token);
-      setIsAuthenticating(false);
-      setAuthenticated(true);
+      Cookies.set("token", token);
     } else {
       setIsAuthenticating(false);
     }
@@ -64,10 +74,8 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         setUser,
-        token,
-        setToken,
         isAuthenticating,
-        authenticated,
+        // authenticated,
         logout,
         login,
       }}
@@ -80,8 +88,10 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
 export function useUserAuth() {
   const context = useContext(AuthContext);
 
-  if (context === undefined) {
-    throw new Error("You tried to use app context outside of the AppProvider");
+  if (!context) {
+    throw new Error(
+      "You tried to use UserAuthContext outside of the UserAuthProvider"
+    );
   }
 
   return context;

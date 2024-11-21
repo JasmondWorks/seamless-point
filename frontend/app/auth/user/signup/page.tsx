@@ -12,7 +12,7 @@ import { FaApple, FaChevronRight, FaGoogle } from "react-icons/fa";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { signUpSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import { createUser } from "@/app/_lib/actions";
+import { signupUser } from "@/app/_lib/actions";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
 import { useState } from "react";
@@ -40,7 +40,7 @@ export default function SignUp() {
 
     try {
       setIsLoading(true);
-      const response = await createUser(data);
+      const response = await signupUser(data);
       const { user, token } = response;
 
       login(user, token);
@@ -52,8 +52,8 @@ export default function SignUp() {
   }
 
   return (
-    <section className="container-custom mx-auto mt-10">
-      <div className="lg:flex flex-col lg:items-center lg:flex-row gap-y-5 gap-x-16 py-10">
+    <section className="container-custom mx-auto mt-10 md:py-10">
+      <div className="flex items-center lg:flex-row gap-y-5 lg:gap-x-16 h-full py-10">
         <div>
           <svg
             className="w-full min-w-96 hidden lg:inline-block"
@@ -734,7 +734,7 @@ export default function SignUp() {
           </svg>
         </div>
         <div className="max-w-2xl mx-auto lg:max-w-max flex-1">
-          <h1 className="section-heading !mb-5 lg:hidden">Sign up</h1>
+          {/* <h1 className="section-heading !mb-5 lg:hidden">Sign up</h1> */}
           <div
             className="rounded-lg"
             style={{ boxShadow: "0 0 7px rgba(0 0 0 /.12)" }}
@@ -742,7 +742,7 @@ export default function SignUp() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="px-16 py-8 space-y-8"
+                className="px-10 sm:px-16 py-8 space-y-8"
               >
                 <div className="flex gap-4 justify-center flex-wrap lg:flex-nowrap">
                   <Button
@@ -853,7 +853,7 @@ export default function SignUp() {
                   />
                   <p className="mt-5 flex items-center justify-center leading-snug gap-2">
                     Already have an account?{" "}
-                    <Link href="/user/login">
+                    <Link href="/auth/user/login">
                       <Button
                         variant={ButtonVariant.link}
                         className="underline px-0 py-0"

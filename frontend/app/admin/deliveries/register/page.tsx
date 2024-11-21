@@ -7,7 +7,7 @@ export default function Register() {
       <h1 className="headline text-center">What are you trying to deliver</h1>
       <div className="flex flex-wrap gap-10 justify-center">
         <Link
-          href="/dashboard/deliveries/register/source"
+          href="/user/deliveries/register/source"
           className="flex flex-col gap-3"
         >
           <div className="card flex-1 bg-white flex flex-col">
@@ -485,7 +485,7 @@ export default function Register() {
           <span className="text-muted">Food stuff, drinks and meat, etc.</span>
         </Link>
         <Link
-          href="/dashboard/deliveries/register/source"
+          href="/user/deliveries/register/source"
           className="flex flex-col gap-3"
         >
           <div className="card flex-1 bg-white flex flex-col">
@@ -1078,7 +1078,8 @@ export default function Register() {
             </div>
             <div className="p-5 border-t border-neutral-100">
               <span className="text-lg font-bold text-neutral-600">
-Regular items              </span>{" "}
+                Regular items{" "}
+              </span>{" "}
             </div>
           </div>
           <span className="text-muted">Furniture, etc.</span>

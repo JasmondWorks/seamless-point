@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { Toaster } from "react-hot-toast";
-
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { UserAuthProvider } from "./_contexts/UserAuthContext";
 
 // export const metadata: Metadata = {

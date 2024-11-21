@@ -9,7 +9,7 @@ router.post(
   "/signup",
   authController.authenticate,
   authController.authorizeRootAdmin,
-  authController.adminSignUp
+  authController.signupAdmin
 );
 
 router.post("/signIn", authController.adminSignIn);

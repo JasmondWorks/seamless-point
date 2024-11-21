@@ -1,10 +1,13 @@
-"use client";
-
 import React from "react";
-import { useUserAuth } from "../_contexts/UserAuthContext";
+import { getUser } from "../_lib/actions";
 
-export default function Username() {
-  const { user } = useUserAuth();
+export default async function Username() {
+  const user = await getUser();
 
-  return <span>{user?.firstName}</span>;
+  return (
+    <span>
+      {/* {user?.firstName} */}
+      Jasmond
+    </span>
+  );
 }

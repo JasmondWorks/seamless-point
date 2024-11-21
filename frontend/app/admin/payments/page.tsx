@@ -1,4 +1,4 @@
-import { DataTable } from "@/app/_components/DataTable";
+import { DataTable } from "@/app/_components/DeliveriesTable";
 import React from "react";
 import {
   deliveriesColumns,
