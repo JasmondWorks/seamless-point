@@ -43,7 +43,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function authenticationInit(token: string) {
       try {
-        // await authenticateUser(token);
+        await authenticateUser(token);
         // setAuthenticated(true);
         console.log("authenticated");
       } catch (error) {
