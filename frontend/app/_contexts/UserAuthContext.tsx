@@ -49,6 +49,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         console.log("authenticated");
       } catch (error) {
         // setAuthenticated(false);
+        console.log("not authenticated");
         logout();
       } finally {
         setIsAuthenticating(false);
