@@ -80,13 +80,15 @@ export default function Navbar({ className = "" }) {
                 2
               </span>
             </Link>
-            <Image
-              width={50}
-              height={50}
-              alt="profile"
-              src="/assets/images/avatar.jpg"
-              className="w-12 h-12 rounded-full object-cover"
-            />
+            <Link href="/user/dashboard">
+              <Image
+                width={50}
+                height={50}
+                alt="profile"
+                src="/assets/images/avatar.jpg"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            </Link>
           </div>
         )}
       </div>
@@ -133,8 +135,6 @@ export default function Navbar({ className = "" }) {
   );
 }
 
-function NavbarSignedIn() {}
-function NavbarSignedOut() {}
 export function BrandLogo({ type = "" }) {
   return (
     <>

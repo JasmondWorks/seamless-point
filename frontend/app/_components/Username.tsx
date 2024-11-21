@@ -6,8 +6,8 @@ export default async function Username() {
 
   return (
     <span>
-      {/* {user?.firstName} */}
-      Jasmond
+      {user?.firstName}
+      {/* Jasmond */}
     </span>
   );
 }
