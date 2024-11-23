@@ -23,7 +23,7 @@ interface ConfirmDialogProps {
 }
 
 const SuccessDialog: React.FC<ConfirmDialogProps> = ({
-  triggerEl, // Content for the trigger (button or custom UI)
+  triggerEl = "", // Content for the trigger (button or custom UI)
   title = "Delivery cancelled",
   description = "Your delivery has successfully been cancelled, you can return to the home page",
   confirmText = "Ok",

@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { Country, State, City } from "country-state-city";
 
-export const handleCopyToClipboard = (text: string) => {
+export const copyToClipboard = (text: string) => {
   navigator.clipboard
     .writeText(text)
     .then(() => {

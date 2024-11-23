@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import { Toaster } from "react-hot-toast";
 import { UserAuthProvider } from "./_contexts/UserAuthContext";
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="text-[85%] md:text[90%] lg:text-[95%]">
       <body className={`antialiased overflow-x-hidden no-scrollbar`}>
-        <UserAuthProvider>{children}</UserAuthProvider>
+        <GoogleOAuthProvider clientId="353332526572-1f03a2r0gstceibcvhtlnfg9eo3gsq8r.apps.googleusercontent.com">
+          <UserAuthProvider>{children}</UserAuthProvider>
+        </GoogleOAuthProvider>
         <Toaster
           toastOptions={{
             success: {

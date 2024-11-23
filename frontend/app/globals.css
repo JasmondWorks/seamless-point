@@ -55,7 +55,7 @@ body {
   box-shadow: 4px 4px 5px rgba(0 0 0 /0.18);
 }
 .text-muted {
-  @apply text-black text-opacity-20;
+  @apply text-black text-opacity-50;
 }
 .text-light {
   @apply text-neutral-400;
@@ -466,4 +466,8 @@ h2.react-datepicker__current-month {
   100% {
     transform: rotate(360deg);
   }
+}
+
+[role="dialog"] {
+  width: 90vw;
 }

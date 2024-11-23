@@ -35,8 +35,6 @@ export default function ForgotPassword() {
       setIsLoading(true);
       const res = await forgotUserPassword(email);
       toast.success(`${res.message}`);
-
-      setTimeout(() => router.push("/auth/user/reset-password/abcde"), 3000);
     } catch (err: any) {
       toast.error(err.message);
     } finally {

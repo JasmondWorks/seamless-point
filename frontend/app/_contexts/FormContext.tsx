@@ -1,13 +1,16 @@
 "use client";
 
 // context/FormContext.js
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const initialData = {};
 const FormContext = createContext(initialData);
 
 export function FormProvider({ children }) {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    amount: 50,
+    // selectedPaymentMethod: "debit-card",
+  });
   const [formStep, setformStep] = useState(1);
 
   function incrementFormStep() {
@@ -21,7 +24,13 @@ export function FormProvider({ children }) {
 
   return (
     <FormContext.Provider
-      value={{ formData, addFormData, incrementFormStep, formStep }}
+      value={{
+        formData,
+        addFormData,
+        incrementFormStep,
+        formStep,
+        setFormData,
+      }}
     >
       {children}
     </FormContext.Provider>

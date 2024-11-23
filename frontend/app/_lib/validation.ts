@@ -369,3 +369,35 @@ export const parcelDocumentSchema = z.object({
     z.number().int().min(1, "Quantity must be at least 1")
   ),
 });
+
+export const cardDetailsSchema = z.object({
+  cardNumber: z
+    .string()
+    .nonempty("Card number is required")
+    .regex(/^\d{16}$/, "Card number must be 16 digits"),
+  cvv: z
+    .string()
+    .nonempty("CVV is required")
+    .regex(/^\d{3,4}$/, "CVV must be 3 or 4 digits"),
+  expiryDate: z
+    .string()
+    .nonempty("Expiry date is required")
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format")
+    .refine((date) => {
+      const [month, year] = date.split("/").map(Number);
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1; // Months are 0-based
+      const currentYear = parseInt(
+        currentDate.getFullYear().toString().slice(-2),
+        10
+      );
+
+      if (
+        year > currentYear ||
+        (year === currentYear && month >= currentMonth)
+      ) {
+        return true; // Valid expiry date
+      }
+      return false; // Expired
+    }, "Card is expired"),
+});

@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 
 export enum ButtonVariant {
@@ -9,36 +9,36 @@ export enum ButtonVariant {
   neutralLight = "NEUTRAL_LIGHT",
   neutralDark = "NEUTRAL_DARK",
 }
-interface Props {
-  variant: ButtonVariant;
-  children?: React.ReactNode;
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  children?: ReactNode;
   text?: string;
   className?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   isReversed?: boolean;
   isRoundedLarge?: boolean;
   isPrimary?: boolean;
   isPrimaryDark?: boolean;
   isBig?: boolean;
-  type?: string;
-  onClick?: any;
 }
 
 export default function Button({
   isPrimary = false,
-  type = "",
+  type = "button", // Default to "button"
   onClick,
   variant = ButtonVariant.link,
   children,
   text = "",
-  icon = "",
+  icon = null,
   isPrimaryDark,
   isReversed = false,
   isRoundedLarge = false,
   isBig = false,
   className = "",
   disabled,
-}: Props) {
+  ...props
+}: ButtonProps) {
   return (
     <button
       disabled={disabled}
@@ -48,7 +48,7 @@ export default function Button({
         "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11", // Common classes
         {
           "py-10": isBig,
-          "opacity-60": disabled,
+          "opacity-40 pointer-events-none": disabled,
           "bg-white text-brandSec":
             variant === ButtonVariant.fillWhite && !isPrimary,
           "bg-white text-brandPry":
@@ -69,6 +69,7 @@ export default function Button({
         },
         className // Additional external classes
       )}
+      {...props}
     >
       {icon && <span>{icon}</span>}
       {text && <span className="flex items-center">{text}</span>}

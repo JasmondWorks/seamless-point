@@ -1,50 +1,55 @@
 "use client";
 
-import Navbar from "@/app/_components/Navbar";
-import { usePathname } from "next/navigation";
+import Button, { ButtonVariant } from "@/app/_components/Button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
-  const pathname = usePathname();
-  // const isDashboardPage = pathname.startsWith("/dashboard");
+  const router = useRouter();
 
-  // if (isDashboardPage)
-    return (
-      <div
-        style={{ minHeight: "calc(100vh - 4rem" }}
-        className="flex bg-neutral-50 mt-16"
-      >
-        <Navbar />
-        <main
-          style={{
-            background:
-              "url('/assets/images/seamlesspoint-watermark.png') no-repeat fixed 98% 67%",
-          }}
-          className="p-12 ml-20 lg:pe-28 flex-1"
-        >
-          <div className="h-full grid place-items-center text-center">
-            <div className="space-y-10">
-              <span className="inline-flex">
-                <svg
-                  width={271}
-                  height={270}
-                  viewBox="0 0 271 270"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M191.42 0H79.58L0.5 79.08V190.92L79.58 270H191.42L270.5 190.92V79.08L191.42 0ZM150.5 210H120.5V180H150.5V210ZM150.5 150H120.5V60H150.5V150Z"
-                    fill="#C00505"
-                  />
-                </svg>
-              </span>
-              <p className="text-lg font-bold">
-                {"We're"} sorry, but it appears {"we've"} just encountered an
-                error
-              </p>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  // return <div>404: Not found</div>;
+  function handleGoBack() {
+    router.back();
+  }
+  return (
+    <div className="grid place-items-center text-center bg-neutral-50 h-screen">
+      <main className="flex flex-col gap-y-10 items-center">
+        <span className="inline-flex">
+          <svg
+            width={271}
+            height={270}
+            viewBox="0 0 271 270"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M191.42 0H79.58L0.5 79.08V190.92L79.58 270H191.42L270.5 190.92V79.08L191.42 0ZM150.5 210H120.5V180H150.5V210ZM150.5 150H120.5V60H150.5V150Z"
+              fill="#C00505"
+            />
+          </svg>
+        </span>
+        <div className="flex flex-col">
+          <h1 className="headline text-lg font-bold">
+            Error:
+            <span className="text-red-500">404</span>
+          </h1>
+          <p>Page not found</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleGoBack}
+            variant={ButtonVariant.fill}
+            text="Go back"
+            className="inline-block"
+          />
+          <Link href="/">
+            <Button
+              className="inline-block !border-brandSec !text-brandSec"
+              variant={ButtonVariant.outline}
+              text="To home page"
+            />
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
 }

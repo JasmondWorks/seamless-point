@@ -24,17 +24,19 @@ export default function Password({ field, props }) {
           }}
         />
       </FormControl>
-      <button
-        type="button" // Prevent default "submit" behavior for the button
-        tabIndex={0}
-        onClick={(e) => {
-          e.preventDefault();
-          setIsPasswordVisible((cur) => !cur);
-        }}
-        className="opacity-60 absolute right-0 px-3 cursor-pointer top-0 bottom-0"
-      >
-        {isPasswordVisible ? <IoEyeOutline /> : <IoEyeOffOutline />}
-      </button>
+      {!props.isPasswordHidden && (
+        <button
+          type="button" // Prevent default "submit" behavior for the button
+          tabIndex={0}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsPasswordVisible((cur) => !cur);
+          }}
+          className="opacity-60 absolute right-0 px-3 cursor-pointer top-0 bottom-0"
+        >
+          {isPasswordVisible ? <IoEyeOutline /> : <IoEyeOffOutline />}
+        </button>
+      )}
     </div>
   );
 }

@@ -69,6 +69,35 @@ export async function loginUser(userDetails: {
 
   return { token, user };
 }
+
+// Google sign in
+export async function signinUser(userDetails: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  authType: string;
+}) {
+  console.log(userDetails);
+
+  const res = await fetch(`${URL}/users/signIn`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userDetails),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) throw new Error(data.message);
+
+  const {
+    token,
+    data: { user },
+  } = data;
+
+  return { token, user };
+}
 export async function loginAdmin(userDetails: {
   email: string;
   password: string;

@@ -1,0 +1,3 @@
+.dialogContainer :global(.right-4.top-4) {
+  display: none;
+}

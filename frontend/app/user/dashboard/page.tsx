@@ -18,7 +18,7 @@ export default function Dashboard() {
         <BalanceDisplay />
       </div>
       <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 py-10 lg:pr-20 [background-color: red]">
-        <Link href="/user/deposit">
+        <Link href="/user/deposit/funding">
           <ActionButton
             text="Deposit"
             icon={
