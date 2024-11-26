@@ -33,8 +33,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     // setAuthenticated(false);
   }
   function login(user: User | null, token: string) {
-    const userFullDetails = { ...user, token };
-    user && localStorage.setItem("user", JSON.stringify(userFullDetails));
+    user && localStorage.setItem("user", JSON.stringify(user));
     user && setUser(user);
     Cookies.set("token", token);
     // setAuthenticated(true);
@@ -60,12 +59,12 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
 
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      const token = user.token;
+      const token = Cookies.get("token");
+      console.log(token);
 
       authenticationInit(token);
 
       setUser(user);
-      Cookies.set("token", token);
     } else {
       setIsAuthenticating(false);
     }

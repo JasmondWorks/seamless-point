@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 import SignOutButton from "./SignOutButton";
@@ -237,19 +237,22 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const [isNavShowing, setIsNavShowing] = useState(false);
 
   function handleToggleNav() {
-    setIsNavExpanded((cur) => !cur);
+    setIsNavShowing((cur) => !cur);
   }
 
+  useEffect(() => {
+    setIsNavShowing(false);
+  }, [pathname]);
   // const pageCategory = pathname.split("/")[2];
   // console.log(pathname.split("/"), pathname);
 
   return (
     <div
       className={`${
-        isNavExpanded ? "w-72" : "w-16"
+        isNavShowing ? "w-72" : "w-16"
       } w-16 lg:min-w-72 top-0 h-full pt-24 fixed bg-[#fafafa] z-20 lg:relative  lg:pt-40 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden transition-all`}
     >
       {/* Rectangle shapes */}
@@ -301,12 +304,12 @@ export default function Navbar() {
       <button
         onClick={handleToggleNav}
         className={`text-3xl flex lg:hidden ${
-          !isNavExpanded
+          !isNavShowing
             ? "justify-center lg:justify-start mx-auto"
             : "ml-auto px-5 lg:justify-start"
         }`}
       >
-        {!isNavExpanded ? (
+        {!isNavShowing ? (
           <FiMenu className="pointer-events-none" />
         ) : (
           <IoClose className="pointer-events-none" />
@@ -320,7 +323,7 @@ export default function Navbar() {
                 <Link
                   href={link.path}
                   className={`font-medium lg:items-center lg:px-10 py-4 lg:py-3 flex gap-3 ${
-                    !isNavExpanded
+                    !isNavShowing
                       ? "justify-center lg:justify-start"
                       : "lg:justify-start px-8"
                   } hover:bg-neutral-200 ${
@@ -331,7 +334,7 @@ export default function Navbar() {
                 >
                   <span className="w-7 h-7 lg:w-5 lg:h-5">{link.icon}</span>
                   <span
-                    className={`${isNavExpanded ? "block" : "hidden lg:block"}`}
+                    className={`${isNavShowing ? "block" : "hidden lg:block"}`}
                   >
                     {link.title}
                   </span>
@@ -345,7 +348,7 @@ export default function Navbar() {
         <Link
           href="/user/settings"
           className={`w-full lg:items-center font-medium lg:px-10 py-4 lg:py-3 flex gap-3 ${
-            !isNavExpanded
+            !isNavShowing
               ? "justify-center lg:justify-start"
               : "lg:justify-start px-8"
           } hover:bg-neutral-200 ${
@@ -379,11 +382,11 @@ export default function Navbar() {
               />
             </svg>
           </span>
-          <span className={`${isNavExpanded ? "block" : "hidden lg:block"}`}>
+          <span className={`${isNavShowing ? "block" : "hidden lg:block"}`}>
             Settings
           </span>
         </Link>
-        <SignOutButton isNavExpanded={isNavExpanded} />
+        <SignOutButton isNavShowing={isNavShowing} />
       </div>
     </div>
   );

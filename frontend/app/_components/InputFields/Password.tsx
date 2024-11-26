@@ -12,6 +12,7 @@ export default function Password({ field, props }) {
     <div className="flex bg-dark-400 items-center relative">
       <FormControl>
         <Input
+          maxLength={props.maxLength}
           type={isPasswordVisible ? "text" : "password"}
           placeholder={isPasswordVisible ? "123abc<>?.!" : props.placeholder}
           {...field}

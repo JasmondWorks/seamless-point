@@ -17,7 +17,7 @@ import {
 import { IoIosClose } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { cardDetailsSchema } from "@/app/_lib/validation";
+import { creditCardSchema } from "@/app/_lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CustomFormField, {
   FormFieldType,
@@ -25,18 +25,31 @@ import CustomFormField, {
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import { Form } from "@/app/_components/ui/form";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
+import { CreditCardForm } from "@/app/_components/CreditCardForm";
 
 enum EDialogContent {
   addDebitCard = "ADD DEBIT CARD",
   success = "SUCCESS",
 }
 
+type CreditCardFormData = z.infer<typeof creditCardSchema>;
+
 export default function SelectDebitCard() {
-  const [debitCards, setDebitCards] = useState([]);
-  const { setFormData, formData } = useFormContext();
+  const [debitCards, setDebitCards] = useState([
+    // {
+    //   cardNumber: "0187 8179 8176 1891",
+    //   expiryMonth: "05",
+    //   expiryYear: "24",
+    //   cvv: "339",
+    //   id: "be8fec82-6f71-49ee-869f-818b2c5bd361",
+    // },
+  ]);
+  const { setFormData, formData, addFormData } = useFormContext();
   const [selectedDebitCard, setSelectedDebitCard] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
+
+  console.log(debitCards);
 
   useEffect(() => {
     setFormData({
@@ -44,9 +57,11 @@ export default function SelectDebitCard() {
       onAddDebitCard: handleAddDebitCard,
       onRemoveDebitCard: handleRemoveDebitCard,
       onSelectDebitCard: handleSelectDebitCard,
+      onUpdateDebitCard: handleUpdateDebitCard,
       selectedDebitCard,
+      debitCards: [],
     });
-  }, []);
+  }, [isDialogOpen]);
 
   function handleOpenAddDebitCardDialog() {
     setIsDialogOpen(true);
@@ -56,16 +71,33 @@ export default function SelectDebitCard() {
     setSelectedDialogContent(EDialogContent.success);
   }
 
+  function handleUpdateDebitCard(id, cardDetails) {
+    const updatedCards = debitCards.map((card) =>
+      card.id === id ? { id: card.id, ...cardDetails } : card
+    );
+    setDebitCards(updatedCards);
+  }
+
   function handleSelectDebitCard(id) {
     setSelectedDebitCard(id);
+    addFormData({ selectedDebitCard: id });
   }
-  function handleAddDebitCard(cardDetails) {
-    setDebitCards((cur) => {
-      [...cur, cardDetails];
+  function handleAddDebitCard(newCardDetails) {
+    const newCard = { ...newCardDetails, id: crypto.randomUUID() };
+
+    setDebitCards((prevItems) => [...prevItems, newCard]);
+    setFormData({
+      ...formData,
+      debitCards: formData?.debitCards?.length
+        ? [...formData.debitCards, newCard]
+        : [newCard],
     });
   }
   function handleRemoveDebitCard(id: string) {
     setDebitCards(debitCards.filter((debitCard) => debitCard.id !== id));
+  }
+  function handleCloseDialog() {
+    setIsDialogOpen(false);
   }
   return (
     <div className="space-y-10">
@@ -76,10 +108,10 @@ export default function SelectDebitCard() {
         <span>Debit card</span>
         <PlusCircledIcon className="text-brandSec text-2xl" />
       </button>
-      {debitCards.length !== 0 && (
-        <div className="flex gap-5 flex-wrap">
+      {debitCards && debitCards.length !== 0 && (
+        <div className="flex flex-col sm:flex-row gap-5 flex-wrap">
           {debitCards.map((card) => (
-            <DebitCard card={card} />
+            <DebitCard key={card.id} card={card} />
           ))}
         </div>
       )}
@@ -88,7 +120,7 @@ export default function SelectDebitCard() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className={styles.dialogContainer}>
           {selectedDialogContent === EDialogContent.addDebitCard && (
-            <AddDebitCardDialogContent />
+            <AddDebitCardDialogContent onCloseDialog={handleCloseDialog} />
           )}
           {selectedDialogContent === EDialogContent.success && (
             <SuccessDialogContent />
@@ -99,26 +131,18 @@ export default function SelectDebitCard() {
   );
 }
 
-function AddDebitCardDialogContent() {
+function AddDebitCardDialogContent({ onCloseDialog }) {
   const balance = 20_000;
   const {
     formData: { onAddDebitCard },
   } = useFormContext();
 
-  const form = useForm<z.infer<typeof cardDetailsSchema>>({
-    resolver: zodResolver(cardDetailsSchema),
-    defaultValues: {
-      cardNumber: "",
-      cvv: "",
-      expiryDate: "",
-    },
-  });
-
-  async function onSubmit(data: z.infer<typeof cardDetailsSchema>) {
-    console.log(data);
+  const onSubmit = (data: CreditCardFormData) => {
+    console.log("Submitted Data:", data);
 
     onAddDebitCard(data);
-  }
+    onCloseDialog();
+  };
 
   return (
     <div className="flex flex-col gap-y-8">
@@ -140,35 +164,7 @@ function AddDebitCardDialogContent() {
       <h3 className="text-2xl font-bold">
         Enter your card details to withdraw
       </h3>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid md:grid-cols-2 gap-5">
-            <CustomFormField
-              className="col-span-2"
-              label="CARD NUMBER"
-              name="cardNumber"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="Example"
-            />
-            <CustomFormField
-              label="EXPIRY"
-              name="expiryDate"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="MM/YY"
-            />
-            <CustomFormField
-              label="CVV"
-              name="cvv"
-              control={form.control}
-              fieldType={FormFieldType.PASSWORD}
-              placeholder="123"
-            />
-          </div>
-          <ButtonFormSubmit text="I UNDERSTAND" />
-        </form>
-      </Form>
+      <CreditCardForm onSubmit={onSubmit} />
     </div>
   );
 }

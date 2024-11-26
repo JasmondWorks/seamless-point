@@ -370,34 +370,39 @@ export const parcelDocumentSchema = z.object({
   ),
 });
 
-export const cardDetailsSchema = z.object({
-  cardNumber: z
-    .string()
-    .nonempty("Card number is required")
-    .regex(/^\d{16}$/, "Card number must be 16 digits"),
-  cvv: z
-    .string()
-    .nonempty("CVV is required")
-    .regex(/^\d{3,4}$/, "CVV must be 3 or 4 digits"),
-  expiryDate: z
-    .string()
-    .nonempty("Expiry date is required")
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format")
-    .refine((date) => {
-      const [month, year] = date.split("/").map(Number);
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth() + 1; // Months are 0-based
-      const currentYear = parseInt(
-        currentDate.getFullYear().toString().slice(-2),
-        10
-      );
-
-      if (
-        year > currentYear ||
-        (year === currentYear && month >= currentMonth)
-      ) {
-        return true; // Valid expiry date
+export const creditCardSchema = z
+  .object({
+    cardNumber: z
+      .string()
+      .min(19, "Card number must be 16 digits")
+      .regex(/^\d{4} \d{4} \d{4} \d{4}$/, "Card number format is invalid"),
+    expiryMonth: z
+      .string()
+      .min(2, "Month is required")
+      .max(2, "Invalid month")
+      .regex(/^(0[1-9]|1[0-2])$/, "Invalid month"),
+    expiryYear: z
+      .string()
+      .min(2, "Year is required")
+      .max(2, "Invalid year")
+      .regex(/^\d{2}$/, "Invalid year"),
+    cvv: z
+      .string()
+      .regex(/^\d{3}$/, "Invalid CVV")
+      .min(3, "CVV is required"),
+  })
+  .refine(
+    (data) => {
+      const { expiryMonth, expiryYear } = data;
+      // Custom validation: expiry year should not be in the past
+      const currentYear = new Date().getFullYear().toString().slice(-2); // Get last 2 digits of the current year
+      if (parseInt(expiryYear) < parseInt(currentYear)) {
+        return false;
       }
-      return false; // Expired
-    }, "Card is expired"),
-});
+      return true;
+    },
+    {
+      message: "The date entered has passed",
+      path: ["expiryMonth", "expiryYear"],
+    }
+  );

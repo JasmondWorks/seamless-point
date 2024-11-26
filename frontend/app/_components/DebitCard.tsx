@@ -1,79 +1,118 @@
 import ConfirmDialogContent from "@/app/_components/ConfirmDialogContent";
+import { CreditCardForm } from "@/app/_components/CreditCardForm";
+import DialogMainHeader from "@/app/_components/DialogMainHeader";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
-import { Dialog } from "@/app/_components/ui/dialog";
+import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { useFormContext } from "@/app/_contexts/FormContext";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 enum EDialogContent {
   removeCard = "REMOVE_CARD",
   success = "SUCCESS",
+  updateCard = "UPDATE",
+  updateCardSuccess = "UPDATE_CARD_SUCCESS",
 }
 
 export default function DebitCard({ card }) {
   const {
-    formData: { onRemoveDebitCard, onSelectDebitCard, selectedDebitCard },
+    formData: {
+      onRemoveDebitCard,
+      onSelectDebitCard,
+      selectedDebitCard,
+      // debitCards,
+    },
   } = useFormContext();
+
+  console.log(selectedDebitCard);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
+  // const [selectedCardToEdit, setSelectedCardToEdit] = useState(null);
+  let isSelected;
 
-  const isSelected = card.id === selectedDebitCard;
+  useEffect(() => {
+    isSelected = card.id === selectedDebitCard;
+  }, [selectedDebitCard]);
 
-  function handleSelectPaymentMethod(e) {
+  function handleRemoveDebitCard() {
+    onRemoveDebitCard(card.id);
+    handleOpenSuccessCardDialog();
+  }
+  function handleSelectDebitCard(e) {
     onSelectDebitCard(e.target.value);
+    console.log(e.target.value);
+  }
+
+  function handleOpenUpdateCardDialog() {
+    setIsDialogOpen(true);
+    setSelectedDialogContent(EDialogContent.updateCard);
   }
   function handleOpenRemoveCardDialog() {
     setIsDialogOpen(true);
     setSelectedDialogContent(EDialogContent.removeCard);
   }
   function handleOpenSuccessCardDialog() {
+    setIsDialogOpen(true);
     setSelectedDialogContent(EDialogContent.success);
+  }
+  function handleOpenUpdateCardSuccessDialog() {
+    setSelectedDialogContent(EDialogContent.updateCardSuccess);
   }
 
   return (
     <>
-      <label className="p-5 bg-white justify-between gap-5 flex items-start rounded-2xl border border-neutral-200 leading-4">
-        <div className="border p-1 px-2 leading-none border-neutral-200 rounded-lg">
-          <svg
-            width={30}
-            height={19}
-            viewBox="0 0 30 19"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M14.9053 15.9396C13.3266 17.2704 11.2787 18.0737 9.04092 18.0737C4.04776 18.0737 0 14.0741 0 9.14036C0 4.20662 4.04776 0.207031 9.04092 0.207031C11.2787 0.207031 13.3266 1.01036 14.9053 2.34109C16.484 1.01036 18.5319 0.207031 20.7697 0.207031C25.7628 0.207031 29.8106 4.20662 29.8106 9.14036C29.8106 14.0741 25.7628 18.0737 20.7697 18.0737C18.5319 18.0737 16.484 17.2704 14.9053 15.9396Z"
-              fill="#ED0006"
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M14.9053 15.9396C16.8492 14.3011 18.0818 11.863 18.0818 9.14036C18.0818 6.41776 16.8492 3.97962 14.9053 2.34108C16.484 1.01036 18.5319 0.207031 20.7697 0.207031C25.7628 0.207031 29.8106 4.20662 29.8106 9.14036C29.8106 14.0741 25.7628 18.0737 20.7697 18.0737C18.5319 18.0737 16.484 17.2704 14.9053 15.9396Z"
-              fill="#F9A000"
-            />
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M14.9053 15.9393C16.8492 14.3008 18.0818 11.8627 18.0818 9.14007C18.0818 6.41748 16.8492 3.97936 14.9053 2.34082C12.9614 3.97936 11.7288 6.41748 11.7288 9.14007C11.7288 11.8627 12.9614 14.3008 14.9053 15.9393Z"
-              fill="#FF5E00"
-            />
-          </svg>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-xl">Visa ending in 1234</span>
-          <span>Expiry 01/2000</span>
-          <span className="cursor-pointer mt-5 text-purple-700 font-bold">
-            Edit
-          </span>
+      <label className="cursor-pointer p-5 bg-white justify-between gap-5 flex items-start rounded-2xl border border-neutral-200 leading-4">
+        <div className="flex flex-col md:flex-row gap-5 items-start">
+          <div className="border p-1 px-2 border-neutral-200 rounded-lg">
+            <svg
+              width={30}
+              height={19}
+              viewBox="0 0 30 19"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M14.9053 15.9396C13.3266 17.2704 11.2787 18.0737 9.04092 18.0737C4.04776 18.0737 0 14.0741 0 9.14036C0 4.20662 4.04776 0.207031 9.04092 0.207031C11.2787 0.207031 13.3266 1.01036 14.9053 2.34109C16.484 1.01036 18.5319 0.207031 20.7697 0.207031C25.7628 0.207031 29.8106 4.20662 29.8106 9.14036C29.8106 14.0741 25.7628 18.0737 20.7697 18.0737C18.5319 18.0737 16.484 17.2704 14.9053 15.9396Z"
+                fill="#ED0006"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M14.9053 15.9396C16.8492 14.3011 18.0818 11.863 18.0818 9.14036C18.0818 6.41776 16.8492 3.97962 14.9053 2.34108C16.484 1.01036 18.5319 0.207031 20.7697 0.207031C25.7628 0.207031 29.8106 4.20662 29.8106 9.14036C29.8106 14.0741 25.7628 18.0737 20.7697 18.0737C18.5319 18.0737 16.484 17.2704 14.9053 15.9396Z"
+                fill="#F9A000"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M14.9053 15.9393C16.8492 14.3008 18.0818 11.8627 18.0818 9.14007C18.0818 6.41748 16.8492 3.97936 14.9053 2.34082C12.9614 3.97936 11.7288 6.41748 11.7288 9.14007C11.7288 11.8627 12.9614 14.3008 14.9053 15.9393Z"
+                fill="#FF5E00"
+              />
+            </svg>
+          </div>
+          <div className="flex flex-col items-start gap-3">
+            <span className="text-xl leading-tight">
+              Visa ending in {card.cardNumber.slice(-4)}
+            </span>
+            <span>
+              Expiry {card.expiryMonth}/{card.expiryYear}
+            </span>
+            <span
+              onClick={handleOpenUpdateCardDialog}
+              className="cursor-pointer mt-5 text-purple-700 font-bold"
+            >
+              Edit
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Input
-            className="w-3"
+            className="w-3 !h-auto"
             value={card.id}
             checked={isSelected}
-            onChange={handleSelectPaymentMethod}
+            onChange={handleSelectDebitCard}
             type="radio"
             name="debitCard"
           />
@@ -104,17 +143,49 @@ export default function DebitCard({ card }) {
       </label>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        {selectedDialogContent === EDialogContent.removeCard && (
-          <ConfirmDialogContent
-            title="Remove Card"
-            description="Are you sure you want to remove this card? This action cannot be undone."
-            onConfirm={handleOpenSuccessCardDialog}
-          />
-        )}
-        {selectedDialogContent === EDialogContent.success && (
-          <SuccessDialogContent />
-        )}
+        <DialogContent className="dialogContainer">
+          {selectedDialogContent === EDialogContent.removeCard && (
+            <ConfirmDialogContent
+              title="Remove Card"
+              description="Are you sure you want to remove this card? This action cannot be undone."
+              onConfirm={handleRemoveDebitCard}
+            />
+          )}
+          {selectedDialogContent === EDialogContent.success && (
+            <SuccessDialogContent />
+          )}
+          {selectedDialogContent === EDialogContent.updateCardSuccess && (
+            <SuccessDialogContent title="Card information has been updated" />
+          )}
+          {selectedDialogContent === EDialogContent.updateCard && (
+            <UpdatePaymentDialogContent
+              onOpenSuccessDialog={handleOpenUpdateCardSuccessDialog}
+              card={card}
+            />
+          )}
+        </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function UpdatePaymentDialogContent({ card, onOpenSuccessDialog }) {
+  const {
+    formData: { onUpdateDebitCard },
+  } = useFormContext();
+  function onSubmit(data) {
+    console.log(data);
+    onUpdateDebitCard(card.id, data);
+    onOpenSuccessDialog();
+  }
+
+  return (
+    <div className="flex flex-col gap-y-6">
+      <DialogMainHeader
+        title="Update payment method"
+        subtitle="Update your card details"
+      />
+      <CreditCardForm cardDetails={card} onSubmit={onSubmit} />
+    </div>
   );
 }

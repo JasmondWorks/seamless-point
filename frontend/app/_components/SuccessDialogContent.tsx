@@ -13,6 +13,7 @@ export default function SuccessDialogContent({
   title = "Successful",
   description = "",
   confirmText = "Ok",
+  onConfirmSuccess = "",
 }) {
   return (
     <div>
@@ -22,20 +23,29 @@ export default function SuccessDialogContent({
             <Check color="white" />
           </div>
         </Badge>
-        <h3 className="text-xl">
-          <span>{title}</span>
-        </h3>
+        <span className="text-xl">{title}</span>
       </DialogTitle>
       <DialogDescription>{description}</DialogDescription>
       <DialogFooter className="mt-5">
-        <DialogClose asChild className="w-full">
+        {!onConfirmSuccess && (
+          <DialogClose asChild className="w-full">
+            <Button
+              variant={ButtonVariant.fill}
+              text={confirmText}
+              className="flex-1 bg-customGreen w-full"
+              isRoundedLarge
+            />
+          </DialogClose>
+        )}
+        {onConfirmSuccess && (
           <Button
+            onClick={onConfirmSuccess}
             variant={ButtonVariant.fill}
             text={confirmText}
             className="flex-1 bg-customGreen w-full"
             isRoundedLarge
           />
-        </DialogClose>
+        )}
       </DialogFooter>
     </div>
   );

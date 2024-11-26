@@ -470,4 +470,17 @@ h2.react-datepicker__current-month {
 
 [role="dialog"] {
   width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 15px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+}
+[role="dialog"]::-webkit-scrollbar {
+  display: none;
+}
+.dialogContainer .right-4.top-4 {
+  display: none;
 }

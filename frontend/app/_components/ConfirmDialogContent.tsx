@@ -38,7 +38,7 @@ export default function ConfirmDialogContent({
         >
           <AlertCircle color="red" />
         </Badge>
-        <h3 className="text-xl">{title}</h3>
+        <span className="text-xl">{title}</span>
       </DialogTitle>
       <DialogDescription>{description}</DialogDescription>
       <DialogFooter className="grid grid-cols-2 gap-3 mt-5">

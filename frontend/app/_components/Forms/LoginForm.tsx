@@ -23,28 +23,15 @@ import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login, user } = useUserAuth();
+  const { login } = useUserAuth();
 
-  // const form = useForm<z.infer<typeof baseUserSchema>>({
-  //   resolver: zodResolver(baseUserSchema),
-  //   defaultValues: {
-  //     email: "",
-  //     password: "",
-  //   },
-  // });
+  console.log(isLoading);
 
   const form = useForm<z.infer<typeof baseUserSchema>>({
     resolver: zodResolver(baseUserSchema),
-    defaultValues: { email: "", password: "", rememberMe: false },
+    defaultValues: { email: "", password: "" },
     mode: "onSubmit", // Optional: Change to "all" for real-time validation
   });
-
-  useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log("Form value changed:", value, "Field:", name, "Type:", type);
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
@@ -95,6 +82,7 @@ export default function LoginForm() {
     console.log(data);
 
     try {
+      setIsLoading(true);
       const res = await loginUser(data);
       const { user, token } = res;
 
@@ -106,6 +94,8 @@ export default function LoginForm() {
       if (error.message === "fetch failed")
         toast.error("Error: Check your internet connection");
       else toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -159,6 +149,7 @@ export default function LoginForm() {
             </svg>
             <span>Sign in with Google</span>
           </Button>
+
           <Button
             onClick={(e) => e.preventDefault()}
             className="text-sm !px-3"

@@ -4,9 +4,9 @@ import React from "react";
 import { useUserAuth } from "../_contexts/UserAuthContext";
 
 export default function SignOutButton({
-  isNavExpanded,
+  isNavShowing,
 }: {
-  isNavExpanded: boolean;
+  isNavShowing: boolean;
 }) {
   const { logout } = useUserAuth();
 
@@ -14,7 +14,7 @@ export default function SignOutButton({
     <button
       onClick={logout}
       className={`w-full lg:items-center font-medium lg:px-10 py-4 lg:py-3 flex gap-3 ${
-        !isNavExpanded
+        !isNavShowing
           ? "justify-center lg:justify-start"
           : "lg:justify-start px-8"
       } hover:bg-neutral-200`}
@@ -37,7 +37,7 @@ export default function SignOutButton({
           />
         </svg>
       </span>
-      <span className={`${isNavExpanded ? "block" : "hidden lg:block"}`}>
+      <span className={`${isNavShowing ? "block" : "hidden lg:block"}`}>
         Logout
       </span>
     </button>

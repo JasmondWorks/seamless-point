@@ -10,7 +10,8 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoutes>
+    // <ProtectedRoutes>
+    <>
       <div className="h-screen flex flex-col">
         <Navbar />
         <div className="bg-neutral-50 flex-1 overflow-auto flex">
@@ -33,6 +34,7 @@ export default async function DashboardLayout({
           </ScrollArea>
         </div>
       </div>
-    </ProtectedRoutes>
+      {/* </ProtectedRoutes> */}
+    </>
   );
 }

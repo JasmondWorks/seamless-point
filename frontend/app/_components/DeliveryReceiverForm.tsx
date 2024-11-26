@@ -86,26 +86,27 @@ export default function DeliveryReceiverForm() {
 
   async function onSubmit(data: z.infer<typeof deliveryDestinationSchema>) {
     // console.log(data);
-    // addFormData(data);
-    const newFormData = { ...formData, ...data };
-    console.log(newFormData);
+    addFormData(data);
+    router.push('/user/deliveries/parcel-info');
+    // const newFormData = { ...formData, ...data };
+    // console.log(newFormData);
 
-    const { summary, ...newDelivery } = newFormData;
-    newDelivery.pickupAddress = `${newDelivery.aptUnit} ${newDelivery.street}`;
-    newDelivery.streetNumber = `123`;
-    newDelivery.user = user.id;
-    newDelivery.status = "unconfirmed";
+    // const { summary, ...newDelivery } = newFormData;
+    // newDelivery.pickupAddress = `${newDelivery.aptUnit} ${newDelivery.street}`;
+    // newDelivery.streetNumber = `123`;
+    // newDelivery.user = user.id;
+    // newDelivery.status = "unconfirmed";
 
-    try {
-      const response = await createDelivery(newDelivery);
-      console.log(response);
-      router.push(
-        `/user/deliveries/success/?trackingNum=${response.trackingId}`
-      );
-    } catch (error: any) {
-      toast.error(error.message);
-      console.error(error.message);
-    }
+    // try {
+    //   const response = await createDelivery(newDelivery);
+    //   console.log(response);
+    //   router.push(
+    //     `/user/deliveries/success/?trackingNum=${response.trackingId}`
+    //   );
+    // } catch (error: any) {
+    //   toast.error(error.message);
+    //   console.error(error.message);
+    // }
 
     // incrementFormStep();
   }

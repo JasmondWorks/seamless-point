@@ -19,7 +19,8 @@ export default function Funding() {
     setSelectedPaymentMethod(type);
   }
 
-  function handleSubmit() {
+  function handleSubmit(e) {
+    e.preventDefault();
     console.log("here");
     if (!selectedPaymentMethod)
       return toast.error("Please select a payment method");

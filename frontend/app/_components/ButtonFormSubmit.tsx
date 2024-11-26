@@ -22,6 +22,7 @@ export default function ButtonFormSubmit({
 }: Props) {
   return (
     <Button
+      type="submit"
       disabled={isLoading}
       onClick={onClick}
       text={isLoading ? <Loader /> : text}

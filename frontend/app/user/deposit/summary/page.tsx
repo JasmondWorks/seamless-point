@@ -6,9 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import CustomFormField, {
   FormFieldType,
 } from "@/app/_components/CustomFormField";
-import { FaApple, FaChevronRight } from "react-icons/fa";
 import { Form } from "@/app/_components/ui/form";
-import Link from "next/link";
 
 import { IoIosClose } from "react-icons/io";
 
@@ -33,9 +31,9 @@ import { copyToClipboard } from "@/app/_utils/utils";
 import { ButtonVariant } from "@/app/_components/Button";
 import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
 import CountdownTimer from "@/app/_components/CountdownTimer";
-import { cardDetailsSchema } from "@/app/_lib/validation";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
+import { CreditCardForm } from "@/app/_components/CreditCardForm";
 
 enum EDialogContent {
   cardDetails = "CARD_DETAILS",
@@ -47,7 +45,7 @@ enum EDialogContent {
 
 export default function Page() {
   const { formData } = useFormContext();
-  console.log(formData.paymentMethod);
+
   const router = useRouter();
   const transactionFee = 1.5;
 
@@ -154,57 +152,12 @@ export default function Page() {
 }
 
 function CardDetailsDialogContent({ onOpenBankValidationDialog }) {
-  const form = useForm<z.infer<typeof cardDetailsSchema>>({
-    resolver: zodResolver(cardDetailsSchema),
-    defaultValues: {
-      cardNumber: "",
-      cvv: "",
-      expiryDate: "",
-    },
-  });
-
-  async function onSubmit(data: z.infer<typeof cardDetailsSchema>) {
-    console.log(data);
-    onOpenBankValidationDialog();
-  }
-
   return (
     <div className={`flex flex-col gap-y-8`}>
       <TotalPriceHeader />
       <div className="space-y-8">
         <h3 className="text-2xl font-bold">Enter your card details to pay</h3>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-5">
-              <CustomFormField
-                className="col-span-2"
-                label="CARD NUMBER"
-                name="cardNumber"
-                control={form.control}
-                fieldType={FormFieldType.INPUT}
-                placeholder="Example"
-              />
-              <CustomFormField
-                label="EXPIRY"
-                name="expiryDate"
-                control={form.control}
-                fieldType={FormFieldType.INPUT}
-                placeholder="MM/YY"
-              />
-              <CustomFormField
-                label="CVV"
-                name="cvv"
-                control={form.control}
-                fieldType={FormFieldType.PASSWORD}
-                placeholder="123"
-              />
-            </div>
-            <ButtonFormSubmit
-              onClick={onOpenBankValidationDialog}
-              text="I UNDERSTAND"
-            />
-          </form>
-        </Form>
+        <CreditCardForm handleSubmit={onOpenBankValidationDialog} />
       </div>
     </div>
   );

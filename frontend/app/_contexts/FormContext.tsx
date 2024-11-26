@@ -7,9 +7,9 @@ const initialData = {};
 const FormContext = createContext(initialData);
 
 export function FormProvider({ children }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     amount: 50,
-    // selectedPaymentMethod: "debit-card",
+    selectedPaymentMethod: "debit-card",
   });
   const [formStep, setformStep] = useState(1);
 
@@ -19,8 +19,6 @@ export function FormProvider({ children }) {
   const addFormData = (data) => {
     setFormData((cur) => ({ ...cur, ...data }));
   };
-
-  console.log(formData);
 
   return (
     <FormContext.Provider

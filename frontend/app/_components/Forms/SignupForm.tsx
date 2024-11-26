@@ -87,11 +87,14 @@ export default function SignupForm() {
     try {
       setIsLoading(true);
       const response = await signupUser(data);
+      console.log(response);
       const { user, token } = response;
 
       login(user, token);
     } catch (error: any) {
-      toast.error(error.message);
+      if (error.message === "fetch failed")
+        toast.error("Check your internet connection");
+      else toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
