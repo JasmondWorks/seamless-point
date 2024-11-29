@@ -1,16 +1,28 @@
+import clsx from "clsx";
 import React from "react";
 
 export default function ActionButton({
   icon,
   text,
+  size = "",
 }: {
   icon: any;
   text: string;
+  size?: string;
 }) {
   return (
-    <div className="p-5 rounded-xl items-center flex gap-6 bg-orange-100 bg-opacity-40">
-      <span className="rounded-full bg-orange-200 p-2 w-16 lg:w-20 aspect-square grid place-items-center">
-        {icon || (
+    <div className="p-5 rounded-xl items-center flex gap-6 bg-[#fef5ee]">
+      <span
+        className={clsx(
+          "rounded-full bg-orange-200 p-3 aspect-square grid place-items-center"
+        )}
+      >
+        {icon ? (
+          <span className={clsx("w-10 aspect-square", {
+            "w-8 ": size === "sm",
+            "w-12 lg:w-20": size !== "sm",
+          })}>{icon}</span>
+        ) : (
           <svg
             width={40}
             height={40}

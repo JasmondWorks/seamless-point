@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 
 interface CountdownProps {
   initialSeconds: number; // Start time in seconds,
-  onSetTimeLeft: () => void;
+  onSetTimeLeft?: () => void;
 }
 
 const CountdownTimer: React.FC<CountdownProps> = ({
   initialSeconds,
-  onSetTimeLeft,
+  onSetTimeLeft = "",
 }) => {
   const [timeLeft, setTimeLeft] = useState(initialSeconds);
 
@@ -19,7 +19,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({
     const intervalId = setInterval(() => {
       const newTime = timeLeft - 1;
       setTimeLeft((prevTime) => prevTime - 1);
-      onSetTimeLeft(newTime);
+      onSetTimeLeft && onSetTimeLeft(newTime);
     }, 1000);
 
     // Cleanup interval on unmount or when timeLeft changes

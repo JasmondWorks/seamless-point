@@ -18,6 +18,7 @@ import CopyToClipboard from "@/app/_components/CopyToClipboard";
 import ConfirmDialog from "@/app/_components/Dialogs/ConfirmDialog2";
 import { useState } from "react";
 import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
+import { formatDateTime } from "@/app/_lib/utils";
 
 // Define your delivery type
 export type Delivery = {
@@ -169,7 +170,7 @@ export const getDeliveriesColumns = (
       header: "DISPATCH",
       cell: ({ row }) => (
         <Image
-          className="w-7 object-contain"
+          className="w-7 object-contain mx-auto"
           src={`/assets/images/${row.getValue("dispatch")}`}
           alt="dispatch"
           width={100}
@@ -194,23 +195,7 @@ export const getDeliveriesColumns = (
       accessorKey: "date",
       header: "DATE",
       cell: ({ row }) => {
-        const isoDate = row.getValue("date");
-        const date = new Date(isoDate);
-
-        // Extract parts of the date and time
-        const year = date.getFullYear();
-        const month = date.toLocaleString("en-US", { month: "short" });
-        const day = date.getDate();
-        const hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        const ampm = hours >= 12 ? "PM" : "AM";
-        const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-
-        return (
-          <span>
-            {month} {day}, {formattedHours}:{minutes} {ampm}
-          </span>
-        );
+        return <span>{formatDateTime(row.getValue("date"))}</span>;
       },
     },
   ];

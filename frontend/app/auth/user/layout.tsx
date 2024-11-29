@@ -27,7 +27,9 @@ export default function UserAuthLayout({
     !user && (
       <div className="flex flex-col h-screen">
         <Navbar />
-        <ScrollArea className="flex-1 h-full">{children}</ScrollArea>
+        <ScrollArea className="h-full mt-20 md:mt-0 flex-1">
+          {children}
+        </ScrollArea>
       </div>
     )
   );

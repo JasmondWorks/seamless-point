@@ -12,7 +12,7 @@ export enum BadgeVariant {
 interface Props {
   className?: string;
   text?: string;
-  variant: BadgeVariant;
+  variant: BadgeVariant | null;
   children?: React.ReactNode;
   isRoundedFull?: boolean;
 }

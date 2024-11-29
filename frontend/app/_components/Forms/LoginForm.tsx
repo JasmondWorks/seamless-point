@@ -46,6 +46,7 @@ export default function LoginForm() {
           }
         );
 
+        console.log(userDetailsResponse);
         if (userDetailsResponse.ok) {
           const userInfo = await userDetailsResponse.json();
           console.log(userInfo); // Logs the user info

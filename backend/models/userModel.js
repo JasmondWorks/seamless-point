@@ -3,73 +3,97 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, "Please provide a first name"],
-  },
-  lastName: {
-    type: String,
-    // required: [true, "Please provide a last name"],
-  },
-  dob: {
-    type: Date,
-    // required: [true, "Please provide a DOB"],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ["Male", "Female"],
-      message: "Gender is either: Male or Female",
-    },
-  },
-  email: {
-    type: String,
-    validate: [validator.isEmail, "Please provide a valid email"],
+const phoneNumberRegex = /^\+?[1-9]\d{1,14}$/;
 
-    required: [true, "Please provide a valid email"],
-    unique: true,
-  },
-  authType: {
-    type: String,
-    enum: {
-      values: ["credentials", "google", "twitter", "facebook"],
-      message: "Authtype is either: credentials, google, twitter or facebook ",
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: [true, "Please provide a first name"],
     },
-    default: "credentials",
-    required: [true, "Please specify the authType"],
-  },
-  balance: {
-    type: Number,
-    default: 0,
-  },
-
-  role: { type: String, default: "user" },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: [8, "Password must be at least 8 characters"],
-  },
-  confirmPassword: {
-    type: String,
-    validate: {
-      validator: function (el) {
-        return el === this.password;
+    lastName: {
+      type: String,
+      // required: [true, "Please provide a last name"],
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, "Please provide your phone number"],
+      validate: {
+        validator: function (v) {
+          return phoneNumberRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid phone number!`,
       },
-      message: "Passwords do not match!",
     },
-    required: [true, "Please confirm your password"],
+    dob: {
+      type: Date,
+      // required: [true, "Please provide a DOB"],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ["Male", "Female"],
+        message: "Gender is either: Male or Female",
+      },
+    },
+    email: {
+      type: String,
+      validate: [validator.isEmail, "Please provide a valid email"],
+
+      required: [true, "Please provide a valid email"],
+      unique: true,
+    },
+    authType: {
+      type: String,
+      enum: {
+        values: ["credentials", "google", "twitter", "facebook"],
+        message:
+          "Authtype is either: credentials, google, twitter or facebook ",
+      },
+      default: "credentials",
+      required: [true, "Please specify the authType"],
+    },
+    balance: {
+      type: Number,
+      default: 0,
+    },
+    city: {
+      type: String,
+    },
+    street: {
+      type: String,
+    },
+    streetNumber: {
+      type: String,
+    },
+    role: { type: String, default: "user" },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: [8, "Password must be at least 8 characters"],
+    },
+    confirmPassword: {
+      type: String,
+      validate: {
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords do not match!",
+      },
+      required: [true, "Please confirm your password"],
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpires: Date,
+    latestTokenAssignedAt: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
   },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetTokenExpires: Date,
-  latestTokenAssignedAt: Date,
-  active: {
-    type: Boolean,
-    default: true,
-    select: false,
-  },
-});
+  { timestamps: true }
+);
 
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });

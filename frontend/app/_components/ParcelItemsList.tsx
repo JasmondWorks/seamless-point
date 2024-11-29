@@ -1,3 +1,5 @@
+import ConfirmDialogContent from "@/app/_components/ConfirmDialogContent";
+import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import { useFormContext } from "@/app/_contexts/FormContext";
 import { formatCurrency } from "@/app/_lib/utils";
 import { Edit, Plus, Trash2Icon } from "lucide-react";
@@ -5,7 +7,11 @@ import React, { useState } from "react";
 
 export default function ParcelItemsList() {
   const {
-    formData: { items, onEditParcelItem, onRemoveParcelItem },
+    formData: {
+      items,
+      onOpenEditParcelItemDialog,
+      onOpenRemoveParcelItemDialog,
+    },
   } = useFormContext();
 
   if (!items?.length) return;
@@ -30,8 +36,18 @@ export default function ParcelItemsList() {
             </div>
           </div>
           <div className="flex gap-3">
-            <Edit size={18} onClick={() => onEditParcelItem(item)} />
-            <Trash2Icon size={18} onClick={() => onRemoveParcelItem(item.id)} />
+            <button>
+              <Edit
+                size={18}
+                onClick={() => onOpenEditParcelItemDialog(item)}
+              />
+            </button>
+            <button>
+              <Trash2Icon
+                size={18}
+                onClick={() => onOpenRemoveParcelItemDialog(item)}
+              />
+            </button>
           </div>
         </div>
       ))}

@@ -4,6 +4,8 @@ const Admin = require("../models/adminModel");
 const { catchAsync } = require("../utils/helpers");
 const AppError = require("../utils/appError");
 const { verifyJwt } = require("../utils/jwt.js");
+const Email = require("../utils/email");
+
 const { createSendToken } = require("../utils/helpers");
 
 exports.authenticate = catchAsync(async (req, _res, next) => {
@@ -17,8 +19,6 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
 
   if (token === "null" || !token)
     throw new AppError("You are not logged in! Please log in", 401);
-
-  console.log("Token is", token);
 
   const decoded = await verifyJwt(token);
 
@@ -36,13 +36,12 @@ exports.authenticate = catchAsync(async (req, _res, next) => {
       401
     );
 
+  console.log(freshUser);
+
   req.user = freshUser;
 
   next();
 });
-
-exports.authenicateAdmin = catchAsync(async () => {});
-exports.authenticateUser = catchAsync(async () => {});
 
 exports.authorize = (...roles) =>
   catchAsync(async (req, _res, next) => {
@@ -55,6 +54,76 @@ exports.authorize = (...roles) =>
     next();
   });
 
+exports.verifyToken = (_req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Successfully authenticated",
+  });
+};
+
+exports.authenicateAdmin = catchAsync(async (req, res) => {
+  let token =
+    (req.headers.authorization?.startsWith("Bearer") &&
+      req.headers.authorization.split(" ")[1]) ||
+    (req.headers.cookie?.startsWith("jwt") &&
+    typeof req.headers.cookie === "string"
+      ? req.headers.cookie.split("=")[1]
+      : undefined);
+
+  if (token === "null" || !token)
+    throw new AppError("You are not logged in! Please log in", 401);
+
+  const decoded = await verifyJwt(token);
+
+  console.log("decoded", decoded.id);
+  const freshUser = await Admin.findById(decoded.id);
+
+  if (!freshUser)
+    throw new AppError("The user belonging to this token does not exist.", 401);
+
+  if (freshUser.changePasswordAfter(decoded.iat))
+    throw new AppError(
+      "User recently changed password! Please log in again",
+      401
+    );
+
+  res.status(200).json({
+    status: "success",
+    message: "Admin successfully authenticated",
+  });
+});
+
+exports.authenticateUser = catchAsync(async (req, res) => {
+  let token =
+    (req.headers.authorization?.startsWith("Bearer") &&
+      req.headers.authorization.split(" ")[1]) ||
+    (req.headers.cookie?.startsWith("jwt") &&
+    typeof req.headers.cookie === "string"
+      ? req.headers.cookie.split("=")[1]
+      : undefined);
+
+  if (token === "null" || !token)
+    throw new AppError("You are not logged in! Please log in", 401);
+
+  const decoded = await verifyJwt(token);
+
+  const freshUser = await User.findById(decoded.id);
+
+  if (!freshUser)
+    throw new AppError("The user belonging to this token does not exist.", 401);
+
+  if (freshUser.changePasswordAfter(decoded.iat))
+    throw new AppError(
+      "User recently changed password! Please log in again",
+      401
+    );
+
+  res.status(200).json({
+    status: "success",
+    message: "User Successfully authenticated",
+  });
+});
+
 exports.authorizeRootAdmin = catchAsync(async (req, _res, next) => {
   if (!req.user.isRoot)
     throw new AppError(
@@ -63,13 +132,6 @@ exports.authorizeRootAdmin = catchAsync(async (req, _res, next) => {
 
   next();
 });
-
-exports.verifyToken = (_req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "Successfully authenticated",
-  });
-};
 
 exports.getUser = catchAsync(async (req, res) => {
   if (!req.body.email) throw new AppError("Please provide an email", 400);
@@ -99,10 +161,13 @@ module.exports.userSignIn = catchAsync(async function (req, res) {
 
   console.log(user, req.body.email);
 
-  if (!user)
+  if (!user) {
     user = await new User(req.body).save({
       validateBeforeSave: false,
     });
+
+    new Email(user).sendWelcome();
+  }
 
   createSendToken(user, 200, res);
 });
@@ -138,7 +203,9 @@ exports.signupUser = catchAsync(async (req, res) => {
 
   user = await User.findById(newUser._id);
 
-  await createSendToken(user, 201, res);
+  new Email(user).sendWelcome();
+
+  createSendToken(user, 201, res);
 });
 
 exports.signupAdmin = catchAsync(async (req, res) => {
@@ -162,7 +229,7 @@ exports.signupAdmin = catchAsync(async (req, res) => {
     isRoot,
   });
 
-  await createSendToken(newAdmin, 201, res);
+  createSendToken(newAdmin, 201, res);
 });
 
 module.exports.adminSignIn = catchAsync(async function (req, res) {
@@ -203,15 +270,15 @@ exports.adminLogin = catchAsync(async (req, res) => {
   if (!admin || !(await admin.correctPassword(password, admin.password)))
     throw new AppError("Incorrect email or password", 401);
 
-  await createSendToken(admin, 200, res);
+  createSendToken(admin, 200, res);
 });
 
 module.exports.forgotUserPassword = catchAsync(async function (req, res) {
   // find the userId based on email
-  const { email } = req.body;
-  if (!email) throw new AppError("Please provide an email", 400);
+  const { my_email } = req.body;
+  if (!my_email) throw new AppError("Please provide an email", 400);
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ my_email });
 
   if (user && user.authType !== "credentials") {
     throw new AppError(
@@ -226,37 +293,16 @@ module.exports.forgotUserPassword = catchAsync(async function (req, res) {
 
   await user.save({ validateBeforeSave: false });
 
-  // if user found
-  // send them a reset token.
   const resetURL = `${req.protocol}://${req.get(
     "host"
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
-
-  console.log(resetURL);
-  // try {
-  //   await sendEmail({
-  //     email: guest.email,
-  //     subject: "Your password reset token (valid for 10 min)",
-  //     message,
-  //   });
+  await new Email(user).sendResetToken(resetURL);
 
   res.status(200).json({
     status: "success",
-    message: "Token sent to email!",
+    message: "Token sent to your email!",
   });
-  // } catch (err) {
-  //   console.log(err);
-  //   guest.passwordResetToken = undefined;
-  //   guest.passwordResetTokenExpires = undefined;
-  //   await guest.save();
-
-  //   throw new AppError(
-  //     "There was an error sending the email. Try again later!",
-  //     500
-  //   );
-  // }
 });
 
 exports.resetUserPassword = catchAsync(async (req, res) => {

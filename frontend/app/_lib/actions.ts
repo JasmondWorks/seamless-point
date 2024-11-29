@@ -203,29 +203,45 @@ export async function authenticateUser(token: string) {
   if (!res.ok) throw new Error(data.message);
 }
 
+export async function authenticateAdmin(token: string) {
+  console.log("authenticating");
+  const res = await fetch(`${URL}/users/authenticate`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  console.log(data);
+  if (!res.ok) throw new Error(data.message);
+}
+
+
+
 export async function getUser() {
   const token = getUserToken();
   console.log("The token: ", token);
-  // const res = await fetch(`${URL}/users/me`, {
-  //   method: "GET",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${token}`,
-  //   },
-  // });
-  // const data = await res.json();
+  const res = await fetch(`${URL}/users/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
 
-  // console.log(data);
+  console.log(data);
 
-  // if (!res.ok) throw new Error(data.message);
+  if (!res.ok) throw new Error(data.message);
 
-  // const {
-  //   data: { user },
-  // } = data;
+  const {
+    data: { user },
+  } = data;
 
-  // console.log("user is ", user);
+  console.log("user is ", user);
 
-  // return user;
+  return user;
 }
 export async function createDelivery(deliveryDetails: any) {
   const token = getUserToken();

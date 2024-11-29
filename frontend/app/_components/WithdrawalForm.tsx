@@ -7,6 +7,7 @@ import SelectDebitCard from "@/app/_components/SelectDebitCard";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
+import { Label } from "@/app/_components/ui/label";
 import { useFormContext } from "@/app/_contexts/FormContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -44,9 +45,12 @@ export default function WithdrawalForm() {
     <div className="flex flex-col gap-y-10">
       <BalanceDisplay />
       <div className="flex flex-col gap-3">
-        <label htmlFor="withdrawAmount">
+        <Label htmlFor="withdrawAmount">
           Enter the amount that you wish to withdraw
-        </label>
+        </Label>
+        {/* <label htmlFor="withdrawAmount">
+          Enter the amount that you wish to withdraw
+        </label> */}
         <Input
           value={amount}
           onChange={handleSetAmount}

@@ -1,4 +1,5 @@
-import SpinnerFull from "./_components/SpinnerFull";
+import SpinnerFull from "@/app/_components/SpinnerFull";
+
 function loading() {
   return <SpinnerFull />;
 }

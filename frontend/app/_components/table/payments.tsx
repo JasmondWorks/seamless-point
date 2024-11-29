@@ -2,145 +2,129 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/app/_components/ui/checkbox";
-import { CopyIcon } from "@radix-ui/react-icons";
-import { Button } from "@/app/_components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
+import Image from "next/image";
+import CopyToClipboard from "@/app/_components/CopyToClipboard";
+import ConfirmDialog from "@/app/_components/Dialogs/ConfirmDialog2";
+import { useState } from "react";
+import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
+import { formatDate } from "react-datepicker/dist/date_utils";
+import { formatDateTime } from "@/app/_lib/utils";
 
-// Define your delivery type
-type Delivery = {
-  trackingNumber: string;
+export type Payment = {
+  id: string;
   amount: number;
-  receiver: string;
-  destination: string;
+  remark: string;
   date: Date;
   status: string;
 };
 
 // Define the columns
-export const deliveriesColumns: ColumnDef<Delivery>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        indeterminate={table.getIsSomePageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div>Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
+export const getPaymentColumns = (): ColumnDef<Payment>[] => {
+  return [
+    // SELECT ALL
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={table.getIsSomePageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => {
+        const status = row.original.status; // Access 'status' directly from the row data
 
-      // Format the amount as a currency
-      const formatted = new Intl.NumberFormat("en-NG", {
-        style: "currency",
-        currency: "NGN",
-      }).format(amount);
-
-      return (
-        <div className="text-right font-medium flex gap-5">
-          <span>{formatted}</span>
-          <Badge variant={BadgeVariant.blue}>Ongoing</Badge>
-        </div>
-      );
+        return (
+          <Checkbox
+            checked={row.getIsSelected()}
+            indeterminate={row.getIsSomeSelected?.()} // Optional, if partial selection applies
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label={`Select row ${row.id}`} // Accessible label for the checkbox
+          />
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
     },
-  },
-  {
-    accessorKey: "trackingNumber",
-    header: "TRACKING NUMBER",
-    cell: ({ row }) => (
-      <div className="flex gap-2 items-center">
-        <span>{row.getValue("trackingNumber")}</span>
-        <CopyIcon className="text-2xl" />
-      </div>
-    ),
-  },
-  {
-    accessorKey: "receiver",
-    header: "RECEIVER",
-    cell: ({ row }) => <span>{row.getValue("receiver")}</span>,
-  },
-  {
-    accessorKey: "destination",
-    header: "DESTINATION",
-    cell: ({ row }) => <span>{row.getValue("destination")}</span>,
-  },
-  {
-    accessorKey: "date",
-    header: "DATE",
-    cell: ({ row }) => {
-      const isoDate = row.getValue("date");
-      const date = new Date(isoDate);
+    // AMOUNT
+    {
+      id: "amountStatus", // Custom ID for the combined column
+      header: () => <div className="text-center">AMOUNT</div>,
+      cell: ({ row }) => {
+        const amount = row.original.amount; // Access 'amount' directly from the row data
+        const status = row.original.status; // Access 'status' directly from the row data
 
-      // Extract parts of the date and time
-      const year = date.getFullYear();
-      const month = date.toLocaleString("en-US", { month: "short" });
-      const day = date.getDate();
-      const hours = date.getHours();
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      const ampm = hours >= 12 ? "PM" : "AM";
-      const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+        // Format the amount as currency
+        const formattedAmount = new Intl.NumberFormat("en-NG", {
+          style: "currency",
+          currency: "NGN",
+        }).format(amount);
 
-      const readableDateTime = `${month} ${day}, ${year}, ${formattedHours}:${minutes} ${ampm}`;
+        // Determine badge based on status
+        const statusBadge = (() => {
+          switch (status) {
+            case "ongoing":
+              return <Badge variant={BadgeVariant.neutralDark}>Ongoing</Badge>;
+            case "completed":
+              return <Badge variant={BadgeVariant.blue}>Completed</Badge>;
+            case "uncompleted":
+              return <Badge variant={BadgeVariant.orange}>Uncompleted</Badge>;
+            case "pending":
+              return <Badge variant={BadgeVariant.orange}>Pending</Badge>;
+            case "cancelled":
+              return <Badge variant={BadgeVariant.red}>Cancelled</Badge>;
+            case "failed":
+              return <Badge variant={BadgeVariant.red}>Failed</Badge>;
+            default:
+              return <Badge variant={BadgeVariant.red}>Unknown status</Badge>;
+          }
+        })();
 
-      return (
-        <span>
-          {month} {day}, {formattedHours}:{minutes} {ampm}
-        </span>
-      );
+        return (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(80px, 1fr) minmax(100px, 1fr)",
+              gap: "10px",
+              alignItems: "center",
+            }}
+          >
+            <span className="font-medium">{formattedAmount}</span>
+            <div className="flex justify-center">{statusBadge}</div>
+          </div>
+        );
+      },
     },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const delivery = row.original;
+    // ID
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => {
+        const id = row.getValue("id");
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(delivery.trackingNumber)
-              }
-            >
-              Copy tracking number
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View delivery details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+        return (
+          <div className="flex gap-2 items-center">
+            <span>{id}</span>
+            <CopyToClipboard text={id} />
+          </div>
+        );
+      },
     },
-  },
-];
+    // REMARK
+    {
+      accessorKey: "remark",
+      header: "REMARK",
+      cell: ({ row }) => <span>{row.getValue("remark")}</span>,
+    },
+    // DATE
+    {
+      accessorKey: "date",
+      header: "DATE",
+      cell: ({ row }) => {
+        return <span>{formatDateTime(row.getValue("date"))}</span>;
+      },
+    },
+  ];
+};

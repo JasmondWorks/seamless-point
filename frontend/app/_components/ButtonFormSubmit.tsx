@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function ButtonFormSubmit({
-  text,
+  text = "I UNDERSTAND",
   className = "",
   onClick,
   icon,

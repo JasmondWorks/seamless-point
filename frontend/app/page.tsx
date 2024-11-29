@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
-      <ScrollArea className="flex-1 h-full">
+      <ScrollArea className="flex-1 h-full mt-20 md:mt-0">
         <section className="py-32 lg:py-16">
           <div className="container-custom">
             <div className="grid gap-10 gap-y-5 lg:grid-cols-2 items-center">

@@ -18,6 +18,8 @@ router.post("/forgotPassword", authController.forgotAdminPassword);
 
 router.patch("/resetPassword/:token", authController.resetAdminPassword);
 
+router.get("/authenticate", authController.authenicateAdmin);
+
 router.patch(
   "/updateMyPassword",
   authController.authenticate,

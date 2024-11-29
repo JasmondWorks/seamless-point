@@ -2,8 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+<<<<<<< HEAD
 import { Toaster } from "react-hot-toast";
 import { UserAuthProvider } from "./_contexts/UserAuthContext";
+=======
+import { Plus_Jakarta_Sans } from "next/font/google";
+import Navbar from "../components/Navbar";
+import Footer from "@/components/Footer";
+import { usePathname } from "next/navigation";
+import { AppProvider } from "../contexts/AppContext";
+import { AuthProvider } from "../contexts/AuthContext";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "600", "500", "700"], // Specify weights as needed
+});
+>>>>>>> 983440d994ae631074b4b7ca8ab9d2e0e90831bf
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",

@@ -48,14 +48,12 @@ export default function Navbar({ className = "" }) {
 
   return (
     <div
-      className={`flex flex-col md:flex-row md:items-center justify-between py-2 px-5 md:pb-2 bg-white w-full z-50 gap-x-12 md:gap-20 
+      className={`h-20 md:h-auto fixed md:static flex flex-wrap md:flex-row items-center justify-between bg-white w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
         border-b border-neutral-200 transition-shadow duration-300 
-        ${hasScrolled ? "shadow-md" : ""} ${
-        isNavShowing ? "pb-5" : ""
-      } ${className}`}
+        ${hasScrolled ? "shadow-md" : ""} ${className}`}
     >
       <div
-        className={`flex items-center w-full ${
+        className={`px-5 md:px-0 flex md:h-auto items-center h-full w-full ${
           !user ? "md:w-fit" : ""
         } justify-between`}
       >
@@ -92,10 +90,12 @@ export default function Navbar({ className = "" }) {
           </div>
         )}
       </div>
+
+      {/* Nav Menu */}
       {!user && (
         <div
-          className={`flex flex-col md:flex-row md:items-center flex-1 gap-y-5 ${
-            isNavShowing ? "block" : "hidden md:flex"
+          className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 ${
+            isNavShowing ? "block pb-4 md:pb-0" : "hidden md:flex"
           }`}
         >
           <nav className="flex-1 justify-start">

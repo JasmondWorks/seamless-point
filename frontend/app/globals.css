@@ -25,10 +25,10 @@
   height: 0;
 }
 
-/* *::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 0;
   height: 0;
-} */
+}
 html {
   scroll-behavior: smooth;
 }
@@ -482,5 +482,9 @@ h2.react-datepicker__current-month {
   display: none;
 }
 .dialogContainer .right-4.top-4 {
+  display: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
