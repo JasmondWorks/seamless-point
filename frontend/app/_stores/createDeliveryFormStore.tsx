@@ -48,6 +48,7 @@ interface DeliveryForm {
   updateSender: (sender: Sender) => void;
   updateReceiver: (receiver: Receiver) => void;
   updateParcel: (parcel: Parcel) => void;
+  resetDeliveryData: () => void;
 }
 
 export const useDeliveryFormStore = create<DeliveryForm>((set) => ({
@@ -57,6 +58,10 @@ export const useDeliveryFormStore = create<DeliveryForm>((set) => ({
   parcel: null,
   courier: "",
   step: 1, // initial step (sender form)
+
+  resetDeliveryData: () => {
+    set({ deliveryType: "", sender: null, receiver: null, courier: "" });
+  },
 
   onSelectDeliveryType: (type: DeliveryType) => {
     set({ deliveryType: type });

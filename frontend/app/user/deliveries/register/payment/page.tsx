@@ -10,13 +10,18 @@ import { useRouter } from "next/navigation";
 import { useFormContext } from "@/app/_contexts/FormContext";
 import toast from "react-hot-toast";
 import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
-import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
+import { useDeliveriesStore } from "@/app/_stores";
+import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
 
 export default function Payment() {
   const { formData, addFormData, setFormData } = useFormContext();
   const [amount, setAmount] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const resetDeliveryData = useDeliveryFormStore(
+    (store) => store.resetDeliveryData
+  );
 
   console.log(formData);
   const router = useRouter();
@@ -42,6 +47,8 @@ export default function Payment() {
     }
 
     setIsDialogOpen(true);
+
+    resetDeliveryData();
     setTimeout(() => router.push("/user/deliveries/success"), 5000);
   }
   return (
