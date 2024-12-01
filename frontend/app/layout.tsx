@@ -16,7 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="text-[85%] md:text[90%] lg:text-[95%]">
+    <html
+      lang="en"
+      className="scroll-smooth text-[85%] md:text[90%] lg:text-[95%]"
+      style={{ scrollBehavior: "smooth" }}
+    >
       <body className={`antialiased overflow-x-hidden no-scrollbar`}>
         <GoogleOAuthProvider clientId="353332526572-1f03a2r0gstceibcvhtlnfg9eo3gsq8r.apps.googleusercontent.com">
           <UserAuthProvider>{children}</UserAuthProvider>

@@ -11,11 +11,11 @@ import { Bell } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { title: "Home", href: "/" },
-  { title: "About us", href: "/about-us" },
-  { title: "Products", href: "/products" },
-  { title: "F.A.Q", href: "/faqs" },
-  { title: "Contact us", href: "/contact-us" },
+  { title: "Home", href: "/#home" },
+  { title: "About us", href: "/#about-us" },
+  { title: "Products", href: "/#products" },
+  { title: "F.A.Q", href: "/#faqs" },
+  { title: "Contact us", href: "/#contact-us" },
 ];
 export default function Navbar({ className = "" }) {
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -105,7 +105,7 @@ export default function Navbar({ className = "" }) {
                   key={link.href}
                   className="text-center font-medium border-b md:border-b-transparent py-4 md:py-0 border-neutral-100"
                 >
-                  <Link href={link.href}>{link.title}</Link>
+                  <a href={link.href}>{link.title}</a>
                 </li>
               ))}
             </ul>

@@ -9,6 +9,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      scrollBehavior: ["smooth"],
       colors: {
         brandPry: "var(--clr-brand-pry)",
         brandPryLight: "var(--clr-brand-pry--light)",
@@ -92,6 +93,9 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+  },
+  variants: {
+    scrollBehavior: ["responsive"],
   },
   plugins: [require("tailwindcss-animate")],
 };

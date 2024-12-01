@@ -30,7 +30,7 @@
   height: 0;
 }
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: smooth !important;
 }
 
 body {
