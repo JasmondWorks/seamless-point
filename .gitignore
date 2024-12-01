@@ -1,6 +1,5 @@
 
-*/config.env
-*.env*
-*env*
 .env
+.env.local
+
 node_modules
