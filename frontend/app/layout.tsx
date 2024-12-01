@@ -20,8 +20,8 @@ export default function RootLayout({
     >
       <body className={`antialiased overflow-x-hidden no-scrollbar`}>
         <GoogleOAuthProvider
-          // clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}
-          clientId="353332526572-1f03a2r0gstceibcvhtlnfg9eo3gsq8r.apps.googleusercontent.com"
+          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}
+          // clientId="353332526572-1f03a2r0gstceibcvhtlnfg9eo3gsq8r.apps.googleusercontent.com"
         >
           <UserAuthProvider>{children}</UserAuthProvider>
         </GoogleOAuthProvider>
