@@ -16,7 +16,7 @@ import { loginUser, signinAdmin, signinUser } from "@/app/_lib/actions";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import { useAdminAuth } from "@/app/_contexts/AdminAuthContext";
