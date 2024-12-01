@@ -254,7 +254,7 @@ export function DeliveriesTable() {
         />
         <div className="flex items-center gap-4 flex-wrap">
           {tags.map((tag) => (
-            <button onClick={() => toggleTag(tag)}>
+            <button key={tag} onClick={() => toggleTag(tag)}>
               <Badge
                 className={`${selectedTags.includes(tag) ? "opacity-50" : ""}`}
                 key={tag}

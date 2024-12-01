@@ -12,82 +12,114 @@ import { Form } from "@/app/_components/ui/form";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { useFormContext } from "@/app/_contexts/FormContext";
 import { useEffect, useState } from "react";
-import { fetchCountries, fetchStatesForCountry } from "@/app/_utils/utils";
+import {
+  fetchCitiesForState,
+  fetchCountries,
+  fetchStatesForCountry,
+} from "@/app/_utils/utils";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
 
 export default function DeliverySourceForm() {
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const router = useRouter();
-  const { addFormData, formStep, incrementFormStep } = useFormContext();
-
-  const step = 1;
-  const randNum = Math.floor(Math.random() * 5) + 1;
+  const sender = useDeliveryFormStore((store) => store.sender);
 
   const form = useForm<z.infer<typeof deliverySourceSchema>>({
     resolver: zodResolver(deliverySourceSchema),
     defaultValues: {
-      country: "", // Default: Empty string for required text fields
-      state: "", // Default: Empty string for required text fields
-      firstname: "", // Default: Empty string
-      lastname: "", // Default: Empty string
-      city: "", // Default: Empty string
-      street: "", // Default: Empty string
-      aptUnit: "", // Default: Empty string
-      email: "", // Default: Empty string
-      phoneNumber: "", // Default: Empty string
-      deliveryTitle: "", // Default: Empty string
-      summary: "", // Default: Empty string
-      instructions: "Leave package at the front door",
-      amountOfItems: randNum,
+      ...{
+        country: "",
+        state: "",
+        firstname: "",
+        lastname: "",
+        city: "",
+        street: "",
+        aptUnit: "",
+        email: "",
+        phoneNumber: "",
+        deliveryTitle: "",
+        summary: "",
+      },
+      ...sender, // Override with Zustand state
     },
   });
 
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const router = useRouter();
+  const updateSender = useDeliveryFormStore((state) => state.updateSender);
+
   const { watch } = form;
-  const selectedCountry = watch("country");
-  //   const selectedState = watch("state");
+  const selectedCountryName = watch("country");
+  const selectedStateName = watch("state");
 
-  // Fetch all countries on mount
+  // Fetch countries once
   useEffect(() => {
-    // if (step !== formStep) return router.push("/user/deliveries/register");
-
-    async function getCountries() {
+    async function loadCountries() {
       const response = await fetchCountries();
-
       setCountries(response);
     }
-    getCountries();
+    loadCountries();
   }, []);
 
-  //  Get states by selected country
+  // Fetch states for selected country
   useEffect(() => {
-    if (!selectedCountry) return;
-
-    async function getCountryStates() {
-      const country = countries.find((c) => c.name === selectedCountry);
-
-      const states = await fetchStatesForCountry(country.isoCode);
-
-      if (!states.length)
-        toast.error("No states available for the selected country");
-
-      setStates(states);
+    if (!selectedCountryName) {
+      setStates([]); // Clear states when no country is selected
+      return;
     }
 
-    getCountryStates();
-  }, [selectedCountry]);
+    async function loadStates() {
+      const country = countries.find((c) => c.name === selectedCountryName);
 
-  //   Submit form
+      if (country) {
+        const response = await fetchStatesForCountry(country.isoCode);
+        setStates(response);
+
+        if (response.length === 0) toast.error("No states available.");
+      }
+    }
+
+    loadStates();
+    setCities([]); // Clear cities when country changes
+  }, [selectedCountryName, countries]);
+
+  // Fetch cities for selected state
+  useEffect(() => {
+    if (!selectedStateName) {
+      setCities([]); // Clear cities when no state is selected
+      return;
+    }
+
+    async function loadCities() {
+      const country = countries.find((c) => c.name === selectedCountryName);
+      const state = states.find((s) => s.name === selectedStateName);
+
+      if (country && state) {
+        const response = await fetchCitiesForState(
+          country.isoCode,
+          state.isoCode
+        );
+        setCities(response);
+
+        if (response.length === 0) toast.error("No cities available.");
+      }
+    }
+
+    loadCities();
+  }, [selectedStateName, selectedCountryName, states]);
+
+  // Form submission
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
-    console.log(data);
-    addFormData(data);
+    updateSender(data);
 
-    // incrementFormStep();
+    console.log(data);
     router.push("/user/deliveries/register/destination");
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -122,13 +154,22 @@ export default function DeliverySourceForm() {
             fieldType={FormFieldType.INPUT}
             placeholder="Last name"
           />
-          <CustomFormField
+          {/* <CustomFormField
             className="sm:col-span-2"
             label="City"
             name="city"
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="Lagos"
+          /> */}
+          <CustomFormField
+            className="sm:col-span-2"
+            label="City"
+            name="city"
+            control={form.control}
+            fieldType={FormFieldType.SELECT}
+            placeholder="City"
+            selectOptions={cities.map((city) => city.name)}
           />
           <CustomFormField
             label="Street"

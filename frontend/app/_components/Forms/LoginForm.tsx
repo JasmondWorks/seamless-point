@@ -12,15 +12,16 @@ import { FaApple, FaChevronRight } from "react-icons/fa";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { baseUserSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import { loginUser, signinUser } from "@/app/_lib/actions";
+import { loginUser, signinAdmin, signinUser } from "@/app/_lib/actions";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { useAdminAuth } from "@/app/_contexts/AdminAuthContext";
 
-export default function LoginForm() {
+export default function LoginForm({ userType = "user" }) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login } = useUserAuth();
@@ -32,6 +33,21 @@ export default function LoginForm() {
     defaultValues: { email: "", password: "" },
     mode: "onSubmit", // Optional: Change to "all" for real-time validation
   });
+
+  function onLogin(user, token) {
+    switch (userType) {
+      case "user":
+        login(user, token);
+        router.push("/user/dashboard");
+        break;
+      case "admin":
+        login(user, token);
+        router.push("/admin/dashboard");
+        break;
+      default:
+        break;
+    }
+  }
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (response) => {
@@ -58,12 +74,16 @@ export default function LoginForm() {
             authType: "google",
           };
 
-          const response = await signinUser(userDetails);
+          let response;
+          if (userType === "user") response = await signinUser(userDetails);
+          else if (userType === "admin")
+            response = await signinAdmin(userDetails);
+
           const { user, token } = response;
 
           setIsLoading(false);
-          login(user, token);
-          router.push("/user/dashboard");
+
+          onLogin(user, token);
         } else {
           console.error(
             "Failed to fetch user info:",
@@ -87,8 +107,7 @@ export default function LoginForm() {
       const res = await loginUser(data);
       const { user, token } = res;
 
-      login(user, token);
-      router.push("/user/dashboard");
+      onLogin(user, token);
     } catch (error: any) {
       console.log(error);
 
@@ -202,7 +221,7 @@ export default function LoginForm() {
           />
           <p className="mt-5 flex items-center justify-center leading-snug gap-2">
             Don't have an account?{" "}
-            <Link href="/auth/user/signup">
+            <Link href={`/auth/${userType}/signup`}>
               <Button
                 variant={ButtonVariant.link}
                 className="underline !py-0 !h-0"

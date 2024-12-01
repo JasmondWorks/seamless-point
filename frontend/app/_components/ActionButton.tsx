@@ -18,10 +18,17 @@ export default function ActionButton({
         )}
       >
         {icon ? (
-          <span className={clsx("w-10 aspect-square", {
-            "w-8 ": size === "sm",
-            "w-12 lg:w-20": size !== "sm",
-          })}>{icon}</span>
+          <span
+            className={clsx(
+              "w-10 flex justify-center items-center aspect-square",
+              {
+                "w-8 ": size === "sm",
+                "w-12 lg:w-20": size !== "sm",
+              }
+            )}
+          >
+            {icon}
+          </span>
         ) : (
           <svg
             width={40}

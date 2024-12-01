@@ -488,3 +488,15 @@ h2.react-datepicker__current-month {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.box {
+  background-color: var(--box-bg);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: var(--box-shadow);
+}
+
+.header {
+  margin-bottom: 30px;
+  text-align: center;
+}

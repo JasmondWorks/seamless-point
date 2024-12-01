@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import React, { useState } from "react";
 
-const FileUpload = ({ props }) => {
+const FileUpload = ({ props, field }) => {
   const [fileName, setFileName] = useState("");
 
   const handleFileChange = (event) => {

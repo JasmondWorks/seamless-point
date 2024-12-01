@@ -1,15 +1,5 @@
 "use client"; // Ensures everything in this file is client-side safe
 
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-  DialogFooter,
-} from "@/app/_components/ui/dialog"; // Adjust import path as necessary
-
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/app/_components/ui/checkbox";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";

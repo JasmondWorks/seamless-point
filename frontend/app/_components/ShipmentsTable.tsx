@@ -1,209 +1,134 @@
 "use client";
 
 import * as React from "react";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  getDeliveriesColumns,
-  Delivery,
-} from "@/app/_components/table/deliveries";
 
-import { Button } from "@/app/_components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/app/_components/ui/table";
 import Badge, { BadgeVariant } from "./Badge";
 import Searchbox from "@/app/_components/Searchbox";
+import DataTable from "@/app/_components/DataTable";
+import {
+  getShipmentsColumns,
+  Shipment,
+} from "@/app/_components/table/shipments";
 
-export const initialDeliveriesData: Delivery[] = [
+export const initialShipmentsData: Shipment[] = [
   {
-    trackingNumber: "4b547d95-8908-47cc-96f1-8d0c02f28bfb",
-    amount: 316,
-    status: "uncompleted",
-    receiver: "John Doe",
-    destination: "Mainland, Lagos",
-    date: new Date(),
-    dispatch: "dispatch1.png",
+    trackingNumber: "DHL1234567890",
+    amount: 1200.5,
+    status: "approved",
+    sender: "Jane Smith",
+    destination: "Lagos, Nigeria",
+    date: new Date("2024-11-25T14:48:00.000Z"),
+    courier: "DHL",
   },
   {
-    trackingNumber: "74f8b1ad-d676-46cd-8efa-4b0dbc788368",
-    amount: 242,
-    status: "ongoing",
-    receiver: "Jane Doe",
-    destination: "Challenge, Ibadan",
-    date: new Date(),
-    dispatch: "dispatch2.png",
+    trackingNumber: "UPS0987654321",
+    amount: 800.0,
+    status: "rejected",
+    sender: "Bob Brown",
+    destination: "Abuja, Nigeria",
+    date: new Date("2024-11-23T09:30:00.000Z"),
+    courier: "UPS",
   },
   {
-    trackingNumber: "2da81086-0ca2-43e5-b09e-dacf0efdb5cc",
-    amount: 242,
-    status: "ongoing",
-    receiver: "Jane Doe",
-    destination: "Challenge, Ibadan",
-    date: new Date(),
-    dispatch: "dispatch2.png",
+    trackingNumber: "FEDEX1122334455",
+    amount: 1500.75,
+    status: "approved",
+    sender: "Sara O'Connor",
+    destination: "Port Harcourt, Nigeria",
+    date: new Date("2024-11-24T11:20:00.000Z"),
+    courier: "FedEx",
   },
   {
-    trackingNumber: "e68020e6-ef49-4485-8c9c-9fde85dce071",
-    amount: 242,
-    status: "ongoing",
-    receiver: "Jane Doe",
-    destination: "Challenge, Ibadan",
-    date: new Date(),
-    dispatch: "dispatch2.png",
+    trackingNumber: "TNT5566778899",
+    amount: 200.0,
+    status: "rejected",
+    sender: "George Clark",
+    destination: "Kano, Nigeria",
+    date: new Date("2024-11-22T17:40:00.000Z"),
+    courier: "TNT",
+  },
+  {
+    trackingNumber: "USPS3344556677",
+    amount: 950.3,
+    status: "approved",
+    sender: "Amanda Green",
+    destination: "Enugu, Nigeria",
+    date: new Date("2024-11-21T13:15:00.000Z"),
+    courier: "USPS",
+  },
+  {
+    trackingNumber: "DHL2233445566",
+    amount: 1050.25,
+    status: "approved",
+    sender: "David Johnson",
+    destination: "Ibadan, Nigeria",
+    date: new Date("2024-11-20T10:00:00.000Z"),
+    courier: "DHL",
   },
 ];
 
-export function DeliveriesTable() {
-  const [deliveries, setDeliveries] = React.useState<Delivery[]>(
-    initialDeliveriesData
-  );
+export function ShipmentsTable() {
+  // Data variables
+  const [data, setData] = React.useState<Shipment[]>(initialShipmentsData);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  // Table layout variables
+  const columns = getShipmentsColumns();
 
-  const deliveriesColumns = getDeliveriesColumns(handleCancelDelivery);
+  const tags = ["approved", "rejected"];
 
-  const table = useReactTable({
-    data: deliveries,
-    columns: deliveriesColumns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
-
-  // Handlers
-  function handleCancelDelivery(trackingNumber: string) {
-    setDeliveries((prevDeliveries) =>
-      prevDeliveries.map((delivery) =>
-        delivery.trackingNumber === trackingNumber
-          ? { ...delivery, status: "cancelled" }
-          : delivery
-      )
-    );
-    console.log(trackingNumber);
+  function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchQuery(event.target.value);
   }
 
+  function toggleTag(tag: string) {
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tag)
+        ? prevTags.filter((t) => t !== tag)
+        : [...prevTags, tag]
+    );
+  }
+
+  function getBadgeStyle(tag: string): BadgeVariant | null {
+    switch (tag) {
+      case "approved":
+        return BadgeVariant.blue;
+      case "rejected":
+        return BadgeVariant.red;
+      default:
+        return null;
+    }
+  }
   return (
     <div className="w-full space-y-5">
       <div className="flex flex-col lg:flex-row gap-20 gap-y-5 justify-between">
-        <Searchbox placeholder="Search" />
+        <Searchbox
+          placeholder="Search"
+          onChange={handleSearch}
+          value={searchQuery}
+        />
         <div className="flex items-center gap-4 flex-wrap">
-          <Badge variant={BadgeVariant.blue}>Completed</Badge>
-          <Badge variant={BadgeVariant.orange}>Uncompleted</Badge>
-          <Badge variant={BadgeVariant.neutralDark}>Ongoing</Badge>
-          <Badge variant={BadgeVariant.red}>Cancelled/failed</Badge>
+          {tags.map((tag) => (
+            <button key={tag} onClick={() => toggleTag(tag)}>
+              <Badge
+                className={`${selectedTags.includes(tag) ? "opacity-50" : ""}`}
+                key={tag}
+                variant={getBadgeStyle(tag)}
+              >
+                {tag[0].toUpperCase() + tag.slice(1)}{" "}
+                {selectedTags.includes(tag) && "x"}
+              </Badge>
+            </button>
+          ))}
         </div>
       </div>
-      <div className="rounded-md text-center">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow className="border-b" key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      className="whitespace-nowrap text-xs text-neutral-400 font-bold uppercase"
-                      key={header.id}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className="border-b"
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell className="whitespace-nowrap" key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow className="border-b">
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <DataTable
+        columns={columns}
+        data={data}
+        searchQuery={searchQuery}
+        selectedTags={selectedTags}
+      />
     </div>
   );
 }

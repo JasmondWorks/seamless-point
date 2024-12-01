@@ -13,7 +13,7 @@ export default function SignOutButton({
   return (
     <button
       onClick={logout}
-      className={`w-full lg:items-center font-medium lg:px-10 py-4 lg:py-3 flex gap-3 ${
+      className={`w-full lg:items-center font-medium lg:px-10 py-2 flex gap-3 ${
         !isNavShowing
           ? "justify-center lg:justify-start"
           : "lg:justify-start px-8"

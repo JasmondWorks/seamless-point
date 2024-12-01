@@ -2,7 +2,6 @@ import Button, { ButtonVariant } from "@/app/_components/Button";
 import Link from "next/link";
 import BalanceDisplay from "../../_components/BalanceDisplay";
 import ActionButton from "../../_components/ActionButton";
-import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import Username from "@/app/_components/Username";
 
 export default function Dashboard() {

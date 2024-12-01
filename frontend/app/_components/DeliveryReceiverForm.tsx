@@ -7,38 +7,26 @@ import CustomFormField, {
   FormFieldType,
 } from "@/app/_components/CustomFormField";
 
-import {
-  deliveryDedeliveryDestinationSchema,
-  stinationSchema,
-  signUpSchema,
-  deliveryDestinationSchema,
-} from "@/app/_lib/validation";
+import { deliveryDestinationSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import { createDelivery, signupUser } from "@/app/_lib/actions";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import Link from "next/link";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
-import { useFormContext } from "@/app/_contexts/FormContext";
 import { useEffect, useState } from "react";
-import { fetchCountries, fetchStatesForCountry } from "@/app/_utils/utils";
+import {
+  fetchCitiesForState,
+  fetchCountries,
+  fetchStatesForCountry,
+} from "@/app/_utils/utils";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
 
 export default function DeliveryReceiverForm() {
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const router = useRouter();
-
-  const { addFormData, formStep, incrementFormStep, formData } =
-    useFormContext();
-  const { user } = useUserAuth();
-
-  const step = 2;
+  const receiver = useDeliveryFormStore((store) => store.receiver);
 
   const form = useForm<z.infer<typeof deliveryDestinationSchema>>({
     resolver: zodResolver(deliveryDestinationSchema),
-    defaultValues: {
+    defaultValues: receiver || {
       toCountry: "", // Default: Empty string for required text fields
       toState: "", // Default: Empty string for required text fields
       toFirstname: "", // Default: Empty string
@@ -51,64 +39,79 @@ export default function DeliveryReceiverForm() {
     },
   });
 
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const router = useRouter();
+  const updateReceiver = useDeliveryFormStore((state) => state.updateReceiver);
+
   const { watch } = form;
-  const selectedCountry = watch("toCountry");
-  //   const selectedState = watch("state");
+  const selectedCountryName = watch("toCountry");
+  const selectedStateName = watch("toState");
 
+  // Fetch countries once
   useEffect(() => {
-    // if (step !== formStep)
-    //   return router.push("/user/deliveries/register/source");
-
-    async function getCountries() {
+    async function loadCountries() {
       const response = await fetchCountries();
-
       setCountries(response);
     }
-    getCountries();
+    loadCountries();
   }, []);
 
+  // Fetch states for selected country
   useEffect(() => {
-    if (!selectedCountry) return;
-
-    async function getCountryStates() {
-      const country = countries.find((c) => c.name === selectedCountry);
-
-      const states = await fetchStatesForCountry(country.isoCode);
-
-      if (!states.length)
-        toast.error("No states available for the selected country");
-
-      setStates(states);
+    if (!selectedCountryName) {
+      setStates([]); // Clear states when no country is selected
+      return;
     }
 
-    getCountryStates();
-  }, [selectedCountry]);
+    async function loadStates() {
+      const country = countries.find((c) => c.name === selectedCountryName);
 
+      if (country) {
+        const response = await fetchStatesForCountry(country.isoCode);
+        setStates(response);
+
+        if (response.length === 0) toast.error("No states available.");
+      }
+    }
+
+    loadStates();
+    setCities([]); // Clear cities when country changes
+  }, [selectedCountryName, countries]);
+
+  // Fetch cities for selected state
+  useEffect(() => {
+    if (!selectedStateName) {
+      setCities([]); // Clear cities when no state is selected
+      return;
+    }
+
+    async function loadCities() {
+      const country = countries.find((c) => c.name === selectedCountryName);
+      const state = states.find((s) => s.name === selectedStateName);
+
+      if (country && state) {
+        const response = await fetchCitiesForState(
+          country.isoCode,
+          state.isoCode
+        );
+        setCities(response);
+
+        if (response.length === 0) toast.error("No cities available.");
+      }
+    }
+
+    loadCities();
+  }, [selectedStateName, selectedCountryName, states]);
+
+  // Form submission
   async function onSubmit(data: z.infer<typeof deliveryDestinationSchema>) {
-    // console.log(data);
-    addFormData(data);
-    router.push('/user/deliveries/parcel-info');
-    // const newFormData = { ...formData, ...data };
-    // console.log(newFormData);
+    updateReceiver(data);
 
-    // const { summary, ...newDelivery } = newFormData;
-    // newDelivery.pickupAddress = `${newDelivery.aptUnit} ${newDelivery.street}`;
-    // newDelivery.streetNumber = `123`;
-    // newDelivery.user = user.id;
-    // newDelivery.status = "unconfirmed";
-
-    // try {
-    //   const response = await createDelivery(newDelivery);
-    //   console.log(response);
-    //   router.push(
-    //     `/user/deliveries/success/?trackingNum=${response.trackingId}`
-    //   );
-    // } catch (error: any) {
-    //   toast.error(error.message);
-    //   console.error(error.message);
-    // }
-
-    // incrementFormStep();
+    console.log(data);
+    router.push("/user/deliveries/register/parcel-info");
   }
 
   return (
@@ -145,13 +148,21 @@ export default function DeliveryReceiverForm() {
             fieldType={FormFieldType.INPUT}
             placeholder="Receiver's last name"
           />
-          <CustomFormField
+          {/* <CustomFormField
             className="md:col-span-2"
             label="Receiver's city"
             name="toCity"
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="Lagos"
+          /> */}
+          <CustomFormField
+            label="Receiver's city"
+            name="toCity"
+            control={form.control}
+            fieldType={FormFieldType.SELECT}
+            placeholder="City"
+            selectOptions={cities.map((city) => city.name)}
           />
           <CustomFormField
             label="Receiver's Street"

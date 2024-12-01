@@ -25,13 +25,13 @@ export async function signupUser(userDetails: any) {
 
   return { token, user };
 }
-export async function signupAdmin(adminDetails: any) {
+export async function signupAdmin(userDetails: any) {
   const res = await fetch(`${URL}/admins/signUp`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(adminDetails),
+    body: JSON.stringify(userDetails),
   });
   const data = await res.json();
 
@@ -86,6 +86,33 @@ export async function signinUser(userDetails: {
     },
     body: JSON.stringify(userDetails),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) throw new Error(data.message);
+
+  const {
+    token,
+    data: { user },
+  } = data;
+
+  return { token, user };
+}
+export async function signinAdmin(userDetails: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  authType: string;
+}) {
+  const res = await fetch(`${URL}/admins/signIn`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userDetails),
+  });
+
+  console.log(res);
 
   const data = await res.json();
 
@@ -205,7 +232,7 @@ export async function authenticateUser(token: string) {
 
 export async function authenticateAdmin(token: string) {
   console.log("authenticating");
-  const res = await fetch(`${URL}/users/authenticate`, {
+  const res = await fetch(`${URL}/admins/authenticate`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -216,8 +243,6 @@ export async function authenticateAdmin(token: string) {
   console.log(data);
   if (!res.ok) throw new Error(data.message);
 }
-
-
 
 export async function getUser() {
   const token = getUserToken();

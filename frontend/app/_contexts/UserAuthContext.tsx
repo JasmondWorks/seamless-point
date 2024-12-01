@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { authenticateUser } from "../_lib/actions";
+import { authenticateAdmin, authenticateUser } from "../_lib/actions";
 import Cookies from "js-cookie";
 
 type User = {
@@ -41,9 +41,14 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch stored token on mount
   useEffect(() => {
-    async function authenticationInit(token: string) {
+    async function authenticationInit(
+      token: string,
+      userType: string = "user"
+    ) {
       try {
-        await authenticateUser(token);
+        userType === "user"
+          ? await authenticateUser(token)
+          : await authenticateAdmin(token);
         // setAuthenticated(true);
         console.log("authenticated");
       } catch (error) {
@@ -61,8 +66,9 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       const user = JSON.parse(storedUser);
       const token = Cookies.get("token");
       console.log(token);
+      const userType = user.role === "user" ? "user" : "admin";
 
-      authenticationInit(token);
+      authenticationInit(token, userType);
 
       setUser(user);
     } else {

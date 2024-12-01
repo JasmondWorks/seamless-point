@@ -4,12 +4,12 @@ import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import CarrierDetails from "@/app/_components/CarrierDetails";
 import CountdownTimer from "@/app/_components/CountdownTimer";
-import { BrandLogo } from "@/app/_components/Navbar";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from "@/app/_components/ui/dialog";
+import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -19,6 +19,9 @@ export default function SelectCarrierPage() {
   const [selectedCarrier, setSelectedCarrier] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
+  const onSelectCourier = useDeliveryFormStore(
+    (store) => store.onSelectCourier
+  );
 
   const carriers = [
     {
@@ -54,6 +57,7 @@ export default function SelectCarrierPage() {
   function onSubmit() {
     if (!selectedCarrier) return toast.error("You haven't selected a carrier");
 
+    onSelectCourier(selectedCarrier);
     setIsDialogOpen(true);
 
     setTimeout(
@@ -112,7 +116,7 @@ export default function SelectCarrierPage() {
               />
             </div>
 
-            <span className="absolute bottom-2 right-2">
+            <span className="absolute bottom-1 right-1">
               <CountdownTimer initialSeconds={5} />
             </span>
           </div>

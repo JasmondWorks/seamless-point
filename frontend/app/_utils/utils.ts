@@ -23,7 +23,6 @@ export const fetchCountries = async () => {
 
 // Function to get states for a specific country asynchronously
 export const fetchStatesForCountry = async (countryCode) => {
-  console.log(countryCode);
   return new Promise((resolve) => {
     const states = State.getStatesOfCountry(countryCode);
     resolve(states);

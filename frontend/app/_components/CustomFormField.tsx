@@ -130,11 +130,13 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             </FormControl>
             <SelectContent className="shad-select-content">
               {props.selectOptions && props.selectOptions?.length > 0 ? (
-                props.selectOptions?.map((option) => (
-                  <SelectItem className="" key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))
+                props.selectOptions
+                  ?.map((val) => val[0].toUpperCase() + val.slice(1))
+                  .map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))
               ) : (
                 <>
                   {
@@ -169,7 +171,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     default:
       return null;
     case FormFieldType.FILE:
-      return <FileUpload props={props} />;
+      return <FileUpload props={props} field={field} />;
   }
 };
 

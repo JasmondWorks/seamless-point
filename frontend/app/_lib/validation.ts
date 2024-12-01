@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
 // Base schema for common fields (sign-in and sign-up)
 export const emailSchema = z.object({
@@ -238,13 +238,13 @@ export const deliverySourceSchema = z.object({
     })
     .trim()
     .min(1, "Please provide a delivery summary"),
-  amountOfItems: z.number(),
-  instructions: z
-    .string({
-      required_error: "Please provide a delivery summary",
-    })
-    .trim()
-    .min(1, "Please provide a delivery summary"),
+  // amountOfItems: z.number(),
+  // instructions: z
+  //   .string({
+  //     required_error: "Please provide a delivery summary",
+  //   })
+  //   .trim()
+  //   .min(1, "Please provide a delivery summary"),
 });
 export const deliveryDestinationSchema = z.object({
   toCountry: z
@@ -370,6 +370,49 @@ export const parcelDocumentSchema = z.object({
   ),
 });
 
+const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>
+  z.custom<File>(
+    (file) => {
+      if (!(file instanceof File)) {
+        return false; // Ensure it's a File object
+      }
+
+      return (
+        file.size <= maxFileSize && // Check file size
+        allowedMimeTypes.includes(file.type) // Check MIME type
+      );
+    },
+    {
+      message: `Invalid file. Allowed types: ${allowedMimeTypes.join(
+        ", "
+      )}, and size must be less than ${(maxFileSize / (1024 * 1024)).toFixed(
+        1
+      )} MB.`,
+    }
+  );
+export const parcelInfoSchema = z.object({
+  packaging: z
+    .string({
+      required_error: "Please provide an item name",
+    })
+    .trim()
+    .min(1, "Please provide an item name"),
+  currency: z
+    .string({
+      required_error: "Please provide an item name",
+    })
+    .trim()
+    .min(1, "Please provide an item name"),
+  proofOfPurchase: createFileSchema(5 * 1024 * 1024, [
+    "application/pdf", // PDF
+    "image/jpeg", // JPEG
+    "image/png", // PNG
+  ]),
+  packageImage: createFileSchema(2 * 1024 * 1024, [
+    "image/jpeg", // JPEG
+    "image/png", // PNG
+  ]),
+});
 export const creditCardSchema = z
   .object({
     cardNumber: z

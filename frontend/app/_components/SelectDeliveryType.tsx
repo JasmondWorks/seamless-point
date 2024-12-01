@@ -1,16 +1,28 @@
 "use client";
 
 import { useFormContext } from "@/app/_contexts/FormContext";
+import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { DeliveryType } from "@/app/types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function SelectDeliveryType() {
   const { formData, addFormData } = useFormContext();
+  const router = useRouter();
+
+  const onSelectDeliveryType = useDeliveryFormStore(
+    (state) => state.onSelectDeliveryType
+  );
+  function handleSetDeliveryType(type: DeliveryType) {
+    onSelectDeliveryType(type);
+    router.push("/user/deliveries/register/source");
+  }
 
   return (
     <div className="gap-10 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] ">
-      <Link
-        href="/user/deliveries/register/source"
+      <button
+        onClick={() => handleSetDeliveryType(DeliveryType.FOOD)}
         className="flex flex-col gap-3"
       >
         <div className="card flex-1 bg-white flex flex-col">
@@ -905,9 +917,9 @@ export default function SelectDeliveryType() {
           </div>
         </div>
         <span className="text-muted">Food stuff, drinks and meat, etc.</span>
-      </Link>
-      <Link
-        href="/user/deliveries/register/source"
+      </button>
+      <button
+        onClick={() => handleSetDeliveryType(DeliveryType.REGULAR)}
         className="flex flex-col gap-3"
       >
         <div className="card flex-1 bg-white flex flex-col">
@@ -1307,7 +1319,7 @@ export default function SelectDeliveryType() {
           </div>
         </div>
         <span className="text-muted">Furniture, etc.</span>
-      </Link>
+      </button>
     </div>
   );
 }

@@ -23,29 +23,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const initialItems = [
-  {
-    id: "1",
-    itemName: "Books, books, booksss...",
-    quantity: 1,
-    weight: 5,
-    price: 50_000,
-    type: "document",
-    itemDescription: "Lengthyyyyyyyyyyyyyyyyyyyyyyyyyyyy...",
-  },
-  {
-    id: "2",
-    itemName: "Clothing items",
-    itemCategory: "Men's",
-    itemSubCategory: "Casual",
-    hsCode: "8115543766",
-    weight: 3,
-    quantity: 7,
-    price: 130_000,
-    type: "item",
-    value: 1,
-  },
-];
+
 
 enum EDialogContent {
   parcelEditItem = "parcel_edit_item",
@@ -57,9 +35,8 @@ enum EParcelType {
   item = "item",
 }
 
-export default function ParcelItems() {
+export default function ParcelItems(parcelItems, setParcelItems) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [parcelItems, setParcelItems] = useState(initialItems);
   const [selectedParcelType, setSelectedParcelType] = useState("document");
   const [selectedParcelItem, setSelectedParcelItem] = useState(null);
   const [selectedDialogContent, setSelectedDialogContent] = useState("");

@@ -1,28 +1,28 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { authenticateUser } from "../_lib/actions";
+import { authenticateAdmin, authenticateUser } from "../_lib/actions";
 import Cookies from "js-cookie";
 
-type User = {
+type Admin = {
   id: string;
   firstName: string;
   lastName: string;
 };
 
 type AuthType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: Admin | null;
+  setUser: (user: Admin | null) => void;
   isAuthenticating: boolean;
   // authenticated: boolean;
-  login: (user: User | null, token: string) => void;
+  login: (user: Admin | null, token: string) => void;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthType | undefined>(undefined);
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Admin | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   // const [authenticated, setAuthenticated] = useState(false);
 
@@ -32,7 +32,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove("token");
     // setAuthenticated(false);
   }
-  function login(user: User | null, token: string) {
+  function login(user: Admin | null, token: string) {
     user && localStorage.setItem("user", JSON.stringify(user));
     user && setUser(user);
     Cookies.set("token", token);
@@ -43,7 +43,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function authenticationInit(token: string) {
       try {
-        await authenticateUser(token);
+        await authenticateAdmin(token);
         // setAuthenticated(true);
         console.log("authenticated");
       } catch (error) {
@@ -55,10 +55,10 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const storedUser = localStorage.getItem("user");
+    const storedAdmin = localStorage.getItem("user");
 
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
+    if (storedAdmin) {
+      const user = JSON.parse(storedAdmin);
       const token = Cookies.get("token");
       console.log(token);
 
@@ -88,6 +88,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAdminAuth() {
   const context = useContext(AuthContext);
+
+  console.log(context);
 
   if (!context) {
     throw new Error(

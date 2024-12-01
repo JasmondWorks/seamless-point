@@ -6,40 +6,66 @@ import CustomFormField, {
   FormFieldType,
 } from "@/app/_components/CustomFormField";
 
-import {
-  deliverySourceSchema,
-  parcelDocumentSchema,
-  parcelItemSchema,
-} from "@/app/_lib/validation";
+import { parcelInfoSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import CustomDialog from "@/app/_components/Dialogs/CustomDialog";
-import { Edit, Plus, PlusSquareIcon, Trash2Icon } from "lucide-react";
-import { Checkbox } from "@/app/_components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
-import { Label } from "@/app/_components/ui/label";
-import { formatCurrency } from "@/app/_lib/utils";
-import { ConfirmDialog } from "@/app/_components/Dialogs/ConfirmDialog";
 import ParcelItems from "@/app/_components/ParcelItems";
+import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
+const initialItems = [
+  {
+    id: "1",
+    itemName: "Books, books, booksss...",
+    quantity: 1,
+    weight: 5,
+    price: 50_000,
+    type: "document",
+    itemDescription: "Lengthyyyyyyyyyyyyyyyyyyyyyyyyyyyy...",
+  },
+  {
+    id: "2",
+    itemName: "Clothing items",
+    itemCategory: "Men's",
+    itemSubCategory: "Casual",
+    hsCode: "8115543766",
+    weight: 3,
+    quantity: 7,
+    price: 130_000,
+    type: "item",
+    value: 1,
+  },
+];
 export default function ParcelInfo() {
-  const form = useForm<z.infer<typeof deliverySourceSchema>>({
-    resolver: zodResolver(deliverySourceSchema),
+  const [parcelItems, setParcelItems] = useState(initialItems);
+
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof parcelInfoSchema>>({
+    resolver: zodResolver(parcelInfoSchema),
     // defaultValues: {
     // },
+    defaultValues: {},
   });
 
-  async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
-    // console.log(data);
-    try {
-      //   signupUser(data);
-    } catch (error) {}
+  // async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
+  //   console.log(data);
+  //   try {
+  //     //   signupUser(data);
+  //   } catch (error) {}
+  // }
+
+  async function onSubmit() {
+    router.push("/user/deliveries/register/select-carrier");
   }
+  function handleSubmit() {
+    router.push("/user/deliveries/register/select-carrier");
+  }
+
   return (
     <div className="max-w-5xl md:pr-20 md:pl-10 xl:pl-20 xl:pr-40">
       <h1 className="headline text-center mb-10">Parcel information</h1>
@@ -54,7 +80,7 @@ export default function ParcelInfo() {
             name="packaging"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={[]}
+            selectOptions={["plastic", "metal"]}
             placeholder="Select Packaging"
           />
           <CustomFormField
@@ -63,6 +89,7 @@ export default function ParcelInfo() {
             name="currency"
             control={form.control}
             fieldType={FormFieldType.SELECT}
+            selectOptions={["Nigerian naira (NGN)", "US Dollars (USD)"]}
             placeholder="Nigerian naira"
           />
           <ParcelItems />
@@ -82,246 +109,17 @@ export default function ParcelInfo() {
           />
           <div className="flex flex-col gap-y-5 col-span-2">
             <PrivacyPolicyBlock />
-            <Link
-              className="block"
-              href="/user/deliveries/register/destination"
-            >
-              <ButtonFormSubmit text="Continue" />
-            </Link>
+            <ButtonFormSubmit onClick={handleSubmit} text="Continue" />
           </div>
         </form>
       </Form>
+
+      {/* <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid md:grid-cols-2 gap-5"
+        ></form>
+      </Form> */}
     </div>
   );
 }
-
-// function DialogContent({
-//   onClose,
-//   onAddItem,
-//   onUpdateItem,
-//   selectedParcelType,
-//   onSelectParcelType,
-//   documentDetails,
-// }) {
-//   const isEditing = !!documentDetails; // Check if we are editing or adding
-//   return (
-//     <div className="space-y-8">
-//       <div className="space-y-2">
-//         <h3 className="font-medium text-xl">
-//           {isEditing
-//             ? selectedParcelType[0].toUpperCase() + selectedParcelType.slice(1)
-//             : "Describe your item"}
-//         </h3>
-//         {!isEditing && (
-//           <RadioGroup
-//             value={selectedParcelType}
-//             onValueChange={onSelectParcelType}
-//             className="flex gap-4"
-//           >
-//             <div className="flex items-center space-x-2">
-//               <RadioGroupItem value="document" id="document" />
-//               <Label htmlFor="document">Document</Label>
-//             </div>
-//             <div className="flex items-center space-x-2">
-//               <RadioGroupItem value="item" id="item" />
-//               <Label htmlFor="item">Item</Label>
-//             </div>
-//             {/* Display the selected option */}
-//           </RadioGroup>
-//         )}
-//       </div>
-//       {selectedParcelType === "item" && (
-//         <ItemDialogContent
-//           selectedParcelType={selectedParcelType}
-//           onAddItem={onAddItem}
-//           onClose={onClose}
-//         />
-//       )}
-//       {selectedParcelType === "document" && (
-//         <DocumentDialogContent
-//           selectedParcelType={selectedParcelType}
-//           onAddItem={onAddItem}
-//           onUpdateItem={onUpdateItem}
-//           onClose={onClose}
-//           documentDetails={documentDetails}
-//         />
-//       )}
-//     </div>
-//   );
-// }
-
-// function ItemDialogContent({ onClose, onAddItem, selectedParcelType }) {
-//   const form = useForm<z.infer<typeof parcelItemSchema>>({
-//     resolver: zodResolver(parcelItemSchema),
-//     defaultValues: {
-//       itemName: "",
-//       itemCategory: "",
-//       itemSubCategory: "",
-//       hsCode: "",
-//       weight: 1,
-//       quantity: 1,
-//       value: 1,
-//     },
-//   });
-
-//   function onSubmit(data: z.infer<typeof parcelItemSchema>) {
-//     console.log(data);
-
-//     if (!data) return;
-
-//     onClose();
-//   }
-
-//   return (
-//     <Form {...form}>
-//       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-//         <div className="grid grid-cols-2 gap-5">
-//           <CustomFormField
-//             label="Item name"
-//             name="itemName"
-//             control={form.control}
-//             fieldType={FormFieldType.INPUT}
-//             placeholder="123 main street"
-//           />
-//           <CustomFormField
-//             label="Item Category"
-//             name="itemCategory"
-//             control={form.control}
-//             fieldType={FormFieldType.INPUT}
-//             placeholder="Apt/unit"
-//           />
-//           <CustomFormField
-//             label="Item sub-category"
-//             name="itemSubCategory"
-//             control={form.control}
-//             fieldType={FormFieldType.INPUT}
-//             placeholder="you@company.com"
-//           />
-//           <CustomFormField
-//             label="Select HS Code"
-//             name="hsCode"
-//             control={form.control}
-//             fieldType={FormFieldType.PHONE_INPUT}
-//             placeholder="+234"
-//           />
-//           <div className="grid md:grid-cols-3 gap-5 col-span-2">
-//             <CustomFormField
-//               label="Weight (kg)"
-//               name="weight"
-//               control={form.control}
-//               fieldType={FormFieldType.INPUT}
-//               placeholder="1"
-//             />
-//             <CustomFormField
-//               label="Quantity"
-//               name="quantity"
-//               control={form.control}
-//               fieldType={FormFieldType.INPUT}
-//               placeholder="1"
-//             />
-//             <CustomFormField
-//               label="Item Value"
-//               name="value"
-//               control={form.control}
-//               fieldType={FormFieldType.INPUT}
-//               placeholder="N2, 000"
-//             />
-//           </div>
-//         </div>
-//         <ButtonFormSubmit text="Continue" />
-//       </form>
-//     </Form>
-//   );
-// }
-
-// function DocumentDialogContent({
-//   onClose,
-//   onAddItem,
-//   onUpdateItem,
-//   selectedParcelType,
-//   documentDetails, // Destructure documentDetails prop
-// }: {
-//   onClose: () => void;
-//   onAddItem: (item: any) => void;
-//   selectedParcelType: string;
-//   documentDetails?: {
-//     itemName: string;
-//     itemDescription: string;
-//     weight: number;
-//     quantity: number;
-//   };
-// }) {
-//   const form = useForm<z.infer<typeof parcelDocumentSchema>>({
-//     resolver: zodResolver(parcelDocumentSchema),
-//     defaultValues: documentDetails || {
-//       itemName: "",
-//       itemDescription: "",
-//       weight: 1,
-//       quantity: 1,
-//     },
-//   });
-
-//   const isEditing = !!documentDetails; // Check if we are editing or adding
-
-//   function onSubmit(data: z.infer<typeof parcelDocumentSchema>) {
-//     if (!data) return;
-
-//     // Prepare the item to be added or edited
-//     const newItem = {
-//       ...data,
-//       id: isEditing ? documentDetails?.id : crypto.randomUUID(), // Keep the same ID when editing
-//       type: selectedParcelType,
-//     };
-
-//     // Add or update the item
-//     if (isEditing) {
-//       // Edit the existing item
-//       onUpdateItem(newItem);
-//     } else {
-//       // Add a new item
-//       onAddItem(newItem);
-//     }
-
-//     onClose(); // Close the dialog after submit
-//   }
-
-//   return (
-//     <Form {...form}>
-//       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-//         <div className="grid grid-cols-2 gap-5">
-//           <CustomFormField
-//             className="col-span-2"
-//             label="Item name"
-//             name="itemName"
-//             control={form.control}
-//             fieldType={FormFieldType.INPUT}
-//             placeholder="Sofa"
-//           />
-//           <CustomFormField
-//             className="col-span-2"
-//             label="Item description"
-//             name="itemDescription"
-//             control={form.control}
-//             fieldType={FormFieldType.TEXTAREA}
-//             placeholder="Detailed description..."
-//           />
-//           <CustomFormField
-//             label="Item weight (kg)"
-//             name="weight"
-//             control={form.control}
-//             fieldType={FormFieldType.INPUT}
-//             placeholder="1"
-//           />
-//           <CustomFormField
-//             label="Quantity"
-//             name="quantity"
-//             control={form.control}
-//             fieldType={FormFieldType.INPUT}
-//             placeholder="1"
-//           />
-//         </div>
-//         <ButtonFormSubmit text={isEditing ? "Update" : "Add"} />
-//       </form>
-//     </Form>
-//   );
-// }

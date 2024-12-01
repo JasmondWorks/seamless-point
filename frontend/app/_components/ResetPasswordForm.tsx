@@ -18,6 +18,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { resetUserPassword } from "@/app/_lib/actions";
 import { useUserAuth } from "../_contexts/UserAuthContext";
+import { useRouter } from "next/navigation";
 
 export default function ResetPasswordForm({
   resetToken,
@@ -26,6 +27,7 @@ export default function ResetPasswordForm({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useUserAuth();
+  const router = useRouter();
   console.log(resetToken);
 
   const form = useForm<z.infer<typeof resetPasswordSchema>>({
@@ -46,8 +48,9 @@ export default function ResetPasswordForm({
         confirmPassword,
         resetToken
       );
-      const { token, user } = res;
-      login(user, token);
+      // const { token, user } = res;
+      // login(user, token);
+      router.push("/auth/user/login");
 
       // toast.success(`${res.message}`);
     } catch (err: any) {
