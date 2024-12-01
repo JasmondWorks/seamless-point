@@ -19,7 +19,6 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
-import { useAdminAuth } from "@/app/_contexts/AdminAuthContext";
 
 export default function LoginForm({ userType = "user" }) {
   const [isLoading, setIsLoading] = useState(false);

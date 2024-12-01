@@ -227,8 +227,6 @@ export default function Navbar() {
   useEffect(() => {
     setIsNavShowing(false);
   }, [pathname]);
-  // const pageCategory = pathname.split("/")[2];
-  // console.log(pathname.split("/"), pathname);
 
   useEffect(() => {
     if (isNavShowing) {

@@ -50,6 +50,8 @@ export async function loginUser(userDetails: {
   email: string;
   password: string;
 }) {
+  console.log("Login Data Sent:", userDetails);
+
   const res = await fetch(`${URL}/users/login`, {
     method: "POST",
     headers: {
@@ -60,6 +62,7 @@ export async function loginUser(userDetails: {
 
   const data = await res.json();
 
+  console.log("Login Response:", data);
   if (!res.ok) throw new Error(data.message);
 
   const {

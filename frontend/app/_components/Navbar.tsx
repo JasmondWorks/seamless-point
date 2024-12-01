@@ -20,6 +20,8 @@ const navLinks = [
 export default function Navbar({ className = "" }) {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isNavShowing, setIsNavShowing] = useState(false);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+
   const { user } = useUserAuth();
   const pathname = usePathname();
 
@@ -39,6 +41,16 @@ export default function Navbar({ className = "" }) {
     setIsNavShowing(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (isNavShowing) {
+      setIsOverlayVisible(true); // Make it block immediately when showing
+    } else {
+      // Wait for the opacity transition to finish before hiding
+      const timeout = setTimeout(() => setIsOverlayVisible(false), 300); // Match the CSS transition duration
+      return () => clearTimeout(timeout); // Cleanup timeout if `isNavShowing` changes quickly
+    }
+  }, [isNavShowing]);
+
   function handleShowNav() {
     setIsNavShowing(true);
   }
@@ -47,91 +59,102 @@ export default function Navbar({ className = "" }) {
   }
 
   return (
-    <div
-      className={`h-20 md:h-auto fixed md:static flex flex-wrap md:flex-row items-center justify-between bg-white w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
-        border-b border-neutral-200 transition-shadow duration-300 
-        ${hasScrolled ? "shadow-md" : ""} ${className}`}
-    >
+    <>
       <div
-        className={`px-5 md:px-0 flex md:h-auto items-center h-full w-full ${
-          !user ? "md:w-fit" : ""
-        } justify-between`}
+        style={{ display: isOverlayVisible ? "block" : "none" }}
+        onClick={() => setIsNavShowing(false)}
+        className={`bg-black fixed left-0 right-0 bg-opacity-60 h-full z-20 duration-300 transition-opacity ${
+          isNavShowing ? "opacity-50" : "opacity-0"
+        } `}
+      ></div>
+      <div
+        className={`h-20 md:h-auto fixed md:static flex flex-wrap md:flex-row items-center justify-between bg-white w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
+          border-b border-neutral-200 transition-shadow duration-300
+          ${hasScrolled ? "shadow-md" : ""} ${className}`}
       >
-        <Link href="/">
-          <BrandLogo />
-        </Link>
-        {!isNavShowing && !user && (
-          <button onClick={handleShowNav}>
-            <FiMenu className="text-3xl md:hidden" />
-          </button>
-        )}
-        {isNavShowing && !user && (
-          <button onClick={handleHideNav}>
-            <IoClose className="text-3xl md:hidden" />
-          </button>
-        )}
-        {user && (
-          <div className="flex items-center gap-8 md:gap-10">
-            <Link href="/user/notifications" className="relative">
-              <Bell className="text-neutral-600" />
-              <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
-                2
-              </span>
-            </Link>
-            <Link href="/user/dashboard">
-              <Image
-                width={50}
-                height={50}
-                alt="profile"
-                src="/assets/images/avatar.jpg"
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            </Link>
+        <div
+          className={`px-5 md:px-0 flex md:h-auto items-center h-full w-full ${
+            !user ? "md:w-fit" : ""
+          } justify-between`}
+        >
+          <Link href="/">
+            <BrandLogo />
+          </Link>
+          {!isNavShowing && !user && (
+            <button onClick={handleShowNav}>
+              <FiMenu className="text-3xl md:hidden" />
+            </button>
+          )}
+          {isNavShowing && !user && (
+            <button onClick={handleHideNav}>
+              <IoClose className="text-3xl md:hidden" />
+            </button>
+          )}
+          {user && (
+            <div className="flex items-center gap-8 md:gap-10">
+              <Link href="/user/notifications" className="relative">
+                <Bell className="text-neutral-600" />
+                <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
+                  2
+                </span>
+              </Link>
+              <Link href="/user/dashboard">
+                <Image
+                  width={50}
+                  height={50}
+                  alt="profile"
+                  src="/assets/images/avatar.jpg"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              </Link>
+            </div>
+          )}
+        </div>
+        {/* Nav Menu */}
+        {!user && (
+          <div
+            // className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 ${
+            //   isNavShowing ? "block pb-4 md:pb-0" : "hidden md:flex"
+            // }`}
+            className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 overflow-hidden transition-all duration-300 ${
+              isNavShowing ? "max-h-[500px] pb-4 md:pb-0" : "max-h-0 md:flex"
+            }`}
+          >
+            <nav className="flex-1 justify-start">
+              <ul className="flex flex-col md:flex-row md:items-center gap-x-8">
+                {navLinks.map((link) => (
+                  <li
+                    key={link.href}
+                    className="text-center font-medium border-b md:border-b-transparent py-4 md:py-0 border-neutral-100"
+                  >
+                    <a href={link.href}>{link.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <div className="font-medium flex w-full md:w-fit flex-col md:flex-row">
+              <Link href="/auth/user/login" className="inline-block">
+                <Button
+                  variant={ButtonVariant.link}
+                  className="w-full py-7 md:py-3"
+                >
+                  Sign in
+                </Button>
+              </Link>
+              <Link href="/auth/user/signup" className="inline-block">
+                <Button
+                  isRoundedLarge
+                  variant={ButtonVariant.fill}
+                  className="!bg-brandSec !text-white w-full py-7 md:py-3"
+                >
+                  Sign up
+                </Button>
+              </Link>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Nav Menu */}
-      {!user && (
-        <div
-          className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 ${
-            isNavShowing ? "block pb-4 md:pb-0" : "hidden md:flex"
-          }`}
-        >
-          <nav className="flex-1 justify-start">
-            <ul className="flex flex-col md:flex-row md:items-center gap-x-8">
-              {navLinks.map((link) => (
-                <li
-                  key={link.href}
-                  className="text-center font-medium border-b md:border-b-transparent py-4 md:py-0 border-neutral-100"
-                >
-                  <a href={link.href}>{link.title}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="font-medium flex w-full md:w-fit flex-col md:flex-row">
-            <Link href="/auth/user/login" className="inline-block">
-              <Button
-                variant={ButtonVariant.link}
-                className="w-full py-7 md:py-3"
-              >
-                Sign in
-              </Button>
-            </Link>
-            <Link href="/auth/user/signup" className="inline-block">
-              <Button
-                isRoundedLarge
-                variant={ButtonVariant.fill}
-                className="!bg-brandSec !text-white w-full py-7 md:py-3"
-              >
-                Sign up
-              </Button>
-            </Link>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
 
