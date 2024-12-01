@@ -81,6 +81,8 @@ export default function LoginForm({ userType = "user" }) {
 
           const { user, token } = response;
 
+          console.log(response);
+
           setIsLoading(false);
 
           onLogin(user, token);
