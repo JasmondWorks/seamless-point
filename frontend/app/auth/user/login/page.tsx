@@ -1,4 +1,5 @@
 import LoginForm from "@/app/_components/Forms/LoginForm";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function LogIn() {
   return (
@@ -689,7 +690,9 @@ export default function LogIn() {
             className="rounded-lg"
             style={{ boxShadow: "0 0 7px rgba(0 0 0 /.12)" }}
           >
-            <LoginForm />
+            <ErrorBoundary>
+              <LoginForm />
+            </ErrorBoundary>
           </div>
         </div>
       </div>
