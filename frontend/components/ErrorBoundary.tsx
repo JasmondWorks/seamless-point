@@ -1,3 +1,5 @@
+"use client"; // Mark as a client component
+
 import React, { Component } from "react";
 import toast from "react-hot-toast";
 
@@ -5,19 +7,17 @@ class ErrorBoundary extends Component {
   state = { hasError: false, error: null };
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI
+    // Update state to show the fallback UI
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can log the error information here if needed, for example:
-    // console.error("Error caught by ErrorBoundary", error, errorInfo);
-
+    // Log the error information
     if (process.env.NODE_ENV === "development") {
-      console.error("Caught error:", error); // Display full error in development
+      console.error("Caught error:", error, errorInfo);
     }
 
-    // In production, we want to avoid exposing details of the error
+    // Display a toast message in production to avoid exposing error details
     if (process.env.NODE_ENV !== "development") {
       toast.error("Something went wrong. Please try again.");
     }
@@ -25,7 +25,8 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
-      return null; // or a custom fallback UI
+      // Return a custom fallback UI when an error occurs
+      return <div>An error occurred. Please try again later.</div>;
     }
 
     return this.props.children;
