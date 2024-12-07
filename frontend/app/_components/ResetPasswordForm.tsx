@@ -41,22 +41,13 @@ export default function ResetPasswordForm({
   async function onSubmit(data: z.infer<typeof resetPasswordSchema>) {
     const { password, confirmPassword } = data;
 
-    try {
-      setIsLoading(true);
-      const res = await resetUserPassword(
-        password,
-        confirmPassword,
-        resetToken
-      );
-      // const { token, user } = res;
-      // login(user, token);
+    setIsLoading(true);
+    const res = await resetUserPassword(password, confirmPassword, resetToken);
+    if (res.status === "success") {
+      toast.success(res.message);
       router.push("/auth/user/login");
-
-      // toast.success(`${res.message}`);
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setIsLoading(false);
+    } else {
+      toast.error(res.message);
     }
   }
 

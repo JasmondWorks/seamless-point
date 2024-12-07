@@ -13,13 +13,13 @@ export default function SignOutButton({
   return (
     <button
       onClick={logout}
-      className={`w-full lg:items-center font-medium lg:px-10 py-2 flex gap-3 ${
+      className={`w-full lg:items-center font-medium lg:px-10 py-2 flex gap-3 transition-all duration-300 ease-in-out ${
         !isNavShowing
           ? "justify-center lg:justify-start"
           : "lg:justify-start px-8"
       } hover:bg-neutral-200`}
     >
-      <span className="w-7 h-7 lg:w-5 lg:h-5">
+      <span className="w-7 h-7 lg:w-5 lg:h-5 flex-shrink-0 transition-all duration-300 ease-in-out">
         <svg
           className="w-full h-full"
           width={16}
@@ -37,7 +37,11 @@ export default function SignOutButton({
           />
         </svg>
       </span>
-      <span className={`${isNavShowing ? "block" : "hidden lg:block"}`}>
+      <span
+        className={`whitespace-nowrap transition-all duration-300 ease-in-out ${
+          isNavShowing ? "opacity-100" : "opacity-0 w-0 lg:opacity-100 lg:w-auto"
+        }`}
+      >
         Logout
       </span>
     </button>

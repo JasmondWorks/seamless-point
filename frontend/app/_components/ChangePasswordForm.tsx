@@ -38,24 +38,20 @@ export default function ChangePasswordForm() {
   async function onSubmit(data: z.infer<typeof changePasswordSchema>) {
     const { currPassword, password, confirmPassword } = data;
 
-    try {
-      setIsLoading(true);
-      const res = await changeUserPassword(
-        currPassword,
-        password,
-        confirmPassword
-      );
-      const { token } = res;
-      login(undefined, token);
-      toast.success("Password successfully changed");
+    setIsLoading(true);
+    const res = await changeUserPassword(
+      currPassword,
+      password,
+      confirmPassword
+    );
 
-      // Reset the form after success
-      reset();
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsLoading(false);
+    if (res.status === "success") {
+      toast.success(res.message);
+      login(null, res.token);
+    } else {
+      toast.error(res.message);
     }
+    setIsLoading(false);
   }
 
   return (

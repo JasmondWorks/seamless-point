@@ -7,7 +7,7 @@ export default function DeliveryStatusItem({
 }: {
   step: { id: number; title: string; desc: string };
 }) {
-  const currentStep = 4;
+  const currentStep = 1;
   const isStepCompleted = currentStep > step.id;
 
   return (

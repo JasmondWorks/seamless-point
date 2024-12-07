@@ -1,48 +1,72 @@
 "use server";
 
 import { getUserToken } from "@/app/_utils/server-utils";
-import { cookies } from "next/headers";
 
-const URL = "https://seamless-point-one.vercel.app/api/v1";
+const URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Create User function with proper error handling
 export async function signupUser(userDetails: any) {
-  const res = await fetch(`${URL}/users/signUp`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userDetails),
-  });
-  const data = await res.json();
+  try {
+    const res = await fetch(`${URL}/users/signUp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    token,
-    data: { user },
-  } = data;
+    const {
+      token,
+      data: { user },
+    } = data;
 
-  return { token, user };
+    return {
+      status: "success",
+      message: "User created successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
 }
 export async function signupAdmin(userDetails: any) {
-  const res = await fetch(`${URL}/admins/signUp`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userDetails),
-  });
-  const data = await res.json();
+  try {
+    const res = await fetch(`${URL}/admins/signUp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
 
-  if (!res.ok) throw new Error(data.message);
+    const data = await res.json();
 
-  const {
-    token,
-    data: { user },
-  } = data;
+    if (!res.ok) throw new Error(data.message);
 
-  return { token, user };
+    const {
+      token,
+      data: { user },
+    } = data;
+
+    return {
+      status: "success",
+      message: "Admin created successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 
 // Sign In User function with async/await
@@ -51,26 +75,40 @@ export async function loginUser(userDetails: {
   password: string;
 }) {
   console.log("Login Data Sent:", userDetails);
+  try {
+    const res = await fetch(`${URL}/users/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
 
-  const res = await fetch(`${URL}/users/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userDetails),
-  });
+    const data = await res.json();
 
-  const data = await res.json();
+    console.log("Login Response:", data);
+    if (!res.ok) throw new Error(data.message);
 
-  console.log("Login Response:", data);
-  if (!res.ok) throw new Error(data.message);
+    const {
+      token,
+      data: { user },
+    } = data;
 
-  const {
-    token,
-    data: { user },
-  } = data;
-
-  return { token, user };
+    return {
+      status: "success",
+      message: "User logged in successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 
 // Google sign in
@@ -82,24 +120,39 @@ export async function signinUser(userDetails: {
 }) {
   console.log(userDetails);
 
-  const res = await fetch(`${URL}/users/signIn`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userDetails),
-  });
+  try {
+    const res = await fetch(`${URL}/users/signIn`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    token,
-    data: { user },
-  } = data;
+    const {
+      token,
+      data: { user },
+    } = data;
 
-  return { token, user };
+    return {
+      status: "success",
+      message: "User logged in successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 export async function signinAdmin(userDetails: {
   email: string;
@@ -107,92 +160,147 @@ export async function signinAdmin(userDetails: {
   lastName: string;
   authType: string;
 }) {
-  const res = await fetch(`${URL}/admins/signIn`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userDetails),
-  });
+  try {
+    const res = await fetch(`${URL}/admins/signIn`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
 
-  console.log(res);
+    console.log(res);
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    token,
-    data: { user },
-  } = data;
+    const {
+      token,
+      data: { user },
+    } = data;
 
-  return { token, user };
+    return {
+      status: "success",
+      message: "Admin logged in successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 export async function loginAdmin(userDetails: {
   email: string;
   password: string;
 }) {
-  const res = await fetch(`${URL}/admins/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userDetails),
-  });
+  try {
+    const res = await fetch(`${URL}/admins/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    token,
-    data: { user },
-  } = data;
+    const {
+      token,
+      data: { user },
+    } = data;
 
-  return { token, user };
+    return {
+      status: "success",
+      message: "Admin logged in successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 
 export async function forgotUserPassword(email: string) {
   console.log(email);
-  const res = await fetch(`${URL}/users/forgotPassword`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email }),
-  });
+  try {
+    const res = await fetch(`${URL}/users/forgotPassword`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const { status, message } = data;
+    const { status: serverStatus, message } = data;
 
-  return { status, message };
+    return { serverStatus, status: "success", message };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 export async function resetUserPassword(
   password: string,
   confirmPassword: string,
   resetToken: string | string[]
 ) {
-  const res = await fetch(`${URL}/users/resetPassword?token=${resetToken}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ password, confirmPassword }),
-  });
+  try {
+    const res = await fetch(`${URL}/users/resetPassword?token=${resetToken}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password, confirmPassword }),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    token,
-    data: { user },
-  } = data;
+    const {
+      token,
+      data: { user },
+    } = data;
 
-  return { token, user };
+    return {
+      status: "success",
+      message: "Password reset successfully",
+      token,
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 export async function changeUserPassword(
   currPassword: string,
@@ -201,97 +309,161 @@ export async function changeUserPassword(
 ) {
   const storedToken = getUserToken();
 
-  const res = await fetch(`${URL}/users/updateMyPassword`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${storedToken}`,
-    },
-    body: JSON.stringify({ currPassword, password, confirmPassword }),
-  });
+  try {
+    const res = await fetch(`${URL}/users/updateMyPassword`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${storedToken}`,
+      },
+      body: JSON.stringify({ currPassword, password, confirmPassword }),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const { token } = data;
+    const { token } = data;
 
-  return { token };
+    return {
+      status: "success",
+      message: "Password updated successfully",
+      token,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 
 export async function authenticateUser(token: string) {
   console.log("authenticating");
-  const res = await fetch(`${URL}/users/authenticate`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const data = await res.json();
-  console.log(data);
-  if (!res.ok) throw new Error(data.message);
+  try {
+    const res = await fetch(`${URL}/users/authenticate`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    console.log(data);
+    if (!res.ok) throw new Error(data.message);
+    return { status: "success", message: "User authenticated successfully" };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 
 export async function authenticateAdmin(token: string) {
   console.log("authenticating");
-  const res = await fetch(`${URL}/admins/authenticate`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const data = await res.json();
-  console.log(data);
-  if (!res.ok) throw new Error(data.message);
+  try {
+    const res = await fetch(`${URL}/admins/authenticate`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    console.log(data);
+    if (!res.ok) throw new Error(data.message);
+    return { status: "success", message: "Admin authenticated successfully" };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 
 export async function getUser() {
   const token = getUserToken();
   console.log("The token: ", token);
-  const res = await fetch(`${URL}/users/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const data = await res.json();
+  try {
+    const res = await fetch(`${URL}/users/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
 
-  console.log(data);
+    console.log(data);
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    data: { user },
-  } = data;
+    const {
+      data: { user },
+    } = data;
 
-  console.log("user is ", user);
+    console.log("user is ", user);
 
-  return user;
+    return {
+      status: "success",
+      message: "User fetched successfully",
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }
 export async function createDelivery(deliveryDetails: any) {
   const token = getUserToken();
 
   console.log(deliveryDetails);
 
-  const res = await fetch(`${URL}/delivery`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(deliveryDetails),
-  });
+  try {
+    const res = await fetch(`${URL}/delivery`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(deliveryDetails),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) throw new Error(data.message);
+    if (!res.ok) throw new Error(data.message);
 
-  const {
-    data: { delivery },
-  } = data;
+    const {
+      data: { delivery },
+    } = data;
 
-  return delivery;
+    return {
+      status: "success",
+      message: "Delivery created successfully",
+      delivery,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
 }

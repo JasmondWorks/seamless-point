@@ -21,6 +21,13 @@ type AuthType = {
 
 const AuthContext = createContext<AuthType | undefined>(undefined);
 
+type AuthResponse = {
+  status: string;
+  message: string;
+  user?: User;
+  token?: string;
+};
+
 export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -45,19 +52,16 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       token: string,
       userType: string = "user"
     ) {
-      try {
-        userType === "user"
-          ? await authenticateUser(token)
-          : await authenticateAdmin(token);
-        // setAuthenticated(true);
-        console.log("authenticated");
-      } catch (error) {
-        // setAuthenticated(false);
-        console.log("not authenticated");
+      const res: AuthResponse = userType === "user" 
+        ? await authenticateUser(token) 
+        : await authenticateAdmin(token);
+
+      if (res.status === "success" && res.user && res.token) {
+        login(res.user, res.token);
+      } else {
         logout();
-      } finally {
-        setIsAuthenticating(false);
       }
+      setIsAuthenticating(false);
     }
 
     const storedUser = localStorage.getItem("user");

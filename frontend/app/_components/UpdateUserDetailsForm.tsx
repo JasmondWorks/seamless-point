@@ -21,7 +21,7 @@ import { useUserAuth } from "../_contexts/UserAuthContext";
 import Button, { ButtonVariant } from "./Button";
 
 export default function UpdateUserDetailsForm() {
-  const [isDialogOpen, setisDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof changePasswordSchema>>({
     resolver: zodResolver(changePasswordSchema),
@@ -41,7 +41,7 @@ export default function UpdateUserDetailsForm() {
 
   function handleUpdateAccount() {
     setIsDialogOpen(true);
-    setDialogContent("account/updated");
+    // setDialogContent("account/updated");
   }
   return (
     <Form {...form}>

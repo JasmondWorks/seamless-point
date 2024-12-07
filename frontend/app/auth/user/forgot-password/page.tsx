@@ -31,15 +31,17 @@ export default function ForgotPassword() {
   });
 
   async function onSubmit({ email }: z.infer<typeof emailSchema>) {
-    try {
-      setIsLoading(true);
-      const res = await forgotUserPassword(email);
-      toast.success(`${res.message}`);
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setIsLoading(false);
+    setIsLoading(true);
+    const res = await forgotUserPassword(email);
+
+    if (res.status === "success") {
+      toast.success("A link has been sent to your email");
+      setTimeout(() => router.push("/auth/user/login"), 3000);
+    } else {
+      toast.error(res.message);
     }
+
+    setIsLoading(false);
   }
 
   return (

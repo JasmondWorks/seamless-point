@@ -33,7 +33,7 @@ export default function LoginForm({ userType = "user" }) {
     mode: "onSubmit", // Optional: Change to "all" for real-time validation
   });
 
-  function onLogin(user, token) {
+  function onLogin(user: any, token: any) {
     switch (userType) {
       case "user":
         login(user, token);
@@ -78,23 +78,25 @@ export default function LoginForm({ userType = "user" }) {
           else if (userType === "admin")
             response = await signinAdmin(userDetails);
 
-          const { user, token } = response;
-
-          console.log(response);
+          if (response?.status === "success") {
+            const { user, token } = response;
+            onLogin(user, token);
+            toast.success(response?.message);
+          } else {
+            toast.error(response?.message);
+          }
 
           setIsLoading(false);
-
-          onLogin(user, token);
         } else {
-          console.error(
-            "Failed to fetch user info:",
-            userDetailsResponse.status,
-            userDetailsResponse.statusText
-          );
+          toast.error("Failed to fetch user info");
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        toast.error(error.message);
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred");
+        }
       }
     },
     scope: "profile email",
@@ -103,21 +105,17 @@ export default function LoginForm({ userType = "user" }) {
   async function onSubmit(data: z.infer<typeof baseUserSchema>) {
     console.log(data);
 
-    try {
-      setIsLoading(true);
-      const res = await loginUser(data);
-      const { user, token } = res;
+    setIsLoading(true);
+    const response = await loginUser(data);
 
+    if (response.status === "success") {
+      const { user, token } = response;
       onLogin(user, token);
-    } catch (error: any) {
-      console.log(error);
-
-      if (error.message === "fetch failed")
-        toast.error("Error: Check your internet connection");
-      else toast.error(error.message);
-    } finally {
-      setIsLoading(false);
+      toast.success("Login successful");
+    } else {
+      toast.error(response.message);
     }
+    setIsLoading(false);
   }
 
   return (

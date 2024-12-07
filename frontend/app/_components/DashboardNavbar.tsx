@@ -216,7 +216,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isNavShowing, setIsNavShowing] = useState(false);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-  const { role } = JSON.parse(localStorage.getItem("user"));
+  const storedUser = localStorage.getItem("user");
+  const { role } = storedUser ? JSON.parse(storedUser) : { role: "user" };
 
   // console.log(overlayRef.current);
 
@@ -251,7 +252,7 @@ export default function Navbar() {
       <div
         className={`${
           isNavShowing ? "w-72" : "w-16"
-        } w-16 lg:min-w-72 top-0 h-full pt-24 fixed bg-[#fafafa] z-20 lg:relative  lg:pt-32 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-all`}
+        } fixed top-0 h-full pt-24 bg-[#fafafa] z-20 lg:relative lg:pt-32 lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-all duration-300 ease-in-out`}
       >
         {/* Rectangle shapes */}
         <div className="hidden lg:block absolute top-0 left-0 -z-10">
@@ -301,7 +302,7 @@ export default function Navbar() {
         </div>
         <button
           onClick={handleToggleNav}
-          className={`text-3xl flex lg:hidden ${
+          className={`text-3xl flex lg:hidden transition-all duration-300 ease-in-out ${
             !isNavShowing
               ? "justify-center lg:justify-start mx-auto"
               : "ml-auto px-5 lg:justify-start"
@@ -316,98 +317,59 @@ export default function Navbar() {
         <div className="w-full flex flex-col gap-16 items-center lg:items-start">
           <nav className="w-full">
             <ul>
-              {role === "user" &&
-                navLinks.map((link) => (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <li key={link.path}>
-                          <Link
-                            href={link.path}
-                            className={`font-medium lg:items-center lg:px-10 py-2 flex gap-3 ${
-                              !isNavShowing
-                                ? "justify-center lg:justify-start"
-                                : "lg:justify-start px-8"
-                            } hover:bg-neutral-200 ${
-                              pathname === link.path
-                                ? "text-brandSec pointer-events-none"
-                                : ""
+              {(role === "user" ? navLinks : adminNavLinks).map((link) => (
+                <TooltipProvider key={link.path}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <li>
+                        <Link
+                          href={link.path}
+                          className={`font-medium lg:items-center lg:px-10 py-2 flex gap-3 w-full transition-all duration-300 ease-in-out ${
+                            !isNavShowing
+                              ? "justify-center lg:justify-start px-5"
+                              : "lg:justify-start px-8"
+                          } hover:bg-neutral-200 ${
+                            pathname === link.path
+                              ? "text-brandSec pointer-events-none"
+                              : ""
+                          }`}
+                        >
+                          <span className="w-7 h-7 lg:w-5 lg:h-5 flex-shrink-0 transition-all duration-300 ease-in-out">
+                            {link.icon}
+                          </span>
+                          <span
+                            className={`whitespace-nowrap transition-all duration-300 ease-in-out ${
+                              isNavShowing ? "opacity-100" : "opacity-0 w-0 lg:opacity-100 lg:w-auto"
                             }`}
                           >
-                            <span className="w-7 h-7 lg:w-5 lg:h-5">
-                              {link.icon}
-                            </span>
-                            <span
-                              className={`${
-                                isNavShowing ? "block" : "hidden lg:block"
-                              }`}
-                            >
-                              {link.title}
-                            </span>
-                          </Link>
-                        </li>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{link.title}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
-              {role === "admin" &&
-                adminNavLinks.map((link) => (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <li key={link.path}>
-                          <Link
-                            href={link.path}
-                            className={`font-medium lg:items-center lg:px-10 py-2 flex gap-3 ${
-                              !isNavShowing
-                                ? "justify-center lg:justify-start"
-                                : "lg:justify-start px-8"
-                            } hover:bg-neutral-200 ${
-                              pathname === link.path
-                                ? "text-brandSec pointer-events-none"
-                                : ""
-                            }`}
-                          >
-                            <span className="w-7 h-7 lg:w-5 lg:h-5">
-                              {link.icon}
-                            </span>
-                            <span
-                              className={`${
-                                isNavShowing ? "block" : "hidden lg:block"
-                              }`}
-                            >
-                              {link.title}
-                            </span>
-                          </Link>
-                        </li>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{link.title}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
+                            {link.title}
+                          </span>
+                        </Link>
+                      </li>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{link.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
             </ul>
           </nav>
         </div>
         <div className="lg:mx-0 w-full flex flex-col items-center">
           <Link
             href={role === "user" ? "/user/settings" : "/admin/settings"}
-            className={`w-full lg:items-center font-medium lg:px-10 py-2 flex gap-3 ${
+            className={`w-full lg:items-center font-medium lg:px-10 py-2 flex gap-3 transition-all duration-300 ease-in-out ${
               !isNavShowing
                 ? "justify-center lg:justify-start"
                 : "lg:justify-start px-8"
             } hover:bg-neutral-200 ${
-              pathname === "/user/settings" || "/admin/settings"
-            }
+              pathname === "/user/settings" || pathname === "/admin/settings"
                 ? "text-brandSec pointer-events-none"
                 : ""
             }`}
           >
-            <span className="w-7 h-7 lg:w-5 lg:h-5">
+            <span className="w-7 h-7 lg:w-5 lg:h-5 flex-shrink-0 transition-all duration-300 ease-in-out">
               <svg
                 className="w-full h-full"
                 width={16}
@@ -432,7 +394,11 @@ export default function Navbar() {
                 />
               </svg>
             </span>
-            <span className={`${isNavShowing ? "block" : "hidden lg:block"}`}>
+            <span
+              className={`whitespace-nowrap transition-all duration-300 ease-in-out ${
+                isNavShowing ? "opacity-100" : "opacity-0 w-0 lg:opacity-100 lg:w-auto"
+              }`}
+            >
               Settings
             </span>
           </Link>

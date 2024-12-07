@@ -38,17 +38,18 @@ export default function SignUp() {
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
     console.log(data);
 
-    try {
-      setIsLoading(true);
-      const response = await signupAdmin(data);
-      const { user, token } = response;
+    setIsLoading(true);
+    const response = await signupAdmin(data);
 
+    if (response.status === "success") {
+      const { user, token } = response;
       login(user, token);
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsLoading(false);
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
     }
+
+    setIsLoading(false);
   }
 
   return (

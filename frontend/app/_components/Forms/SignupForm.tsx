@@ -70,13 +70,17 @@ export default function SignupForm() {
         } else {
           console.error(
             "Failed to fetch user info:",
-            res.status,
-            res.statusText
+            userDetailsResponse.status,
+            userDetailsResponse.statusText
           );
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        toast.error(error.message);
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred");
+        }
       }
     },
     scope: "profile email",
@@ -84,20 +88,17 @@ export default function SignupForm() {
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
     console.log(data);
 
-    try {
-      setIsLoading(true);
-      const response = await signupUser(data);
-      console.log(response);
-      const { user, token } = response;
+    setIsLoading(true);
+    const response = await signupUser(data);
 
+    if (response.status === "success") {
+      const { user, token } = response;
       login(user, token);
-    } catch (error: any) {
-      if (error.message === "fetch failed")
-        toast.error("Check your internet connection");
-      else toast.error(error.message);
-    } finally {
-      setIsLoading(false);
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
     }
+    setIsLoading(false);
   }
 
   useEffect(() => {
