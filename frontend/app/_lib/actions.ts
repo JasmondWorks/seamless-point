@@ -354,7 +354,10 @@ export async function authenticateUser(token: string) {
     const data = await res.json();
     console.log(data);
     if (!res.ok) throw new Error(data.message);
-    return { status: "success", message: "User authenticated successfully" };
+    return {
+      status: "success",
+      message: "User authenticated successfully",
+    };
   } catch (error: any) {
     return {
       status: "error",

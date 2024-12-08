@@ -3,11 +3,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authenticateAdmin, authenticateUser } from "../_lib/actions";
 import Cookies from "js-cookie";
+import { getLocalStorageKey } from "@/app/_lib/utils";
 
 type User = {
   id: string;
   firstName: string;
   lastName: string;
+  role: string;
 };
 
 type AuthType = {
@@ -15,7 +17,7 @@ type AuthType = {
   setUser: (user: User | null) => void;
   isAuthenticating: boolean;
   // authenticated: boolean;
-  login: (user: User | null, token: string) => void;
+  login: (user: User | undefined, token: string) => void;
   logout: () => void;
 };
 
@@ -28,6 +30,8 @@ type AuthResponse = {
   token?: string;
 };
 
+const userKey = getLocalStorageKey("user");
+
 export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -39,8 +43,8 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove("token");
     // setAuthenticated(false);
   }
-  function login(user: User | null, token: string) {
-    user && localStorage.setItem("user", JSON.stringify(user));
+  function login(user: User | undefined, token: string) {
+    user && localStorage.setItem(userKey, JSON.stringify(user));
     user && setUser(user);
     Cookies.set("token", token);
     // setAuthenticated(true);
@@ -52,24 +56,29 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       token: string,
       userType: string = "user"
     ) {
-      const res: AuthResponse = userType === "user" 
-        ? await authenticateUser(token) 
-        : await authenticateAdmin(token);
+      const res: AuthResponse =
+        userType === "user"
+          ? await authenticateUser(token)
+          : await authenticateAdmin(token);
 
-      if (res.status === "success" && res.user && res.token) {
-        login(res.user, res.token);
+      console.log(res);
+
+      const user: User = JSON.parse(localStorage.getItem(userKey) || "{}");
+
+      if (res.status === "success") {
+        login(user, token);
       } else {
         logout();
       }
       setIsAuthenticating(false);
     }
 
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem(userKey);
 
     if (storedUser) {
-      const user = JSON.parse(storedUser);
-      const token = Cookies.get("token");
-      console.log(token);
+      const user: User = JSON.parse(storedUser);
+      const token: string = Cookies.get("token") || "";
+
       const userType = user.role === "user" ? "user" : "admin";
 
       authenticationInit(token, userType);

@@ -4,12 +4,13 @@ import clsx from "clsx";
 import Loader from "./Loader";
 
 interface Props {
-  text: string;
+  text?: string;
   className?: string;
   icon?: React.ReactNode;
   onClick?: any;
   isReversed?: boolean;
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 export default function ButtonFormSubmit({
@@ -19,6 +20,7 @@ export default function ButtonFormSubmit({
   icon,
   isReversed,
   isLoading,
+  children,
 }: Props) {
   return (
     <Button
@@ -31,6 +33,8 @@ export default function ButtonFormSubmit({
       variant={ButtonVariant.fill}
       isReversed={isReversed}
       icon={!isLoading && icon}
-    />
+    >
+      {!text && children}
+    </Button>
   );
 }

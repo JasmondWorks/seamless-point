@@ -51,3 +51,10 @@ export function formatCurrency(amount, currency) {
     currency,
   }).format(amount);
 }
+
+export function getLocalStorageKey(baseKey: string) {
+  const appUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || "defaultAppUrl";
+  // Hash or sanitize appUrl if necessary
+  const sanitizedUrl = appUrl.replace(/[^a-zA-Z0-9]/g, "_"); // Replace special characters with underscores
+  return `${sanitizedUrl}_${baseKey}`;
+}

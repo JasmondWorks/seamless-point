@@ -1,12 +1,12 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import CustomFormField, {
-  FormFieldType,
-} from "@/app/_components/CustomFormField";
-import { Form } from "@/app/_components/ui/form";
+// import { useForm } from "react-hook-form";
+// import { z } from "zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import CustomFormField, {
+//   FormFieldType,
+// } from "@/app/_components/CustomFormField";
+// import { Form } from "@/app/_components/ui/form";
 
 import { IoIosClose } from "react-icons/io";
 
@@ -26,14 +26,17 @@ import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { useFormContext } from "@/app/_contexts/FormContext";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { copyToClipboard } from "@/app/_utils/utils";
-import { ButtonVariant } from "@/app/_components/Button";
-import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
+// import { ButtonVariant } from "@/app/_components/Button";
+// import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
 import CountdownTimer from "@/app/_components/CountdownTimer";
-import Badge, { BadgeVariant } from "@/app/_components/Badge";
+// import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { CreditCardForm } from "@/app/_components/CreditCardForm";
+import { usePaystackPayment } from "react-paystack";
+import { PaystackButton } from "react-paystack";
+import { getLocalStorageKey } from "@/app/_lib/utils";
 
 enum EDialogContent {
   cardDetails = "CARD_DETAILS",
@@ -43,8 +46,41 @@ enum EDialogContent {
   success = "SUCCESS",
 }
 
+const onSuccess = (reference: any) => {
+  console.log("success");
+  // Implementation for whatever you want to do with reference and after success call.
+  console.log(reference);
+};
+
+// you can call this function anything
+const onClose = () => {
+  // implementation for  whatever you want to do when the Paystack dialog closed.
+  console.log("closed");
+};
+
+interface User {
+  email: string;
+  [key: string]: any;  // For other properties
+}
+
 export default function Page() {
   const { formData } = useFormContext();
+  const [user, setUser] = useState<User>({} as User);
+
+  // Move localStorage access to useEffect
+  useEffect(() => {
+    const userData = JSON.parse(
+      localStorage.getItem(getLocalStorageKey("user")) || "{}"
+    ) as User;
+    setUser(userData);
+  }, []);
+
+  const config = {
+    reference: new Date().getTime().toString(),
+    email: user.email,
+    amount: formData.amount * 100,
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+  };
 
   const router = useRouter();
   const transactionFee = 1.5;
@@ -52,9 +88,11 @@ export default function Page() {
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  function handleSubmit() {
+  const initializePayment = usePaystackPayment(config);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setIsDialogOpen(true);
-    setSelectedDialogContent("");
 
     switch (formData.selectedPaymentMethod) {
       case "bank-transfer":
@@ -63,13 +101,13 @@ export default function Page() {
       case "debit-card":
         handleOpenCardDetailsDialog();
         break;
-
       default:
         return;
     }
   }
 
   function handleOpenCardDetailsDialog() {
+    setIsDialogOpen(false);
     setSelectedDialogContent(EDialogContent.cardDetails);
   }
   function handleOpenAccountDetailsDialog() {
@@ -91,10 +129,7 @@ export default function Page() {
 
   return (
     <>
-      <form
-        onSubmit={(e) => e.preventDefault()}
-        className={`flex flex-col gap-10`}
-      >
+      <div className="flex flex-col gap-10">
         <h1 className="headline text-center">{formData.amount} NGN</h1>
         <div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
@@ -117,8 +152,14 @@ export default function Page() {
           </div>
         </div>
         <PrivacyPolicyBlock />
-        <ButtonFormSubmit onClick={handleSubmit} text="I UNDERSTAND" />
-      </form>
+        <PaystackButton
+          {...config}
+          text="I UNDERSTAND"
+          onSuccess={onSuccess}
+          onClose={onClose}
+          className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
+        />
+      </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className={`${styles.dialogContainer}`}>
           {selectedDialogContent === EDialogContent.cardDetails && (
@@ -142,7 +183,7 @@ export default function Page() {
           {selectedDialogContent === EDialogContent.success && (
             <SuccessDialogContent
               title="Deposit successful"
-              onConfirm={handleCloseDialog}
+              onConfirmSuccess={handleCloseDialog}
             />
           )}
         </DialogContent>
@@ -151,18 +192,26 @@ export default function Page() {
   );
 }
 
-function CardDetailsDialogContent({ onOpenBankValidationDialog }) {
+function CardDetailsDialogContent({
+  onOpenBankValidationDialog,
+}: {
+  onOpenBankValidationDialog: () => void;
+}) {
   return (
     <div className={`flex flex-col gap-y-8`}>
       <TotalPriceHeader />
       <div className="space-y-8">
         <h3 className="text-2xl font-bold">Enter your card details to pay</h3>
-        <CreditCardForm handleSubmit={onOpenBankValidationDialog} />
+        <CreditCardForm onSubmit={onOpenBankValidationDialog} />
       </div>
     </div>
   );
 }
-function BankValidationContent({ onOpenSuccessDialog }) {
+function BankValidationContent({
+  onOpenSuccessDialog,
+}: {
+  onOpenSuccessDialog: () => void;
+}) {
   return (
     <div className={`flex flex-col gap-y-8 ${styles.dialogContainer}`}>
       <TotalPriceHeader />
@@ -185,7 +234,11 @@ function BankValidationContent({ onOpenSuccessDialog }) {
     </div>
   );
 }
-function AccountDetailsContent({ onOpenVerifyDialog }) {
+function AccountDetailsContent({
+  onOpenVerifyDialog,
+}: {
+  onOpenVerifyDialog: () => void;
+}) {
   const { formData } = useFormContext();
   const transactionFee = 1.5;
   const totalAmount = formData.amount + transactionFee;
@@ -230,17 +283,22 @@ function AccountDetailsContent({ onOpenVerifyDialog }) {
     </div>
   );
 }
-function VerifyContent({ onOpenSuccessDialog }) {
+function VerifyContent({
+  onOpenSuccessDialog,
+}: {
+  onOpenSuccessDialog: () => void;
+}) {
   const initialTimeLeft = 5;
   const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
 
-  function handleSetTimeLeft(timeLeft) {
-    setTimeLeft(timeLeft);
-  }
+  const handleSetTimeLeft = useCallback((time: number) => {
+    setTimeLeft(time);
+  }, []);
 
   useEffect(() => {
-    if (timeLeft === 0) return onOpenSuccessDialog();
-  }, [timeLeft]);
+    if (timeLeft === 0) onOpenSuccessDialog();
+  }, [timeLeft, onOpenSuccessDialog]);
+
   return (
     <div className="flex flex-col gap-y-8">
       <div className="flex flex-col gap-5 px-12 text-center">

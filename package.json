@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@next/font": "^14.2.15",
+    "@paystack/inline-js": "^2.22.1",
     "@shadcn/ui": "^0.0.4",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",

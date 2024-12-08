@@ -23,7 +23,7 @@ export default function ActionButton({
               "w-10 flex justify-center items-center aspect-square",
               {
                 "w-8 ": size === "sm",
-                "w-12 lg:w-20": size !== "sm",
+                "w-12 lg:w-14": size !== "sm",
               }
             )}
           >

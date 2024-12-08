@@ -1,45 +1,44 @@
 "use client";
 
-// context/FormContext.js
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-const initialData = {};
-const FormContext = createContext(initialData);
+type FormContextValue<T = any> = {
+  formData: T;
+  addFormData: (data: Partial<T>) => void;
+  formStep: number;
+  incrementFormStep: () => void;
+  setFormData: React.Dispatch<React.SetStateAction<T>>;
+};
 
-export function FormProvider({ children }) {
-  const [formData, setFormData] = useState<any>({
+const FormContext = createContext<FormContextValue>({} as FormContextValue);
+
+export function FormProvider({ children }: { children: React.ReactNode }) {
+  const [formData, setFormData] = useState({
     amount: 50,
     selectedPaymentMethod: "debit-card",
   });
-  const [formStep, setformStep] = useState(1);
+  const [formStep, setFormStep] = useState(1);
 
-  function incrementFormStep() {
-    setformStep((step) => step + 1);
-  }
-  const addFormData = (data) => {
-    setFormData((cur) => ({ ...cur, ...data }));
+  const incrementFormStep = () => setFormStep(step => step + 1);
+  const addFormData = (data: Partial<typeof formData>) => {
+    setFormData(cur => ({ ...cur, ...data }));
   };
 
   return (
-    <FormContext.Provider
-      value={{
-        formData,
-        addFormData,
-        incrementFormStep,
-        formStep,
-        setFormData,
-      }}
-    >
+    <FormContext.Provider value={{
+      formData,
+      addFormData,
+      incrementFormStep,
+      formStep,
+      setFormData,
+    }}>
       {children}
     </FormContext.Provider>
   );
 }
 
-export function useFormContext() {
-  const context = useContext(FormContext);
-
-  if (!context)
-    throw new Error("You tried to use FormContext outside FormProvider");
-
+export function useFormContext<T = any>() {
+  const context = useContext<FormContextValue<T>>(FormContext);
+  if (!context) throw new Error("useFormContext must be used within FormProvider");
   return context;
 }
