@@ -3,12 +3,12 @@ import Button, { ButtonVariant } from "@/app/_components/Button";
 import Image from "next/image";
 import React from "react";
 
-export default function CarrierDetails({
-  carrier,
-  selectedCarrier,
-  onSelectCarrier,
+export default function CourierDetails({
+  courier,
+  selectedCourier,
+  onSelectCourier,
 }) {
-  const isSelected = selectedCarrier?.name === carrier.name;
+  const isSelected = selectedCourier?.name === courier.name;
 
   return (
     <div
@@ -20,14 +20,14 @@ export default function CarrierDetails({
     >
       <div className="flex gap-3">
         <Image
-          src={carrier.logo}
+          src={courier.logo}
           height={30}
           width={30}
-          alt={carrier.name}
+          alt={courier.name}
           className="w-10 object-contain"
         />
         <div className="flex flex-col">
-          <span className="uppercase font-bold text-lg">{carrier.name}</span>
+          <span className="uppercase font-bold text-lg">{courier.name}</span>
           <span className="text-sm">Express shipping</span>
         </div>
       </div>
@@ -46,13 +46,13 @@ export default function CarrierDetails({
           text="Drop Off"
         />
       </div>
-      <span className="text-3xl font-semibold">N{carrier.price}</span>
+      <span className="text-3xl font-semibold">N{courier.price}</span>
       <Button
         className={`${isSelected ? "!bg-[#fde9d7] !text-brandSec" : ""} `}
         isRoundedLarge
         variant={ButtonVariant.fill}
         text={isSelected ? "SELECTED" : "Select"}
-        onClick={() => onSelectCarrier(carrier)}
+        onClick={() => onSelectCourier(courier)}
       />
     </div>
   );

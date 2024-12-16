@@ -23,8 +23,6 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-
-
 enum EDialogContent {
   parcelEditItem = "parcel_edit_item",
   parcelAddItem = "parcel_add_item",
@@ -35,49 +33,36 @@ enum EParcelType {
   item = "item",
 }
 
-export default function ParcelItems(parcelItems, setParcelItems) {
+export default function ParcelItems({
+  parcelItems,
+  parcelActions,
+  selectedParcelItem,
+}: any) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedParcelType, setSelectedParcelType] = useState("document");
-  const [selectedParcelItem, setSelectedParcelItem] = useState(null);
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
-  const { formData, setFormData } = useFormContext();
+  const { addItem, removeItem, editItem, selectItem } = parcelActions;
 
-  useEffect(() => {
-    setFormData({
-      ...formData,
-      items: parcelItems,
-      onEditParcelItem: handleEditParcelItem,
-      onRemoveParcelItem: handleRemoveParcelItem,
-      onAddParcelItem: handleAddParcelItem,
-      onOpenRemoveParcelItemDialog: handleOpenRemoveParcelItemDialog,
-      onOpenEditParcelItemDialog: handleOpenEditParcelItemDialog,
-      selectedParcelItem,
-    });
-  }, [parcelItems, selectedParcelItem]);
-
+  function handleAddParcelItem(item: any) {
+    addItem(item);
+    setIsDialogOpen(false);
+  }
+  function handleEditParcelItem(item: any) {
+    editItem(item);
+    setIsDialogOpen(false);
+  }
+  function handleRemoveParcelItem() {
+    console.log(selectedParcelItem);
+    removeItem(selectedParcelItem);
+    setIsDialogOpen(false);
+  }
   // Clear selected parcel item on exit or submission
   useEffect(() => {
     if (selectedDialogContent === EDialogContent.parcelAddItem)
-      setSelectedParcelItem(null);
+      parcelActions.selectItem(null);
   }, [selectedDialogContent]);
 
   // Parcel state handlers
-  function handleRemoveParcelItem() {
-    setParcelItems(
-      parcelItems.filter((item) => item.id !== selectedParcelItem.id)
-    );
-    setIsDialogOpen(false);
-  }
-  function handleEditParcelItem(editedItem: any) {
-    setParcelItems(
-      parcelItems.map((item) => (item.id === editedItem.id ? editedItem : item))
-    );
-    setIsDialogOpen(false);
-  }
-  function handleAddParcelItem(item: any) {
-    setParcelItems((prevItems) => [...prevItems, item]);
-    setIsDialogOpen(false);
-  }
 
   // Open dialog content handlers
   function handleOpenAddParcelItemDialog() {
@@ -85,23 +70,28 @@ export default function ParcelItems(parcelItems, setParcelItems) {
     setSelectedParcelType(EParcelType.document);
     setSelectedDialogContent(EDialogContent.parcelAddItem);
   }
-  function handleOpenRemoveParcelItemDialog(item) {
+  function handleOpenRemoveParcelItemDialog(item: any) {
     setIsDialogOpen(true);
-    setSelectedParcelItem(item);
+    selectItem(item);
     setSelectedDialogContent(EDialogContent.parcelRemoveItem);
   }
-  function handleOpenEditParcelItemDialog(item) {
-    setSelectedParcelItem(item);
+  function handleOpenEditParcelItemDialog(item: any) {
+    selectItem(item);
     setSelectedDialogContent(EDialogContent.parcelEditItem);
     setIsDialogOpen(true);
   }
 
   return (
     <div className="col-span-2 flex flex-col gap-y-5">
-      <ParcelItemsList />
+      <ParcelItemsList
+        items={parcelItems}
+        onOpenEditParcelItemDialog={handleOpenEditParcelItemDialog}
+        onOpenRemoveParcelItemDialog={handleOpenRemoveParcelItemDialog}
+        parcelActions={parcelActions}
+      />
       <button
         className="h-12 col-span-2 w-full bg-white border border-[#f6ac7b] rounded-lg flex items-center justify-center gap-3"
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.preventDefault();
           handleOpenAddParcelItemDialog();
         }}
@@ -119,11 +109,13 @@ export default function ParcelItems(parcelItems, setParcelItems) {
             <AddParcelItemDialogContent
               selectedParcelType={selectedParcelType}
               setSelectedParcelType={setSelectedParcelType}
+              onAddParcelItem={handleAddParcelItem}
             />
           )}
           {selectedDialogContent === EDialogContent.parcelEditItem && (
             <EditParcelItemDialogContent
               selectedParcelItem={selectedParcelItem}
+              onEditParcelItem={handleEditParcelItem}
             />
           )}
           {selectedDialogContent === EDialogContent.parcelRemoveItem && (
@@ -135,12 +127,15 @@ export default function ParcelItems(parcelItems, setParcelItems) {
   );
 }
 
-function DocumentParcelForm() {
-  const {
-    formData: { onAddParcelItem, onEditParcelItem, selectedParcelItem },
-  } = useFormContext();
-  console.log(selectedParcelItem);
-
+function DocumentParcelForm({
+  onAddParcelItem,
+  onEditParcelItem,
+  selectedParcelItem,
+}: {
+  onAddParcelItem?: (item: any) => void;
+  onEditParcelItem?: (item: any) => void;
+  selectedParcelItem?: any;
+}) {
   const form = useForm<z.infer<typeof parcelDocumentSchema>>({
     resolver: zodResolver(parcelDocumentSchema),
     defaultValues: selectedParcelItem || {
@@ -151,7 +146,7 @@ function DocumentParcelForm() {
     },
   });
 
-  function onSubmit(data) {
+  function onSubmit(data: z.infer<typeof parcelDocumentSchema>) {
     const itemDetails = {
       ...data,
       type: "document",
@@ -205,10 +200,15 @@ function DocumentParcelForm() {
   );
 }
 
-function ItemParcelForm() {
-  const {
-    formData: { onAddParcelItem, onEditParcelItem, selectedParcelItem },
-  } = useFormContext();
+function ItemParcelForm({
+  onAddParcelItem,
+  onEditParcelItem,
+  selectedParcelItem,
+}: {
+  onAddParcelItem?: (item: any) => void;
+  onEditParcelItem?: (item: any) => void;
+  selectedParcelItem?: any;
+}) {
   console.log(selectedParcelItem);
 
   const form = useForm<z.infer<typeof parcelItemSchema>>({
@@ -306,7 +306,8 @@ function ItemParcelForm() {
 function AddParcelItemDialogContent({
   selectedParcelType,
   setSelectedParcelType,
-}) {
+  onAddParcelItem,
+}: any) {
   return (
     <div className="flex flex-col gap-y-5">
       <DialogTitle>
@@ -330,13 +331,20 @@ function AddParcelItemDialogContent({
           </DialogDescription>
         </div>
       </DialogTitle>
-      {selectedParcelType === EParcelType.document && <DocumentParcelForm />}
-      {selectedParcelType === EParcelType.item && <ItemParcelForm />}
+      {selectedParcelType === EParcelType.document && (
+        <DocumentParcelForm onAddParcelItem={onAddParcelItem} />
+      )}
+      {selectedParcelType === EParcelType.item && (
+        <ItemParcelForm onAddParcelItem={onAddParcelItem} />
+      )}
     </div>
   );
 }
 
-function EditParcelItemDialogContent({ selectedParcelItem }) {
+function EditParcelItemDialogContent({
+  selectedParcelItem,
+  onEditParcelItem,
+}: any) {
   return (
     <div>
       <DialogTitle>
@@ -345,9 +353,17 @@ function EditParcelItemDialogContent({ selectedParcelItem }) {
         </span>
       </DialogTitle>
       {selectedParcelItem.type === EParcelType.document && (
-        <DocumentParcelForm />
+        <DocumentParcelForm
+          onEditParcelItem={onEditParcelItem}
+          selectedParcelItem={selectedParcelItem}
+        />
       )}
-      {selectedParcelItem.type === EParcelType.item && <ItemParcelForm />}
+      {selectedParcelItem.type === EParcelType.item && (
+        <ItemParcelForm
+          onEditParcelItem={onEditParcelItem}
+          selectedParcelItem={selectedParcelItem}
+        />
+      )}
     </div>
   );
 }

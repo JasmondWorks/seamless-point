@@ -10,6 +10,7 @@ type User = {
   firstName: string;
   lastName: string;
   role: string;
+  email: string;
 };
 
 type AuthType = {
@@ -83,7 +84,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
 
       authenticationInit(token, userType);
 
-      setUser(user);
+      setUser({ ...user, role: userType });
     } else {
       setIsAuthenticating(false);
     }

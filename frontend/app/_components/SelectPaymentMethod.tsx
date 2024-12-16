@@ -3,8 +3,11 @@ import React, { useState } from "react";
 export default function SelectPaymentMethod({
   onSelect,
   selectedPaymentMethod,
+}: {
+  onSelect: (value: string) => void;
+  selectedPaymentMethod: string;
 }) {
-  function handleSelectPaymentMethod(e) {
+  function handleSelectPaymentMethod(e: React.ChangeEvent<HTMLInputElement>) {
     onSelect(e.target.value);
   }
   return (

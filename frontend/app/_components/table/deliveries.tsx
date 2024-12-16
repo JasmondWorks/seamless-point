@@ -9,27 +9,19 @@ import ConfirmDialog from "@/app/_components/Dialogs/ConfirmDialog2";
 import { useState } from "react";
 import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
 import { formatDateTime } from "@/app/_lib/utils";
-
-// Define your delivery type
-export type Delivery = {
-  trackingNumber: string;
-  amount: number;
-  receiver: string;
-  destination: string;
-  date: Date;
-  status: string;
-  dispatch: string;
-};
+import { Delivery, DispatchEnum, EDeliveryStatus } from "@/app/_lib/types";
+import { dispatches } from "@/app/_lib/constants";
 
 // Define the columns
-export const getDeliveriesColumns = (
-  handleCancelDelivery: (trackingNumber: string) => void
-): ColumnDef<Delivery>[] => {
+export const getDeliveriesColumns = (deliveryActions: {
+  handleCancelDelivery: (trackingNumber: string) => void;
+  handleUpdateDelivery: (trackingNumber: string, status: string) => void;
+}): ColumnDef<Delivery>[] => {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false); // State for success dialog
 
   const handleCancelAndShowSuccess = async (trackingNumber: string) => {
     try {
-      handleCancelDelivery(trackingNumber); // Call the cancel handler
+      deliveryActions.handleCancelDelivery(trackingNumber); // Call the cancel handler
       setIsSuccessDialogOpen(true); // Open success dialog
     } catch (error) {
       console.error("Error cancelling delivery:", error);
@@ -48,7 +40,7 @@ export const getDeliveriesColumns = (
           aria-label="Select all"
         />
       ),
-      cell: ({ row, table }) => {
+      cell: ({ row }) => {
         const status = row.original.status; // Access 'status' directly from the row data
 
         if (status === "ongoing")
@@ -114,19 +106,21 @@ export const getDeliveriesColumns = (
           currency: "NGN",
         }).format(amount);
 
+        console.log(status, EDeliveryStatus.ONGOING);
+
         // Determine badge based on status
         const statusBadge = (() => {
           switch (status) {
-            case "ongoing":
-              return <Badge variant={BadgeVariant.neutralDark}>Ongoing</Badge>;
-            case "completed":
+            case EDeliveryStatus.ONGOING:
+            case EDeliveryStatus.PENDING:
+              return <Badge variant={BadgeVariant.neutralDark}>{status}</Badge>;
+            case EDeliveryStatus.COMPLETED:
               return <Badge variant={BadgeVariant.blue}>Completed</Badge>;
-            case "uncompleted":
+            case EDeliveryStatus.UNCOMPLETED:
               return <Badge variant={BadgeVariant.orange}>Uncompleted</Badge>;
-            case "cancelled":
-              return <Badge variant={BadgeVariant.red}>Cancelled</Badge>;
-            case "failed":
-              return <Badge variant={BadgeVariant.red}>Failed</Badge>;
+            case EDeliveryStatus.CANCELLED:
+            case EDeliveryStatus.FAILED:
+              return <Badge variant={BadgeVariant.red}>{status}</Badge>;
             default:
               return <Badge variant={BadgeVariant.red}>Unknown status</Badge>;
           }
@@ -135,7 +129,7 @@ export const getDeliveriesColumns = (
         return (
           <div className="flex items-center gap-10">
             <span className="font-medium">{formattedAmount}</span>
-            {statusBadge}
+            <div className="capitalize">{statusBadge}</div>
           </div>
         );
       },
@@ -145,7 +139,7 @@ export const getDeliveriesColumns = (
       accessorKey: "trackingNumber",
       header: "TRACKING NUMBER",
       cell: ({ row }) => {
-        const trackingNumber = row.getValue("trackingNumber");
+        const trackingNumber = row.original.trackingNumber;
         return (
           <div className="flex gap-2 items-center">
             <span>{trackingNumber}</span>
@@ -158,34 +152,49 @@ export const getDeliveriesColumns = (
     {
       accessorKey: "dispatch",
       header: "DISPATCH",
-      cell: ({ row }) => (
-        <Image
-          className="w-7 object-contain mx-auto"
-          src={`/assets/images/${row.getValue("dispatch")}`}
-          alt="dispatch"
-          width={100}
-          height={100}
-        />
-      ),
+      cell: ({ row }) => {
+        const dispatch = dispatches.find(
+          (dispatch) => dispatch.name === row.original.dispatch
+        );
+        console.log(dispatch);
+        if (!dispatch) return null;
+        return (
+          <Image
+            className="w-7 object-contain mx-auto"
+            src={dispatch.logo}
+            alt={dispatch.name}
+            width={100}
+            height={100}
+          />
+        );
+      },
     },
     // RECEIVER
     {
       accessorKey: "receiver",
       header: "RECEIVER",
-      cell: ({ row }) => <span>{row.getValue("receiver")}</span>,
+      cell: ({ row }) => (
+        <span>
+          {row.original.receiver.toFirstname} {row.original.receiver.toLastname}
+        </span>
+      ),
     },
     // DESTINATION
     {
       accessorKey: "destination",
       header: "DESTINATION",
-      cell: ({ row }) => <span>{row.getValue("destination")}</span>,
+      cell: ({ row }) => (
+        <span>
+          {row.original.receiver.toState}, {row.original.receiver.toCountry}
+        </span>
+      ),
     },
     // DATE
     {
       accessorKey: "date",
       header: "DATE",
       cell: ({ row }) => {
-        return <span>{formatDateTime(row.getValue("date"))}</span>;
+        return <span>{formatDateTime(row.original.createdAt)}</span>;
       },
     },
   ];

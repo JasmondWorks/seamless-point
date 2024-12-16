@@ -13,14 +13,13 @@ export default function Error({
   console.log(error);
   return (
     <main className="flex h-screen justify-center items-center flex-col gap-6 mt-8">
-      <h1 className="text-center !leading-tight text-[3rem] font-semibold">
+      <h1 className="text-center !leading-tight text-3xl !mb-0 font-bold">
         Something went wrong!
       </h1>
-      <p className="text-[1.8rem]">Please try again later.</p>
+      <p className="text-lg">Please try again later.</p>
       <Button onClick={reset} variant={ButtonVariant.fill}>
         Try again!
       </Button>
-        
     </main>
   );
 }

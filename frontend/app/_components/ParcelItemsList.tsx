@@ -5,15 +5,17 @@ import { formatCurrency } from "@/app/_lib/utils";
 import { Edit, Plus, Trash2Icon } from "lucide-react";
 import React, { useState } from "react";
 
-export default function ParcelItemsList() {
-  const {
-    formData: {
-      items,
-      onOpenEditParcelItemDialog,
-      onOpenRemoveParcelItemDialog,
-    },
-  } = useFormContext();
-
+export default function ParcelItemsList({
+  items,
+  onOpenEditParcelItemDialog,
+  onOpenRemoveParcelItemDialog,
+  parcelActions,
+}: {
+  items: any;
+  onOpenEditParcelItemDialog: any;
+  onOpenRemoveParcelItemDialog: any;
+  parcelActions: any;
+}) {
   if (!items?.length) return;
 
   return (
@@ -42,10 +44,14 @@ export default function ParcelItemsList() {
                 onClick={() => onOpenEditParcelItemDialog(item)}
               />
             </button>
+
             <button>
               <Trash2Icon
                 size={18}
-                onClick={() => onOpenRemoveParcelItemDialog(item)}
+                onClick={() => {
+                  console.log(item);
+                  onOpenRemoveParcelItemDialog(item);
+                }}
               />
             </button>
           </div>

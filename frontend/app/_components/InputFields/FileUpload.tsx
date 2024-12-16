@@ -1,24 +1,25 @@
 import { Plus } from "lucide-react";
 import React, { useState } from "react";
 
-const FileUpload = ({ props, field }) => {
+const FileUpload = ({ props, field }: { props: any; field: any }) => {
   const [fileName, setFileName] = useState("");
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name); // Update the state with the file name
+      field.onChange(file);
     }
   };
 
   return (
     <div className="rounded-lg bg-white space-y-5 p-5">
-      <h3 className="font-semibold text-xl">{props.title}</h3>
+      <h3 className="font-semibold">{props.title}</h3>
       <label
         htmlFor={props.name}
         className="text-center flex flex-col items-center border border-dashed gap-3 border-neutral-200 rounded-md p-2 cursor-pointer"
       >
-        <span>
+        <span className="text-sm text-gray-600">
           Browse and choose the files you want to upload from your computer
         </span>
         <div className="bg-[#37c1f9] h-9 w-9 rounded-md font-bold grid place-items-center !leading-none">
@@ -34,7 +35,7 @@ const FileUpload = ({ props, field }) => {
 
       {/* Display the uploaded file name if available */}
       {fileName && (
-        <p className="text-sm text-gray-600">Selected file: {fileName}</p>
+        <p className="text-xs text-gray-600">Selected file: {fileName}</p>
       )}
     </div>
   );

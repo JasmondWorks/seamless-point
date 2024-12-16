@@ -19,10 +19,13 @@ import {
 } from "@/app/_utils/utils";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
+import { newDelivery } from "@/app/_lib/types";
 
 export default function DeliveryReceiverForm() {
-  const receiver = useDeliveryFormStore((store) => store.receiver);
+  const receiver = useCreateDeliveryStore(
+    (store: newDelivery) => store.receiver
+  );
 
   const form = useForm<z.infer<typeof deliveryDestinationSchema>>({
     resolver: zodResolver(deliveryDestinationSchema),
@@ -44,7 +47,9 @@ export default function DeliveryReceiverForm() {
   const [cities, setCities] = useState([]);
 
   const router = useRouter();
-  const updateReceiver = useDeliveryFormStore((state) => state.updateReceiver);
+  const updateReceiver = useCreateDeliveryStore(
+    (state) => state.updateReceiver
+  );
 
   const { watch } = form;
   const selectedCountryName = watch("toCountry");
@@ -67,10 +72,12 @@ export default function DeliveryReceiverForm() {
     }
 
     async function loadStates() {
-      const country = countries.find((c) => c.name === selectedCountryName);
+      const country = countries.find(
+        (c: any) => c.name === selectedCountryName
+      );
 
       if (country) {
-        const response = await fetchStatesForCountry(country.isoCode);
+        const response: any = await fetchStatesForCountry(country.isoCode);
         setStates(response);
 
         if (response.length === 0) toast.error("No states available.");
@@ -89,11 +96,13 @@ export default function DeliveryReceiverForm() {
     }
 
     async function loadCities() {
-      const country = countries.find((c) => c.name === selectedCountryName);
-      const state = states.find((s) => s.name === selectedStateName);
+      const country = countries.find(
+        (c: any) => c.name === selectedCountryName
+      );
+      const state = states.find((s: any) => s.name === selectedStateName);
 
       if (country && state) {
-        const response = await fetchCitiesForState(
+        const response: any = await fetchCitiesForState(
           country.isoCode,
           state.isoCode
         );

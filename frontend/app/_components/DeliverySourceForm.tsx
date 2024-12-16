@@ -20,10 +20,19 @@ import {
 } from "@/app/_utils/utils";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 
 export default function DeliverySourceForm() {
-  const sender = useDeliveryFormStore((store) => store.sender);
+  const sender = useCreateDeliveryStore((store) => store.sender);
+  const deliveryType = useCreateDeliveryStore((store) => store.deliveryType);
+  const step = useCreateDeliveryStore((store) => store.step);
+  console.log(step);
+  useEffect(() => {
+    if (step !== 2) {
+      toast.error("Select a delivery type first");
+      router.push("/user/deliveries/register");
+    }
+  }, [step]);
 
   const form = useForm<z.infer<typeof deliverySourceSchema>>({
     resolver: zodResolver(deliverySourceSchema),
@@ -50,16 +59,32 @@ export default function DeliverySourceForm() {
   const [cities, setCities] = useState([]);
 
   const router = useRouter();
-  const updateSender = useDeliveryFormStore((state) => state.updateSender);
+  const updateSender = useCreateDeliveryStore((state) => state.updateSender);
+  console.log(deliveryType);
 
-  const { watch } = form;
+  const { watch, setValue } = form;
   const selectedCountryName = watch("country");
   const selectedStateName = watch("state");
+
+  // Clear selected state and cities when country changes
+  useEffect(() => {
+    if (selectedCountryName) {
+      setValue("state", ""); // Clear state
+      setValue("city", ""); // Clear city
+    }
+  }, [selectedCountryName, setValue]);
+
+  // Clear selected city when state changes
+  useEffect(() => {
+    if (selectedStateName) {
+      setValue("city", ""); // Clear city
+    }
+  }, [selectedStateName, setValue]);
 
   // Fetch countries once
   useEffect(() => {
     async function loadCountries() {
-      const response = await fetchCountries();
+      const response: any = await fetchCountries();
       setCountries(response);
     }
     loadCountries();
@@ -73,10 +98,12 @@ export default function DeliverySourceForm() {
     }
 
     async function loadStates() {
-      const country = countries.find((c) => c.name === selectedCountryName);
+      const country: any = countries.find(
+        (c: any) => c.name === selectedCountryName
+      );
 
       if (country) {
-        const response = await fetchStatesForCountry(country.isoCode);
+        const response: any = await fetchStatesForCountry(country.isoCode);
         setStates(response);
 
         if (response.length === 0) toast.error("No states available.");
@@ -95,11 +122,13 @@ export default function DeliverySourceForm() {
     }
 
     async function loadCities() {
-      const country = countries.find((c) => c.name === selectedCountryName);
-      const state = states.find((s) => s.name === selectedStateName);
+      const country = countries.find(
+        (c: any) => c.name === selectedCountryName
+      );
+      const state = states.find((s: any) => s.name === selectedStateName);
 
       if (country && state) {
-        const response = await fetchCitiesForState(
+        const response: any = await fetchCitiesForState(
           country.isoCode,
           state.isoCode
         );
@@ -110,13 +139,13 @@ export default function DeliverySourceForm() {
     }
 
     loadCities();
-  }, [selectedStateName, selectedCountryName, states]);
+  }, [selectedStateName, states]);
 
   // Form submission
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
     updateSender(data);
-
     console.log(data);
+
     router.push("/user/deliveries/register/destination");
   }
 
@@ -130,7 +159,7 @@ export default function DeliverySourceForm() {
             control={form.control}
             fieldType={FormFieldType.SELECT}
             placeholder="Country"
-            selectOptions={countries.map((country) => country.name)}
+            selectOptions={countries.map((country: any) => country.name)}
           />
           <CustomFormField
             label="State"
@@ -138,7 +167,8 @@ export default function DeliverySourceForm() {
             control={form.control}
             fieldType={FormFieldType.SELECT}
             placeholder="State"
-            selectOptions={states.map((state) => state.name)}
+            selectOptions={states.map((state: any) => state.name)}
+            selectMessage="Please select a country first"
           />
           <CustomFormField
             label="First name"
@@ -154,14 +184,6 @@ export default function DeliverySourceForm() {
             fieldType={FormFieldType.INPUT}
             placeholder="Last name"
           />
-          {/* <CustomFormField
-            className="sm:col-span-2"
-            label="City"
-            name="city"
-            control={form.control}
-            fieldType={FormFieldType.INPUT}
-            placeholder="Lagos"
-          /> */}
           <CustomFormField
             className="sm:col-span-2"
             label="City"
@@ -169,7 +191,8 @@ export default function DeliverySourceForm() {
             control={form.control}
             fieldType={FormFieldType.SELECT}
             placeholder="City"
-            selectOptions={cities.map((city) => city.name)}
+            selectOptions={cities.map((city: any) => city.name)}
+            selectMessage="Please select a state first"
           />
           <CustomFormField
             label="Street"

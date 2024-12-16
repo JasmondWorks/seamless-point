@@ -23,6 +23,7 @@ export default function Navbar({ className = "" }) {
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
 
   const { user } = useUserAuth();
+
   const pathname = usePathname();
 
   useEffect(() => {
@@ -113,11 +114,10 @@ export default function Navbar({ className = "" }) {
         {/* Nav Menu */}
         {!user && (
           <div
-            // className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 ${
-            //   isNavShowing ? "block pb-4 md:pb-0" : "hidden md:flex"
-            // }`}
-            className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 overflow-hidden transition-all duration-300 ${
-              isNavShowing ? "max-h-[500px] pb-4 md:pb-0" : "max-h-0 md:flex"
+            className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              isNavShowing 
+                ? "max-h-[800px] opacity-100 pb-4 md:pb-0 translate-y-0" 
+                : "max-h-0 md:max-h-none md:opacity-100 opacity-0 -translate-y-4"
             }`}
           >
             <nav className="flex-1 justify-start">

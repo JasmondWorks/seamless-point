@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import SignOutButton from "./SignOutButton";
 import { IoClose, IoWalletOutline } from "react-icons/io5";
 import { FaRegUserCircle } from "react-icons/fa";
+import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 
 const navLinks = [
   {
@@ -217,7 +218,9 @@ export default function Navbar() {
   const [isNavShowing, setIsNavShowing] = useState(false);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const storedUser = localStorage.getItem("user");
-  const { role } = storedUser ? JSON.parse(storedUser) : { role: "user" };
+
+  const { user } = useUserAuth();
+  const { role } = user;
 
   // console.log(overlayRef.current);
 
@@ -251,8 +254,8 @@ export default function Navbar() {
 
       <div
         className={`${
-          isNavShowing ? "w-72" : "w-16"
-        } fixed top-0 h-full pt-24 bg-[#fafafa] z-20 lg:relative lg:pt-32 lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-all duration-300 ease-in-out`}
+          isNavShowing ? "w-72" : "w-12"
+        } fixed top-0 h-full pt-24 bg-[#fafafa] z-20 lg:relative lg:pt-32 lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-[width] duration-300 ease-in-out`}
       >
         {/* Rectangle shapes */}
         <div className="hidden lg:block absolute top-0 left-0 -z-10">
@@ -295,14 +298,14 @@ export default function Navbar() {
               fill="#D9D9D9"
             />
             <path
-              d="M35.5262 42.3427L253.678 183.445L22.4035 301.819L35.5262 42.3427Z"
+              d="M35.5262 42.3427L253.678 183.445L222.4035 301.819L35.5262 42.3427Z"
               fill="#EE5E21"
             />
           </svg>
         </div>
         <button
           onClick={handleToggleNav}
-          className={`text-3xl flex lg:hidden transition-all duration-300 ease-in-out ${
+          className={`text-[1.65rem] flex lg:hidden transition-all duration-300 ease-in-out ${
             !isNavShowing
               ? "justify-center lg:justify-start mx-auto"
               : "ml-auto px-5 lg:justify-start"
@@ -324,9 +327,9 @@ export default function Navbar() {
                       <li>
                         <Link
                           href={link.path}
-                          className={`font-medium lg:items-center lg:px-10 py-2 flex gap-3 w-full transition-all duration-300 ease-in-out ${
+                          className={`font-medium lg:px-10 px-3 py-3 flex items-center gap-3 w-full transition-all duration-300 ease-in-out ${
                             !isNavShowing
-                              ? "justify-center lg:justify-start px-5"
+                              ? "justify-center lg:justify-start"
                               : "lg:justify-start px-8"
                           } hover:bg-neutral-200 ${
                             pathname === link.path
@@ -334,12 +337,14 @@ export default function Navbar() {
                               : ""
                           }`}
                         >
-                          <span className="w-7 h-7 lg:w-5 lg:h-5 flex-shrink-0 transition-all duration-300 ease-in-out">
+                          <div className="w-[1.65rem] aspect-square lg:w-5 lg:h-5 flex items-center justify-center flex-shrink-0">
                             {link.icon}
-                          </span>
+                          </div>
                           <span
-                            className={`whitespace-nowrap transition-all duration-300 ease-in-out ${
-                              isNavShowing ? "opacity-100" : "opacity-0 w-0 lg:opacity-100 lg:w-auto"
+                            className={`whitespace-nowrap transition-all duration-300 ease-in-out lg:block ${
+                              isNavShowing
+                                ? "opacity-100"
+                                : "opacity-0 w-0 lg:opacity-100 lg:w-auto hidden"
                             }`}
                           >
                             {link.title}
@@ -359,7 +364,7 @@ export default function Navbar() {
         <div className="lg:mx-0 w-full flex flex-col items-center">
           <Link
             href={role === "user" ? "/user/settings" : "/admin/settings"}
-            className={`w-full lg:items-center font-medium lg:px-10 py-2 flex gap-3 transition-all duration-300 ease-in-out ${
+            className={`w-full items-center font-medium lg:px-10 py-3 flex gap-3 transition-all duration-300 ease-in-out ${
               !isNavShowing
                 ? "justify-center lg:justify-start"
                 : "lg:justify-start px-8"
@@ -369,7 +374,7 @@ export default function Navbar() {
                 : ""
             }`}
           >
-            <span className="w-7 h-7 lg:w-5 lg:h-5 flex-shrink-0 transition-all duration-300 ease-in-out">
+            <div className="w-[1.65rem] aspect-square lg:w-5 lg:h-5 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-in-out">
               <svg
                 className="w-full h-full"
                 width={16}
@@ -393,10 +398,12 @@ export default function Navbar() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </span>
+            </div>
             <span
-              className={`whitespace-nowrap transition-all duration-300 ease-in-out ${
-                isNavShowing ? "opacity-100" : "opacity-0 w-0 lg:opacity-100 lg:w-auto"
+              className={`whitespace-nowrap transition-all duration-300 ease-in-out lg:block ${
+                isNavShowing
+                  ? "opacity-100"
+                  : "opacity-0 w-0 lg:opacity-100 lg:w-auto hidden"
               }`}
             >
               Settings

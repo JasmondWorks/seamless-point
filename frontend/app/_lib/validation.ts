@@ -390,8 +390,18 @@ const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>
       )} MB.`,
     }
   );
+const fileSchema = z
+  .instanceof(File) // Ensure the input is a `File` object
+  .refine(
+    (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+    { message: "Only JPEG and PNG images are allowed" }
+  )
+  .refine(
+    (file) => file.size <= 5 * 1024 * 1024, // 5MB file size limit
+    { message: "File size must be less than 5MB" }
+  );
 export const parcelInfoSchema = z.object({
-  packaging: z
+  packagingType: z
     .string({
       required_error: "Please provide an item name",
     })
@@ -412,6 +422,7 @@ export const parcelInfoSchema = z.object({
     "image/jpeg", // JPEG
     "image/png", // PNG
   ]),
+  // packageImage: fileSchema.optional(),
 });
 export const creditCardSchema = z
   .object({

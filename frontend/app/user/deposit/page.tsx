@@ -1,42 +1,34 @@
 "use client";
 
-// import { useForm } from "react-hook-form";
-// import { z } from "zod";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import CustomFormField, {
-//   FormFieldType,
-// } from "@/app/_components/CustomFormField";
-// import { Form } from "@/app/_components/ui/form";
-
-import { IoIosClose } from "react-icons/io";
-
+// import SquadPay from "react-squadpay";
+// import { PaystackButton } from "react-paystack";
 import styles from "./page.module.css";
 
+import { Input } from "@/app/_components/ui/input";
+import SelectDebitCardButton from "@/app/_components/SelectDebitCard";
+import DepositAccountDetailsCard from "@/app/_components/DepositAccountDetailsCard";
+import React, { useCallback, useEffect, useState } from "react";
+import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
+import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
+import SelectPaymentMethod from "@/app/_components/SelectPaymentMethod";
+import { useFormContext } from "@/app/_contexts/FormContext";
+import toast from "react-hot-toast";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
+  DialogHeader,
 } from "@/app/_components/ui/dialog";
-
-import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
-import { useFormContext } from "@/app/_contexts/FormContext";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState, useCallback } from "react";
-import { copyToClipboard } from "@/app/_utils/utils";
-// import { ButtonVariant } from "@/app/_components/Button";
-// import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
-import CountdownTimer from "@/app/_components/CountdownTimer";
-// import Badge, { BadgeVariant } from "@/app/_components/Badge";
+import { Dialog } from "@/app/_components/ui/dialog";
+import { getLocalStorageKey } from "@/app/_lib/utils";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { CreditCardForm } from "@/app/_components/CreditCardForm";
-// import { usePaystackPayment } from "react-paystack";
-import { PaystackButton } from "react-paystack";
-import { getLocalStorageKey } from "@/app/_lib/utils";
+import { IoIosClose } from "react-icons/io";
+import CountdownTimer from "@/app/_components/CountdownTimer";
+import { copyToClipboard } from "@/app/_utils/utils";
+import { useRouter } from "next/navigation";
 
 enum EDialogContent {
   cardDetails = "CARD_DETAILS",
@@ -63,13 +55,108 @@ interface User {
   [key: string]: any;
 }
 
-export default function Page() {
+export default function DepositPage() {
+  const [step, setStep] = useState(1);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
+  function incrementStep() {
+    setStep((step) => step + 1);
+  }
+
+  if (step === 1) return <Funding incrementStep={incrementStep} />;
+  if (step === 2) return <Amount incrementStep={incrementStep} />;
+  if (step === 3) return <Summary />;
+}
+
+// Step 1
+function Funding({ incrementStep }: { incrementStep: () => void }) {
+  const { addFormData } = useFormContext();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
+  function handleSelectPaymentMethod(type: string) {
+    setSelectedPaymentMethod(type);
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    console.log("here");
+    if (!selectedPaymentMethod)
+      return toast.error("Please select a payment method");
+
+    addFormData({ selectedPaymentMethod });
+    incrementStep();
+  }
+
+  console.log(selectedPaymentMethod);
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col space-y-10">
+      <div className="space-y-2">
+        <h1 className="headline text-center">Funding of Account</h1>
+        <p className="text-center text-muted">
+          Please Transfer Money To The Account Below Or Choose The Other Option
+        </p>
+      </div>
+      <DepositAccountDetailsCard />
+      <SelectPaymentMethod
+        onSelect={handleSelectPaymentMethod}
+        selectedPaymentMethod={selectedPaymentMethod}
+      />
+
+      <PrivacyPolicyBlock />
+      <ButtonFormSubmit onClick={handleSubmit} text="I UNDERSTAND" />
+    </form>
+  );
+}
+
+// Step 2
+function Amount({ incrementStep }: { incrementStep: () => void }) {
+  const { addFormData, formData } = useFormContext();
+  const [amount, setAmount] = useState("");
+
+  console.log(formData);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!amount) return toast.error("Please enter an amount");
+    if (isNaN(Number(amount))) return toast.error("Amount must be a number");
+
+    addFormData({ amount: Number(amount) });
+    incrementStep();
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
+      <h1 className="headline text-center">
+        How much are you adding to your Account?
+      </h1>
+      <div className="flex flex-col gap-3">
+        <span>Amount</span>
+        <Input
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="h-11 bg-white"
+          type="text"
+          placeholder="100NGN"
+        />
+      </div>
+      <PrivacyPolicyBlock />
+      <ButtonFormSubmit onClick={handleSubmit} text="I UNDERSTAND" />
+    </form>
+  );
+}
+
+// Step 3
+function Summary() {
   const { formData } = useFormContext();
-  const { paymentMethod } = formData;
   const [user, setUser] = useState<User>({} as User);
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+  const transactionFee = 1.5;
 
+  //   Paystack config
   const config = {
     reference: new Date().getTime().toString(),
     email: user.email,
@@ -77,7 +164,7 @@ export default function Page() {
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
   };
 
-  // const initializePayment = usePaystackPayment(config);
+  //   const initializePayment = usePaystackPayment(config);
 
   // Move localStorage access to useEffect
   useEffect(() => {
@@ -86,9 +173,6 @@ export default function Page() {
     ) as User;
     setUser(userData);
   }, []);
-
-  const router = useRouter();
-  const transactionFee = 1.5;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -127,14 +211,46 @@ export default function Page() {
     setSelectedDialogContent("");
   }
 
+  //   Squadpay config
+  const params = {
+    key: process.env.NEXT_PUBLIC_SQUADCO_PUBLIC_KEY!,
+    email: user.email, // from HTML form
+    amount: formData.amount, // no need to multiply by 100 for kobo, its taken care for you
+    currencyCode: "NGN",
+  };
+
+  const Close = () => {
+    console.log("Widget closed");
+  };
+
+  const Load = () => {
+    console.log("Widget Loaded");
+  };
+
+  /**
+   * @param {object} data
+   * @description  reponse when payment is successful
+   */
+  const Success = (data: any) => {
+    console.log(data);
+    console.log("Widget success");
+  };
+
   return (
     <>
       <div className="flex flex-col gap-10">
         <h1 className="headline text-center">{formData.amount} NGN</h1>
         <div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
-            <span>Pay with {paymentMethod}</span>
-            <span>{paymentMethod}</span>
+            <div>
+              Pay with{" "}
+              <span className="capitalize">
+                {formData.selectedPaymentMethod.split("-").join(" ")}
+              </span>
+            </div>
+            <span className="capitalize">
+              {formData.selectedPaymentMethod.split("-").join(" ")}
+            </span>
           </div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
             <span>Amount to add</span>
@@ -152,13 +268,25 @@ export default function Page() {
           </div>
         </div>
         <PrivacyPolicyBlock />
-        {/* <PaystackButton
-          {...config}
-          text="I UNDERSTAND"
-          onSuccess={onSuccess}
-          onClose={onClose}
-          className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
-        /> */}
+        {/* {formData.selectedPaymentMethod === "debit-card" && (
+          <PaystackButton
+            {...config}
+            text="I UNDERSTAND"
+            onSuccess={onSuccess}
+            onClose={onClose}
+            className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
+          />
+        )} */}
+        {/* {formData.selectedPaymentMethod === "bank-transfer" && (
+          <SquadPay
+            className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
+            text="Pay now"
+            params={params}
+            onClose={Close}
+            onLoad={Load}
+            onSuccess={(res: any) => Success(res)}
+          />
+        )} */}
       </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className={`${styles.dialogContainer}`}>

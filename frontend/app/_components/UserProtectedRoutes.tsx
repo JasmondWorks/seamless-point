@@ -7,20 +7,18 @@ import { useUserAuth } from "../_contexts/UserAuthContext";
 
 export default function ProtectedRoutes({
   children,
-  userType = "user",
 }: {
   children: any;
   userType?: string;
 }) {
   const router = useRouter();
-  const { user, isAuthenticating } = useUserAuth();
+  const { user, isAuthenticating, logout } = useUserAuth();
 
   useEffect(() => {
     if (isAuthenticating) return;
-    if (!user) {
-      userType === "user"
-        ? router.push("/auth/user/login")
-        : router.push("/auth/admin/login");
+    if (!user || user.role !== "user") {
+      logout();
+      router.push("/auth/user/login");
     }
   }, [user, isAuthenticating]);
 

@@ -17,9 +17,9 @@ export default async function DashboardLayout({
           <DashboardNavbar />
           <ScrollArea
             // style={{ height: "calc(100% - 80px)" }}
-            className="ml-16 mt-20 md:mt-0 lg:ml-0 flex-1"
+            className="ml-12 mt-20 md:mt-0 lg:ml-0 flex-1"
           >
-            <main className="p-5 w-full md:p-6 lg:p-8 overflow-hidden h-full">
+            <main className="p-5 w-full md:p-6 lg:p-8 overflow-hidden h-full py-10">
               <div className="relative z-10 space-y-10 h-full">{children}</div>
               <Image
                 style={{

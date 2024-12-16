@@ -2,62 +2,44 @@
 
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import Button, { ButtonVariant } from "@/app/_components/Button";
-import CarrierDetails from "@/app/_components/CarrierDetails";
+import CourierDetails from "@/app/_components/CourierDetails";
 import CountdownTimer from "@/app/_components/CountdownTimer";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from "@/app/_components/ui/dialog";
-import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { dispatches } from "@/app/_lib/constants";
+import { Dispatch } from "@/app/_lib/types";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function SelectCarrierPage() {
-  const [selectedCarrier, setSelectedCarrier] = useState(null);
+export default function SelectCourierPage() {
+  const courier = useCreateDeliveryStore((store) => store.courier);
+  const [selectedCourier, setSelectedCourier] = useState<Dispatch | null>(
+    courier
+  );
+  console.log(selectedCourier, courier);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
-  const onSelectCourier = useDeliveryFormStore(
+  const onSelectCourier = useCreateDeliveryStore(
     (store) => store.onSelectCourier
   );
 
-  const carriers = [
-    {
-      name: "dhl",
-      logo: "/assets/images/dhl.png",
-      deliveryType: "Drop Off",
-      price: 60_000,
-    },
-    {
-      name: "aramex",
-      logo: "/assets/images/aramex.png",
-      deliveryType: "Drop Off",
-      price: 60_000,
-    },
-    {
-      name: "ups",
-      logo: "/assets/images/ups.png",
-      deliveryType: "Drop Off",
-      price: 60_000,
-    },
-    {
-      name: "anka",
-      logo: "/assets/images/anka.png",
-      deliveryType: "Saves money",
-      price: 60_000,
-    },
-  ];
+  const couriers = dispatches;
 
-  function handleSelectCarrier(carrier) {
-    setSelectedCarrier(selectedCarrier?.name === carrier.name ? null : carrier);
+  function handleSelectCourier(courier: Dispatch) {
+    const newCourier = selectedCourier?.name === courier.name ? null : courier;
+    setSelectedCourier(newCourier);
+    onSelectCourier(newCourier);
   }
 
   function onSubmit() {
-    if (!selectedCarrier) return toast.error("You haven't selected a carrier");
+    if (!selectedCourier) return toast.error("You haven't selected a courier");
 
-    onSelectCourier(selectedCarrier);
     setIsDialogOpen(true);
 
     setTimeout(
@@ -67,14 +49,14 @@ export default function SelectCarrierPage() {
   }
   return (
     <div className="max-w-5xl space-y-10">
-      <h1 className="headline text-center mb-10">Select Carrier</h1>
+      <h1 className="headline text-center mb-10">Select Courier</h1>
       <div className="overflow-x-auto space-y-5">
-        {carriers.map((carrier) => (
-          <CarrierDetails
-            key={carrier.name}
-            carrier={carrier}
-            selectedCarrier={selectedCarrier}
-            onSelectCarrier={handleSelectCarrier}
+        {couriers.map((courier) => (
+          <CourierDetails
+            key={courier.name}
+            courier={courier}
+            selectedCourier={selectedCourier}
+            onSelectCourier={handleSelectCourier}
           />
         ))}
       </div>
@@ -96,7 +78,7 @@ export default function SelectCarrierPage() {
 
       <Dialog open={isDialogOpen}>
         <DialogContent>
-          <div className="space-y-10 relative">
+          <div className="space-y-10">
             <DialogTitle>
               <span className="text-2xl">Purchase Insurance</span>
             </DialogTitle>

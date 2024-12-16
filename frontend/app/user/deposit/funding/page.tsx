@@ -24,7 +24,7 @@ export default function Funding() {
     console.log("here");
     if (!selectedPaymentMethod)
       return toast.error("Please select a payment method");
-    addFormData({ selectedPaymentMethod });
+    addFormData({ paymentMethod: selectedPaymentMethod });
     router.push("/user/deposit/amount");
   }
 

@@ -45,7 +45,7 @@ export default function Button({
       type={type}
       onClick={onClick}
       className={clsx(
-        "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11", // Common classes
+        "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11 text-base", // Common classes
         {
           "py-10": isBig,
           "opacity-40 pointer-events-none": disabled,

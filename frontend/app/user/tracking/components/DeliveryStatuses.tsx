@@ -26,9 +26,9 @@ const stepsData = [
 
 export default function DeliveryStatuses() {
   return (
-    <div className="flex gap-20 flex-col justify-between">
-      {stepsData.map((step) => (
-        <DeliveryStatusItem key={step.id} step={step} />
+    <div className="flex flex-col overflow-y-hidden">
+      {stepsData.map((step, index) => (
+        <DeliveryStatusItem key={step.id} step={step} index={index} />
       ))}
     </div>
   );

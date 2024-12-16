@@ -1,7 +1,8 @@
 "use client";
 
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { formatCurrency } from "@/app/_lib/utils";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -11,8 +12,11 @@ export default function PackageDetailsPage() {
     router.push("/user/deliveries/register/payment");
   }
 
-  const sender = useDeliveryFormStore((store) => store.sender);
-  const receiver = useDeliveryFormStore((store) => store.receiver);
+  const sender = useCreateDeliveryStore((store) => store.sender);
+  const receiver = useCreateDeliveryStore((store) => store.receiver);
+  const store = useCreateDeliveryStore((store) => store);
+
+  console.log(store);
 
   return (
     <div className="space-y-8">
@@ -48,7 +52,7 @@ export default function PackageDetailsPage() {
               <p className="font-bold">Sender's Address</p>
               <p className="text-muted">
                 {`${sender?.aptUnit} ${sender?.street}, ${sender?.city}, ${sender?.state}` ||
-                  "B Close Port-Harcourt Rivers 500 84928 482 38437 982, Nigeria"}
+                  "Sender's Address"}
               </p>
             </div>
           </div>
@@ -84,7 +88,7 @@ export default function PackageDetailsPage() {
               <p className="font-bold">Sender Address</p>
               <p className="text-muted">
                 {`${receiver?.toAptUnit} ${receiver?.toStreet}, ${receiver?.toCity}, ${receiver?.toState}` ||
-                  "B Close Port-Harcourt Rivers 500 84928 482 38437 982, Nigeria"}{" "}
+                  "Receiver's Address"}
               </p>
             </div>
           </div>
@@ -99,55 +103,66 @@ export default function PackageDetailsPage() {
             display: "grid",
             gridTemplateColumns: "repeat(4, minmax(220px, 1fr))",
           }}
-          className="rounded-3xl p-3 bg-white border border-neutral-300 gap-6 no-scrollbar overflow-x-auto"
+          className="whitespace-pre-wrap rounded-3xl p-3 bg-white border border-neutral-300 gap-6 no-scrollbar overflow-x-auto"
         >
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
+            <p className="font-bold">Amount</p>
+            <p className="text-muted">{formatCurrency(2000)}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="font-bold">Description</p>
+            {store.parcelDetails?.parcelItems.map((item) => (
+              <p key={item?.itemName} className="text-muted">
+                {item?.itemName}
+              </p>
+            ))}
+          </div>
+          <div className="space-y-1">
+            <p className="font-bold">Payment Method</p>
+            <p className="text-muted">
+              {store.parcelDetails?.paymentMethod || "Payment Method"}
+            </p>
+          </div>
+          <div className="space-y-1">
+            <p className="font-bold">Payment Status</p>
             <p className="text-muted">08012345678</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
+            <p className="font-bold">Item value</p>
+            <p className="text-muted">N2000</p>
+          </div>
+          <div className="space-y-1">
+            <p className="font-bold">Weight</p>
             <p className="text-muted">08012345678</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
+            <p className="font-bold">Courier</p>
+            <p className="text-muted">{store.courier?.name || "Courier"}</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
+            <p className="font-bold">Approved by</p>
+            <p className="text-muted">Boe</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
+            <p className="font-bold">Length</p>
+            <p className="text-muted">20cm</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
+            <p className="font-bold">Width</p>
+            <p className="text-muted">30cm</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
+            <p className="font-bold">Height</p>
+            <p className="text-muted">40cm</p>
           </div>
           <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
-          </div>
-          <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
-          </div>
-          <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
-          </div>
-          <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
-          </div>
-          <div className="space-y-1">
-            <p className="font-bold">Phone Number</p>
-            <p className="text-muted">08012345678</p>
+            <p className="font-bold">Quantity</p>
+            <p className="text-muted">
+              {store.parcelDetails?.parcelItems.reduce(
+                (acc, item) => acc + item?.quantity,
+                0
+              )}
+            </p>
           </div>
         </div>
       </div>

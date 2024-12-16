@@ -13,9 +13,11 @@ import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import { useForm } from "react-hook-form";
 import ParcelItems from "@/app/_components/ParcelItems";
-import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { currencies, packageType } from "@/app/_lib/constants";
+import toast from "react-hot-toast";
 
 const initialItems = [
   {
@@ -41,29 +43,70 @@ const initialItems = [
   },
 ];
 export default function ParcelInfo() {
-  const [parcelItems, setParcelItems] = useState(initialItems);
+  const parcelDetails = useCreateDeliveryStore((store) => store.parcelDetails);
+  console.log(parcelDetails);
+
+  const [parcelItems, setParcelItems] = useState<any[]>(
+    parcelDetails?.parcelItems || []
+  );
+  const [selectedParcelItem, setSelectedParcelItem] = useState(null);
+  const addParcelDetails = useCreateDeliveryStore(
+    (store) => store.addParcelDetails
+  );
 
   const router = useRouter();
 
+  const parcelActions = {
+    addItem: handleAddParcelItem,
+    removeItem: handleRemoveParcelItem,
+    editItem: handleEditParcelItem,
+    selectItem: handleSelectParcelItem,
+  };
+
+  function handleRemoveParcelItem(item: any) {
+    console.log(item.id);
+    setParcelItems(parcelItems.filter((item: any) => item.id !== item.id));
+  }
+  function handleEditParcelItem(editedItem: any) {
+    setParcelItems(
+      parcelItems.map((item: any) =>
+        item.id === editedItem.id ? editedItem : item
+      )
+    );
+  }
+  function handleAddParcelItem(item: any) {
+    setParcelItems((prevItems: any) => [...prevItems, item]);
+  }
+  function handleSelectParcelItem(item: any) {
+    setSelectedParcelItem(item);
+  }
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
-    // defaultValues: {
-    // },
-    defaultValues: {},
+    defaultValues: parcelDetails || {},
   });
 
-  // async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
-  //   console.log(data);
-  //   try {
-  //     //   signupUser(data);
-  //   } catch (error) {}
-  // }
-
-  async function onSubmit() {
-    router.push("/user/deliveries/register/select-carrier");
+  async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
+    try {
+      // Submit logic
+      const parcelDetails = {
+        parcelItems,
+        ...data,
+      };
+      console.log(parcelDetails);
+      addParcelDetails(parcelDetails);
+      // Navigate to the next page
+      router.push("/user/deliveries/register/select-courier");
+    } catch (error) {
+      console.error(error);
+    }
   }
   function handleSubmit() {
-    router.push("/user/deliveries/register/select-carrier");
+    const isValid = form.formState.isValid;
+    if (!isValid) {
+      toast.error("All fields must be filled");
+      return;
+    }
+    form.handleSubmit(onSubmit)();
   }
 
   return (
@@ -71,16 +114,19 @@ export default function ParcelInfo() {
       <h1 className="headline text-center mb-10">Parcel information</h1>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
           className="grid md:grid-cols-2 gap-5"
         >
           <CustomFormField
             className="col-span-2 md:col-span-1"
             label="Select Packaging"
-            name="packaging"
+            name="packagingType"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={["plastic", "metal"]}
+            selectOptions={packageType}
             placeholder="Select Packaging"
           />
           <CustomFormField
@@ -89,10 +135,14 @@ export default function ParcelInfo() {
             name="currency"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={["Nigerian naira (NGN)", "US Dollars (USD)"]}
+            selectOptions={currencies}
             placeholder="Nigerian naira"
           />
-          <ParcelItems />
+          <ParcelItems
+            parcelItems={parcelItems}
+            parcelActions={parcelActions}
+            selectedParcelItem={selectedParcelItem}
+          />
           <CustomFormField
             className="col-span-2"
             title="Upload proof of purchase"
@@ -109,17 +159,10 @@ export default function ParcelInfo() {
           />
           <div className="flex flex-col gap-y-5 col-span-2">
             <PrivacyPolicyBlock />
-            <ButtonFormSubmit onClick={handleSubmit} text="Continue" />
+            <ButtonFormSubmit text="Continue" />
           </div>
         </form>
       </Form>
-
-      {/* <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid md:grid-cols-2 gap-5"
-        ></form>
-      </Form> */}
     </div>
   );
 }

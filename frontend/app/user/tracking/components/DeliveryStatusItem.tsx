@@ -4,15 +4,17 @@ import StepCheckbox from "./StepCheckbox";
 
 export default function DeliveryStatusItem({
   step,
+  index,
 }: {
   step: { id: number; title: string; desc: string };
+  index: number;
 }) {
   const currentStep = 1;
   const isStepCompleted = currentStep > step.id;
 
   return (
-    <div className="flex gap-20 items-start">
-      <StepCheckbox isStepCompleted={isStepCompleted} />
+    <div className="flex gap-20 items-start overflow-y-hidden pb-10 lg:pb-16">
+      <StepCheckbox isStepCompleted={isStepCompleted} index={index} />
       {currentStep >= step.id && (
         <div
           className={`space-y-5 ${
@@ -21,8 +23,10 @@ export default function DeliveryStatusItem({
         >
           <h3 className="text-2xl font-bold">{step?.title}</h3>
           <p>{step?.desc}</p>
-          <CopyPhoneNumber />
-          <p>{"Rider's"} number</p>
+          <div className="space-y-1">
+            <CopyPhoneNumber />
+            <p className="text-sm font-medium">{"Rider's"} number</p>
+          </div>
         </div>
       )}
     </div>

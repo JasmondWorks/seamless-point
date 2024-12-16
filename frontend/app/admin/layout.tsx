@@ -3,6 +3,7 @@ import DashboardNavbar from "@/app/_components/DashboardNavbar";
 import ProtectedRoutes from "../_components/UserProtectedRoutes";
 import Navbar from "../_components/Navbar";
 import { ScrollArea } from "../_components/ui/scroll-area";
+import AdminProtectedRoutes from "@/app/_components/AdminProtectedRoutes";
 
 export default async function DashboardLayout({
   children,
@@ -10,7 +11,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoutes userType="admin">
+    <AdminProtectedRoutes>
       <div className="h-screen flex flex-col">
         <Navbar />
         <div className="bg-neutral-50 flex-1 overflow-auto flex">
@@ -36,6 +37,6 @@ export default async function DashboardLayout({
           </ScrollArea>
         </div>
       </div>
-    </ProtectedRoutes>
+    </AdminProtectedRoutes>
   );
 }

@@ -7,11 +7,12 @@ import { useUserAuth } from "../_contexts/UserAuthContext";
 
 export default function ProtectedRoutes({ children }: { children: any }) {
   const router = useRouter();
-  const { user, isAuthenticating } = useAdminAuth();
+  const { user, isAuthenticating, logout } = useUserAuth();
 
   useEffect(() => {
     if (isAuthenticating) return;
-    if (!user) {
+    if (!user || user.role !== "admin") {
+      logout();
       router.push("/auth/admin/login");
     }
   }, [user, isAuthenticating]);

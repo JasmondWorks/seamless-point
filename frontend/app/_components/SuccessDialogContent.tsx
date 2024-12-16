@@ -13,7 +13,12 @@ export default function SuccessDialogContent({
   title = "Successful",
   description = "",
   confirmText = "Ok",
-  onConfirmSuccess = "",
+  onConfirmSuccess,
+}: {
+  title?: string;
+  description?: string;
+  confirmText?: string;
+  onConfirmSuccess?: () => void;
 }) {
   return (
     <div>

@@ -1,34 +1,37 @@
 "use client";
 
-import { useFormContext } from "@/app/_contexts/FormContext";
-import { useDeliveryFormStore } from "@/app/_stores/createDeliveryFormStore";
-import { DeliveryType } from "@/app/types";
-import Link from "next/link";
+import { DeliveryType } from "@/app/_lib/types";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function SelectDeliveryType() {
-  const { formData, addFormData } = useFormContext();
   const router = useRouter();
 
-  const onSelectDeliveryType = useDeliveryFormStore(
+  const onSelectDeliveryType = useCreateDeliveryStore(
     (state) => state.onSelectDeliveryType
   );
+  const goToNextStep = useCreateDeliveryStore((state) => state.goToNextStep);
+
+  const setStep = useCreateDeliveryStore((state) => state.setStep);
+  useEffect(() => setStep(1), []);
+
   function handleSetDeliveryType(type: DeliveryType) {
     onSelectDeliveryType(type);
+    goToNextStep();
     router.push("/user/deliveries/register/source");
   }
 
   return (
-    <div className="gap-10 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] ">
+    <div className="gap-10 grid md:grid-cols-2 justify-center">
       <button
         onClick={() => handleSetDeliveryType(DeliveryType.FOOD)}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3 justify-center items-center w-fit"
       >
         <div className="card flex-1 bg-white flex flex-col">
           <div className="flex-1 grid place-items-center px-5 py-10">
             <svg
-              className="w-auto md:w-80"
+              className="max-w-full h-auto"
               width={300}
               height={300}
               viewBox="0 0 300 300"
@@ -910,7 +913,7 @@ export default function SelectDeliveryType() {
           <div className="mx-5">
             <hr />
           </div>
-          <div className="p-5 border-t border-neutral-100">
+          <div className="p-3 border-t border-neutral-100">
             <span className="text-lg font-bold text-neutral-600">
               Food items
             </span>
@@ -918,14 +921,15 @@ export default function SelectDeliveryType() {
         </div>
         <span className="text-muted">Food stuff, drinks and meat, etc.</span>
       </button>
+
       <button
         onClick={() => handleSetDeliveryType(DeliveryType.REGULAR)}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3 justify-center items-center w-fit"
       >
         <div className="card flex-1 bg-white flex flex-col">
           <div className="flex-1 grid place-items-center px-5 py-10">
             <svg
-              className="w-auto md:w-80"
+              className="max-w-full h-auto"
               width={300}
               height={300}
               viewBox="0 0 300 300"
@@ -1312,7 +1316,7 @@ export default function SelectDeliveryType() {
           <div className="mx-5">
             <hr />
           </div>
-          <div className="p-5 border-t border-neutral-100">
+          <div className="p-3 border-t border-neutral-100">
             <span className="text-lg font-bold text-neutral-600">
               Regular items{" "}
             </span>{" "}

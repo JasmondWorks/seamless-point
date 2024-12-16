@@ -3,21 +3,22 @@ import Link from "next/link";
 import BalanceDisplay from "../../_components/BalanceDisplay";
 import ActionButton from "../../_components/ActionButton";
 import Username from "@/app/_components/Username";
+import DashboardLayout from "@/app/_components/DashboardLayout";
 
 export default function Dashboard() {
   return (
-    <div className="flex flex-col ">
-      <h1 className="mb-5">
+    <DashboardLayout isContained={false} isRightContained={true}>
+      <h1 className="">
         <strong>
           Hey <Username /> -{" "}
         </strong>{" "}
         Let's get you started for today
       </h1>
-      <div className="max-w-xl md:max-w-3xl lg:pr-20">
+      <div className="max-w-xl">
         <BalanceDisplay />
       </div>
-      <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 py-10 lg:pr-20 [background-color: red]">
-        <Link href="/user/deposit/funding">
+      <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 [background-color: red]">
+        <Link href="/user/deposit">
           <ActionButton
             text="Deposit"
             icon={
@@ -1158,6 +1159,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
