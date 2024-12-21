@@ -1,5 +1,11 @@
-import { ECurrency } from "@/app/_lib/types";
+"use client";
+
+import { BadgeVariant } from "@/app/_components/Badge";
+import { supabase } from "@/app/_lib/supabase";
+import { ECurrency, Parcel } from "@/app/_lib/types";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { type ClassValue, clsx } from "clsx";
+import { toast } from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -56,11 +62,18 @@ export function formatCurrency(
   }).format(amount);
 }
 
-export function getLocalStorageKey(baseKey: string) {
+export function getLocalStorageKey(key: string) {
   const appUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || "defaultAppUrl";
   // Hash or sanitize appUrl if necessary
   const sanitizedUrl = appUrl.replace(/[^a-zA-Z0-9]/g, "_"); // Replace special characters with underscores
-  return `${sanitizedUrl}_${baseKey}`;
+  return `${sanitizedUrl}_${key}`;
+}
+
+export function getUserId() {
+  const user = JSON.parse(
+    localStorage.getItem(getLocalStorageKey("user")) || "{}"
+  );
+  return user?._id;
 }
 
 export function loadPaystackScript(): Promise<boolean> {
@@ -99,4 +112,152 @@ export function loadPaystackScript(): Promise<boolean> {
 //   script.onload = callback;
 
 //   document.body.appendChild(script);
+// }
+
+export function formatDeliveries(deliveries: any) {
+  return deliveries?.map((delivery: any) => ({
+    ...delivery,
+    sender: {
+      firstName: delivery.firstName,
+      lastName: delivery.lastName,
+      street: delivery.street,
+      aptUnit: delivery.aptUnit,
+      country: delivery.country,
+      state: delivery.state,
+      city: delivery.city,
+      postCode: delivery.postCode,
+      email: delivery.email,
+      phoneNumber: delivery.phoneNumber,
+    },
+    receiver: {
+      toFirstName: delivery.toFirstName,
+      toLastName: delivery.toLastName,
+      toStreet: delivery.toStreet,
+      toAptUnit: delivery.toAptUnit,
+      toCountry: delivery.toCountry,
+      toState: delivery.toState,
+      toCity: delivery.toCity,
+      toPostCode: delivery.toPostCode,
+      toEmail: delivery.toEmail,
+      toPhoneNumber: delivery.toPhoneNumber,
+    },
+    trackingId: delivery.trackingId.split("-")[0],
+    dispatch: delivery.dispatch,
+    courier: delivery.courier,
+    status: delivery.status,
+    createdAt: delivery.createdAt,
+    amount: delivery.amount,
+    parcelDetails: {
+      parcelItems: delivery.parcelItems,
+      packagingType: delivery.packagingType,
+      packageImage: delivery.packageImage,
+      proofOfPurchase: delivery.proofOfPurchase,
+      currency: delivery.currency,
+    },
+  }));
+}
+
+export function getBadgeStyle(tag: string): BadgeVariant | null {
+  switch (tag) {
+    case "completed":
+      return BadgeVariant.blue;
+    case "uncompleted":
+    case "pending":
+      return BadgeVariant.orange;
+    case "ongoing":
+    case "unconfirmed":
+      return BadgeVariant.neutralDark;
+    case "cancelled":
+    case "failed":
+      return BadgeVariant.red;
+    case "delivered":
+      return BadgeVariant.green;
+    default:
+      return null;
+  }
+}
+
+export function getParcelTotalAmount(parcelDetails: any) {
+  return parcelDetails.parcelItems.reduce(
+    (acc: number, item: Parcel) => acc + (item?.value || 0),
+    0
+  );
+}
+
+export function getParcelTotalWeight(parcelDetails: any) {
+  return parcelDetails.parcelItems.reduce(
+    (acc: number, item: Parcel) => acc + (item?.weight || 0),
+    0
+  );
+}
+
+export function getStoreState(store: any, excludeFields: string[] = []) {
+  const state = store.getState();
+
+  // Filter out any properties that are functions or are in the excludeFields array
+  const dataVariables = Object.keys(state).reduce((acc: any, key: any) => {
+    if (typeof state[key] !== "function" && !excludeFields.includes(key)) {
+      acc[key] = state[key];
+    }
+    return acc;
+  }, {});
+
+  return dataVariables;
+}
+
+export function getNewDeliveryData() {
+  const storeObj = useCreateDeliveryStore;
+  const state = getStoreState(storeObj, ["step"]);
+
+  return state;
+}
+
+export async function uploadFile(
+  file: File,
+  bucket: string
+): Promise<string | null> {
+  try {
+    // Generate a unique path for the file within the bucket
+    const folder = getUserId(); // Example folder name
+    const uniqueFileName = `${Date.now()}-${file.name}`; // Ensure a unique file name
+    const path = `${folder}/${uniqueFileName}`; // Full path in the bucket
+
+    // Upload the file to the specified bucket and path
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, {
+        cacheControl: "3600", // Cache for 1 hour
+        upsert: true, // Replace file if it already exists
+      });
+
+    console.log(file);
+
+    if (error) {
+      console.error("File upload error:", error.message);
+      toast.error(error.message);
+      return null;
+    }
+
+    // Get the public URL of the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(data.path);
+
+    if (!publicUrlData) {
+      console.error("Error generating public URL");
+      toast.error("Error generating public URL");
+      return null;
+    }
+
+    return publicUrlData?.publicUrl || null;
+  } catch (err) {
+    console.error("Error uploading file:", err);
+    toast.error("Error uploading file");
+    return null;
+  }
+}
+// export async function getSuperbaseMedia(bucketName) {
+//   const {data, error} = await supabase.storage.from(bucketName).list(getUserId + '/', {
+//     limit: 10,
+//   })
 // }

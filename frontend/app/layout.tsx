@@ -5,6 +5,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import { UserAuthProvider } from "@/app/_contexts/UserAuthContext";
 import { IsClientCtxProvider } from "@/app/is-client-ctx";
+import QueryProvider from "@/app/_lib/QueryProvider";
 
 export default function RootLayout({
   children,
@@ -54,13 +55,15 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
       </head>
       <body className={`antialiased overflow-x-hidden no-scrollbar`}>
-        <IsClientCtxProvider>
-          <GoogleOAuthProvider
-            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}
-          >
-            <UserAuthProvider>{children}</UserAuthProvider>
-          </GoogleOAuthProvider>
-        </IsClientCtxProvider>
+        <QueryProvider>
+          <IsClientCtxProvider>
+            <GoogleOAuthProvider
+              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}
+            >
+              <UserAuthProvider>{children}</UserAuthProvider>
+            </GoogleOAuthProvider>
+          </IsClientCtxProvider>
+        </QueryProvider>
         <Toaster
           toastOptions={{
             success: {

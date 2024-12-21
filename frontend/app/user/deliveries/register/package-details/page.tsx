@@ -1,7 +1,12 @@
 "use client";
 
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { formatCurrency } from "@/app/_lib/utils";
+import {
+  formatCurrency,
+  getNewDeliveryData,
+  getParcelTotalAmount,
+  getStoreState,
+} from "@/app/_lib/utils";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -15,8 +20,8 @@ export default function PackageDetailsPage() {
   const sender = useCreateDeliveryStore((store) => store.sender);
   const receiver = useCreateDeliveryStore((store) => store.receiver);
   const store = useCreateDeliveryStore((store) => store);
-
-  console.log(store);
+  const state = getNewDeliveryData();
+  console.log(state);
 
   return (
     <div className="space-y-8">
@@ -32,7 +37,7 @@ export default function PackageDetailsPage() {
               <div className="space-y-1">
                 <p className="font-bold">Name</p>
                 <p className="text-muted">
-                  {`${sender?.firstname} ${sender?.lastname}` || "John doe"}
+                  {`${sender?.firstName} ${sender?.lastName}` || "John doe"}
                 </p>
               </div>
               <div className="space-y-1">
@@ -66,7 +71,7 @@ export default function PackageDetailsPage() {
               <div className="space-y-1">
                 <p className="font-bold">Name</p>
                 <p className="text-muted">
-                  {`${receiver?.toFirstname} ${receiver?.toLastname}` ||
+                  {`${receiver?.toFirstName} ${receiver?.toLastName}` ||
                     "John doe"}
                 </p>
               </div>
@@ -81,7 +86,7 @@ export default function PackageDetailsPage() {
               <p className="font-bold">Phone Number</p>
               <p className="text-muted">
                 {" "}
-                {receiver?.toPhone || "08012345678"}
+                {receiver?.toPhoneNumber || "08012345678"}
               </p>
             </div>
             <div className="space-y-1">
@@ -107,29 +112,37 @@ export default function PackageDetailsPage() {
         >
           <div className="space-y-1">
             <p className="font-bold">Amount</p>
-            <p className="text-muted">{formatCurrency(2000)}</p>
+            <p className="text-muted">
+              {formatCurrency(getParcelTotalAmount(store.parcelDetails))}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Description</p>
             {store.parcelDetails?.parcelItems.map((item) => (
-              <p key={item?.itemName} className="text-muted">
-                {item?.itemName}
+              <p key={item?.name} className="text-muted">
+                {item?.name}
               </p>
             ))}
           </div>
           <div className="space-y-1">
             <p className="font-bold">Payment Method</p>
             <p className="text-muted">
-              {store.parcelDetails?.paymentMethod || "Payment Method"}
+              {store.parcelDetails?.paymentMethod || "N/A"}
             </p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Payment Status</p>
-            <p className="text-muted">08012345678</p>
+            <p className="text-muted">
+              {store.parcelDetails?.paymentStatus || "N/A"}
+            </p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Item value</p>
-            <p className="text-muted">N2000</p>
+            {store.parcelDetails?.parcelItems.map((item) => (
+              <p key={item?.id} className="text-muted">
+                {item?.value}
+              </p>
+            ))}
           </div>
           <div className="space-y-1">
             <p className="font-bold">Weight</p>

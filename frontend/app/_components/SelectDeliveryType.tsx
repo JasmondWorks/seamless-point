@@ -19,7 +19,7 @@ export default function SelectDeliveryType() {
   function handleSetDeliveryType(type: DeliveryType) {
     onSelectDeliveryType(type);
     goToNextStep();
-    router.push("/user/deliveries/register/source");
+    router.push("/user/deliveries/register/sender");
   }
 
   return (

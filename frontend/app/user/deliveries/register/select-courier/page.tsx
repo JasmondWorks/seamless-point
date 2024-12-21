@@ -18,23 +18,25 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function SelectCourierPage() {
+  const couriers = dispatches;
+
   const courier = useCreateDeliveryStore((store) => store.courier);
   const [selectedCourier, setSelectedCourier] = useState<Dispatch | null>(
-    courier
+    couriers.find((c) => c.name.toLowerCase() === courier) || null
   );
-  console.log(selectedCourier, courier);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
   const onSelectCourier = useCreateDeliveryStore(
     (store) => store.onSelectCourier
   );
-
-  const couriers = dispatches;
-
+  console.log(selectedCourier);
   function handleSelectCourier(courier: Dispatch) {
-    const newCourier = selectedCourier?.name === courier.name ? null : courier;
-    setSelectedCourier(newCourier);
-    onSelectCourier(newCourier);
+    console.log(courier);
+
+    setSelectedCourier((prev: Dispatch | null) =>
+      prev?.name === courier.name ? null : courier
+    );
+    onSelectCourier(courier);
   }
 
   function onSubmit() {
@@ -91,14 +93,19 @@ export default function SelectCourierPage() {
                 height={200}
               />
               <span className="text-4xl font-semibold">N6,000</span>
-              <Badge
-                className="w-fit"
-                variant={BadgeVariant.orange}
-                text="SELECTED"
-              />
+              <div className="flex flex-col gap-1 items-end">
+                <span className="text-sm font-semibold">
+                  {selectedCourier?.name}
+                </span>
+                <Badge
+                  className="w-fit"
+                  variant={BadgeVariant.orange}
+                  text="SELECTED"
+                />
+              </div>
             </div>
 
-            <span className="absolute bottom-1 right-1">
+            <span className="absolute bottom-1 right-3">
               <CountdownTimer initialSeconds={5} />
             </span>
           </div>

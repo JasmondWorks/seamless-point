@@ -14,58 +14,70 @@ import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useDeliveriesStore } from "@/app/_stores/deliveriesStore";
 import { DispatchEnum, EDeliveryStatus } from "@/app/_lib/types";
+import {
+  getNewDeliveryData,
+  getParcelTotalAmount,
+  uploadFile,
+} from "@/app/_lib/utils";
+import { createDelivery } from "@/app/_lib/actions";
 
 export default function Payment() {
-  const { formData, addFormData, setFormData } = useFormContext();
   const [amount, setAmount] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const store = useCreateDeliveryStore((store) => store);
   const addDelivery = useDeliveriesStore((store) => store.addDelivery);
-  console.log(store);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const state = getNewDeliveryData();
+  console.log(state);
 
   const resetDeliveryData = useCreateDeliveryStore(
     (store) => store.resetDeliveryData
   );
 
-  console.log(formData);
   const router = useRouter();
 
-  useEffect(() => {
-    const { amount, ...rest } = formData;
-    setFormData(rest);
-  }, []);
-
-  function handleSetAmount(e) {
-    setAmount(e.target.value);
-    addFormData({ amount: e.target.value });
-  }
+  // TODO: upload packageImage and proofOfPurchase and get back urls
 
   let timeout: NodeJS.Timeout;
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     console.log("submitting...");
-    // if (!formData.amount || isNaN(formData.amount)) {
-    //   if (!formData.amount) toast.error("Enter an amount to proceed");
-    //   if (formData.amount && isNaN(formData.amount))
-    //     toast.error("Amount must be a number");
 
-    //   return;
-    // }
+    // upload files
+    setIsLoading(true);
+    const packageImageUrl = await uploadFile(
+      state.parcelDetails.packageImage,
+      "package_images"
+    );
+    const proofOfPurchaseUrl = await uploadFile(
+      state.parcelDetails.proofOfPurchase,
+      "package_proofs"
+    );
 
+    const newDelivery = {
+      ...state,
+      ...state.sender,
+      ...state.receiver,
+      ...state.parcelDetails,
+    };
+    delete newDelivery.sender;
+    delete newDelivery.receiver;
+    delete newDelivery.parcelDetails;
+    newDelivery.packageImage = packageImageUrl;
+    newDelivery.proofOfPurchase = proofOfPurchaseUrl;
+
+    console.log(newDelivery);
+
+    try {
+      const res = await createDelivery(newDelivery);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
     setIsDialogOpen(true);
+    setIsLoading(false);
 
-    resetDeliveryData();
-    addDelivery({
-      courier: store.courier!,
-      trackingNumber: crypto.randomUUID(),
-      sender: store.sender!,
-      receiver: store.receiver!,
-      parcelDetails: store.parcelDetails!,
-      dispatch: store.courier!.name as DispatchEnum,
-      status: EDeliveryStatus.ONGOING,
-      createdAt: new Date().toISOString(),
-      amount: Math.floor(Math.random() * 100000),
-    });
     timeout = setTimeout(() => router.push("/user/deliveries/success"), 5000);
     return () => clearTimeout(timeout);
   }
@@ -78,8 +90,7 @@ export default function Payment() {
           <Label htmlFor="withdrawAmount">Amount to be paid</Label>
           <Input
             disabled={true}
-            value={amount}
-            onChange={handleSetAmount}
+            value={getParcelTotalAmount(state.parcelDetails)}
             className="bg-white h-11"
             id="withdrawAmount"
             type="text"
@@ -91,7 +102,7 @@ export default function Payment() {
         </div>
 
         <PrivacyPolicyBlock />
-        <ButtonFormSubmit text="I UNDERSTAND" />
+        <ButtonFormSubmit isLoading={isLoading} text="I UNDERSTAND" />
       </form>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

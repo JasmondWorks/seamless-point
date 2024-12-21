@@ -23,9 +23,9 @@ import { useLocationData } from "@/app/_hooks/useLocationData";
 import SpinnerFull from "@/app/_components/SpinnerFull";
 
 export default function DeliverySourceForm() {
-  // const [countries, setCountries] = useState([]);
-  // const [states, setStates] = useState([]);
-  // const [cities, setCities] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
 
   const sender = useCreateDeliveryStore((store) => store.sender);
   const deliveryType = useCreateDeliveryStore((store) => store.deliveryType);
@@ -53,8 +53,14 @@ export default function DeliverySourceForm() {
   const router = useRouter();
   const updateSender = useCreateDeliveryStore((state) => state.updateSender);
 
-  const { countries, states, cities, loadCities, loadStates } =
-    useLocationData();
+  // const {
+  //   countries,
+  //   states,
+  //   cities,
+  //   fetchStates,
+  //   fetchCities,
+  //   // isLocationDataLoading,
+  // } = useLocationData();
 
   const { watch, setValue } = form;
   const selectedCountryName = watch("country");
@@ -62,23 +68,77 @@ export default function DeliverySourceForm() {
 
   // Clear selected state and cities when country changes
   useEffect(() => {
-    setValue("state", ""); // Clear state
-    setValue("city", ""); // Clear city
+    if (selectedCountryName) {
+      setValue("state", ""); // Clear state
+      setValue("city", ""); // Clear city
+    }
   }, [selectedCountryName, setValue]);
 
   // Clear selected city when state changes
   useEffect(() => {
-    setValue("city", ""); // Clear city
+    if (selectedStateName) {
+      setValue("city", ""); // Clear city
+    }
   }, [selectedStateName, setValue]);
+
+  // Fetch countries once
+  useEffect(() => {
+    async function loadCountries() {
+      const response: any = await fetchCountries();
+      setCountries(response);
+    }
+    loadCountries();
+  }, []);
 
   // Fetch states for selected country
   useEffect(() => {
-    loadStates(selectedCountryName);
+    if (!selectedCountryName) {
+      setStates([]); // Clear states when no country is selected
+      return;
+    }
+
+    async function loadStates() {
+      const country: any = countries.find(
+        (c: any) => c.name === selectedCountryName
+      );
+
+      if (country) {
+        const response: any = await fetchStatesForCountry(country.isoCode);
+        setStates(response);
+
+        if (response.length === 0) toast.error("No states available.");
+      }
+    }
+
+    loadStates();
+    setCities([]); // Clear cities when country changes
   }, [selectedCountryName, countries]);
 
   // Fetch cities for selected state
   useEffect(() => {
-    loadCities(selectedCountryName, selectedStateName);
+    if (!selectedStateName) {
+      setCities([]); // Clear cities when no state is selected
+      return;
+    }
+
+    async function loadCities() {
+      const country: any = countries.find(
+        (c: any) => c.name === selectedCountryName
+      );
+      const state = states.find((s: any) => s.name === selectedStateName);
+
+      if (country && state) {
+        const response: any = await fetchCitiesForState(
+          country.isoCode,
+          state.isoCode
+        );
+        setCities(response);
+
+        if (response.length === 0) toast.error("No cities available.");
+      }
+    }
+
+    loadCities();
   }, [selectedStateName, states]);
 
   // Form submission

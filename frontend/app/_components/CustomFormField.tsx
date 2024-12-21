@@ -28,8 +28,10 @@ import {
 import { Textarea } from "./ui/textarea";
 import Password from "./InputFields/Password";
 import DatePicker from "./InputFields/DatePicker";
-import FileUpload from "./InputFields/FileUpload";
+import FileInput from "./InputFields/FileInput";
 import toast from "react-hot-toast";
+import { newDelivery } from "@/app/_lib/types";
+import SelectBox from "@/app/_components/SelectBox";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -61,6 +63,12 @@ interface CustomProps {
   selectOptions?: string[];
   selectGroupOptions?: { title: string; items: string[] }[];
   selectMessage?: string;
+  selectValue?: string;
+  addToStore?: (
+    file: File,
+    fieldName: keyof Pick<newDelivery, "packageImage" | "proofOfPurchase">
+  ) => void;
+  fieldName?: string;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
@@ -122,70 +130,13 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     case FormFieldType.DATE_PICKER:
       return <DatePicker props={props} field={field} />;
     case FormFieldType.SELECT:
-      return (
-        <Select onValueChange={field.onChange} defaultValue={field.value}>
-          <FormControl>
-            <SelectTrigger
-              onMouseDown={(event) => {
-                event.stopPropagation(); // Prevent parent handlers from interfering
-
-                if (!props.selectOptions?.length) {
-                  console.log("selectOptions", props.selectOptions);
-                  event.preventDefault();
-                  toast.error(props.selectMessage || "Select an option");
-                }
-              }}
-              className={`shad-select-trigger ${
-                !props.selectOptions?.length && "opacity-30 cursor-not-allowed"
-              }`}
-            >
-              {!props.selectOptions?.length ? (
-                <p className="text-muted">
-                  {props.selectMessage || "No options available"}
-                </p>
-              ) : (
-                <SelectValue placeholder={props.placeholder} />
-              )}
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent className="shad-select-content">
-            {props.selectOptions?.length > 0
-              ? props.selectOptions
-                  .map((val) => val[0].toUpperCase() + val.slice(1))
-                  .map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))
-              : props.selectGroupOptions?.length > 0 && (
-                  <SelectGroup>
-                    {props.selectGroupOptions.map((optionGroup) => (
-                      <div key={optionGroup.title}>
-                        <SelectLabel className="text-2xl mt-6">
-                          {optionGroup.title}
-                        </SelectLabel>
-                        {optionGroup.items.map((option: string) => (
-                          <SelectItem
-                            className="text-2xl"
-                            value={option}
-                            key={option}
-                          >
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </div>
-                    ))}
-                  </SelectGroup>
-                )}
-          </SelectContent>
-        </Select>
-      );
+      return <SelectBox field={field} props={props} />;
     case FormFieldType.SKELETON:
       return props.renderSkeleton ? props.renderSkeleton(field) : null;
     default:
       return null;
     case FormFieldType.FILE:
-      return <FileUpload props={props} field={field} />;
+      return <FileInput props={props} field={field} />;
   }
 };
 

@@ -1,4 +1,20 @@
-import { Dispatch, DispatchEnum } from "@/app/_lib/types";
+import {
+  Dispatch,
+  DispatchEnum,
+  ECurrency,
+  EDeliveryStatus,
+} from "@/app/_lib/types";
+
+export const deliveryStatus = [
+  EDeliveryStatus.ONGOING,
+  EDeliveryStatus.PENDING,
+  EDeliveryStatus.COMPLETED,
+  EDeliveryStatus.CANCELLED,
+  EDeliveryStatus.FAILED,
+  EDeliveryStatus.UNCONFIRMED,
+  EDeliveryStatus.UNCOMPLETED,
+  EDeliveryStatus.DELIVERED,
+];
 
 export const dispatches: Dispatch[] = [
   {
@@ -33,6 +49,23 @@ export const dispatches: Dispatch[] = [
   },
 ];
 
-export const currencies = ["Nigerian naira (NGN)", "US Dollars (USD)"];
+export const currencies = [
+  {
+    name: "Nigerian naira (NGN)",
+    value: ECurrency.NGN,
+  },
+  {
+    name: "US Dollars (USD)",
+    value: ECurrency.USD,
+  },
+];
 
-export const packageType = ["Box", "Bag", "Envelope", "Other"];
+export const packagingType = ["box", "bag", "envelope", "other"];
+
+export const itemCategory = ["electronics", "clothing", "furniture", "other"];
+export const itemSubCategory = [
+  "electronics",
+  "clothing",
+  "furniture",
+  "other",
+];

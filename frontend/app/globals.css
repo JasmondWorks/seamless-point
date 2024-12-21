@@ -245,7 +245,7 @@ body {
   }
 
   .shad-select-trigger {
-    @apply bg-white  placeholder:text-neutral-500  border-neutral-300 h-11 focus:ring-1 focus:ring-brandSec focus:ring-offset-0 !important;
+    @apply bg-white border-neutral-300 h-11 focus:ring-1 focus:ring-brandSec focus:ring-offset-0 !important;
   }
 
   .shad-select-content {

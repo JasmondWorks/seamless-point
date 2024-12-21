@@ -1,16 +1,22 @@
 import { Plus } from "lucide-react";
 import React, { useState } from "react";
 
-const FileUpload = ({ props, field }: { props: any; field: any }) => {
+const FileUpload = ({
+  props,
+}: {
+  props: any;
+  // addToStore?: ({ file }: { file: File }) => void;
+}) => {
   const [fileName, setFileName] = useState("");
+  const { addToStore } = props;
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name); // Update the state with the file name
-      field.onChange(file);
+      addToStore(file, props.fieldName);
     }
-  };
+  }
 
   return (
     <div className="rounded-lg bg-white space-y-5 p-5">

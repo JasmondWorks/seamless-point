@@ -16,6 +16,7 @@ import { Form } from "@/app/_components/ui/form";
 import { Label } from "@/app/_components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { useFormContext } from "@/app/_contexts/FormContext";
+import { itemCategory } from "@/app/_lib/constants";
 import { parcelDocumentSchema, parcelItemSchema } from "@/app/_lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
@@ -139,8 +140,8 @@ function DocumentParcelForm({
   const form = useForm<z.infer<typeof parcelDocumentSchema>>({
     resolver: zodResolver(parcelDocumentSchema),
     defaultValues: selectedParcelItem || {
-      itemName: "",
-      itemDescription: "",
+      name: "",
+      description: "",
       weight: "",
       quantity: "",
     },
@@ -155,18 +156,27 @@ function DocumentParcelForm({
     console.log(itemDetails);
 
     selectedParcelItem
-      ? onEditParcelItem(itemDetails)
-      : onAddParcelItem(itemDetails);
+      ? onEditParcelItem?.(itemDetails)
+      : onAddParcelItem?.(itemDetails);
+  }
+
+  function handleNestedFormSubmit(event: React.FormEvent) {
+    // Prevent the outer form submission by stopping propagation
+    event.stopPropagation();
+    form.handleSubmit(onSubmit)(event); // Trigger the inner form submission
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form
+        onSubmit={handleNestedFormSubmit} // Use custom submit handler
+        className="space-y-5"
+      >
         <div className="grid grid-cols-2 gap-5">
           <CustomFormField
             className="col-span-2"
             label="Item name"
-            name="itemName"
+            name="name"
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="Sofa"
@@ -174,7 +184,7 @@ function DocumentParcelForm({
           <CustomFormField
             className="col-span-2"
             label="Item description"
-            name="itemDescription"
+            name="description"
             control={form.control}
             fieldType={FormFieldType.TEXTAREA}
             placeholder="Detailed description..."
@@ -209,18 +219,16 @@ function ItemParcelForm({
   onEditParcelItem?: (item: any) => void;
   selectedParcelItem?: any;
 }) {
-  console.log(selectedParcelItem);
-
   const form = useForm<z.infer<typeof parcelItemSchema>>({
     resolver: zodResolver(parcelItemSchema),
     defaultValues: selectedParcelItem || {
-      itemName: "",
-      itemCategory: "",
-      itemSubCategory: "",
+      name: "",
+      category: "",
+      subCategory: "",
       hsCode: "",
-      weight: 1,
-      quantity: 1,
-      value: 1,
+      weight: "",
+      quantity: "",
+      value: "",
     },
   });
 
@@ -230,21 +238,31 @@ function ItemParcelForm({
       type: "item",
       id: selectedParcelItem ? selectedParcelItem.id : crypto.randomUUID(),
     };
+
     console.log(itemDetails);
 
     selectedParcelItem
-      ? onEditParcelItem(itemDetails)
-      : onAddParcelItem(itemDetails);
+      ? onEditParcelItem?.(itemDetails)
+      : onAddParcelItem?.(itemDetails);
+  }
+
+  function handleNestedFormSubmit(event: React.FormEvent) {
+    // Prevent the outer form submission
+    event.stopPropagation();
+    form.handleSubmit(onSubmit)(event); // Trigger the inner form submission
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form
+        onSubmit={handleNestedFormSubmit} // Use custom submit handler
+        className="space-y-5"
+      >
         <div className="grid sm:grid-cols-2 gap-5">
           <CustomFormField
             className="col-span-2 sm:col-span-1"
             label="Item name"
-            name="itemName"
+            name="name"
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="123 main street"
@@ -252,15 +270,16 @@ function ItemParcelForm({
           <CustomFormField
             className="col-span-2 sm:col-span-1"
             label="Item Category"
-            name="itemCategory"
+            name="category"
             control={form.control}
-            fieldType={FormFieldType.INPUT}
-            placeholder="Apt/unit"
+            fieldType={FormFieldType.SELECT}
+            selectOptions={itemCategory}
+            placeholder="Select a category"
           />
           <CustomFormField
             className="col-span-2 sm:col-span-1"
             label="Item sub-category"
-            name="itemSubCategory"
+            name="subCategory"
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="you@company.com"
@@ -279,14 +298,14 @@ function ItemParcelForm({
               name="weight"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="1"
+              placeholder="5"
             />
             <CustomFormField
               label="Quantity"
               name="quantity"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="1"
+              placeholder="10"
             />
             <CustomFormField
               label="Item Value"

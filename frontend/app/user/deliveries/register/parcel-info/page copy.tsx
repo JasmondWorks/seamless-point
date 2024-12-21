@@ -50,13 +50,11 @@ export default function ParcelInfo() {
     parcelDetails?.parcelItems || []
   );
   const [selectedParcelItem, setSelectedParcelItem] = useState<any>(null);
-
-  const parcelDetailsCopy = { ...parcelDetails };
-  delete parcelDetailsCopy.parcelItems;
-
-  const addParcelFile = useCreateDeliveryStore((store) => store.addParcelFile);
   const addParcelDetails = useCreateDeliveryStore(
     (store) => store.addParcelDetails
+  );
+  const addpackageImageFile = useCreateDeliveryStore(
+    (store) => store.addpackageImageFile
   );
 
   const router = useRouter();
@@ -86,11 +84,9 @@ export default function ParcelInfo() {
   function handleSelectParcelItem(item: any) {
     setSelectedParcelItem(item);
   }
-
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
-    defaultValues:
-      parcelDetailsCopy || ({} as Partial<z.infer<typeof parcelInfoSchema>>),
+    defaultValues: parcelDetails || {},
   });
 
   async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
@@ -146,7 +142,7 @@ export default function ParcelInfo() {
             //     (currency) => currency.name === parcelDetails?.currency
             //   )?.value
             // }
-            placeholder="E.g Nigerian naira"
+            placeholder="Nigerian naira"
           />
           <ParcelItems
             parcelItems={parcelItems}
@@ -159,7 +155,8 @@ export default function ParcelInfo() {
             name="proofOfPurchase"
             control={form.control}
             fieldType={FormFieldType.FILE}
-            addToStore={addParcelFile}
+            addToStore={addpackageImageFile}
+            file={form.getValues("proofOfPurchase")}
             fieldName="proofOfPurchase"
           />
           <CustomFormField
@@ -168,7 +165,8 @@ export default function ParcelInfo() {
             name="packageImage"
             control={form.control}
             fieldType={FormFieldType.FILE}
-            addToStore={addParcelFile}
+            addToStore={addpackageImageFile}
+            file={form.getValues("packageImage")}
             fieldName="packageImage"
           />
           <div className="flex flex-col gap-y-5 col-span-2">

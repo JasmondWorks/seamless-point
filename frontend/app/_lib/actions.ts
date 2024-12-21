@@ -435,10 +435,8 @@ export async function getUser() {
 export async function createDelivery(deliveryDetails: any) {
   const token = getUserToken();
 
-  console.log(deliveryDetails);
-
   try {
-    const res = await fetch(`${URL}/delivery`, {
+    const res = await fetch(`${URL}/deliveries`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -449,11 +447,13 @@ export async function createDelivery(deliveryDetails: any) {
 
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.message);
+    console.log(data);
 
     const {
       data: { delivery },
     } = data;
+
+    if (!res.ok) throw new Error(data.message);
 
     return {
       status: "success",
@@ -468,5 +468,25 @@ export async function createDelivery(deliveryDetails: any) {
           ? "Check your internet connection"
           : error.message,
     };
+  }
+}
+
+export async function fetchDeliveries(page: number, limit: number) {
+  try {
+    const token = getUserToken();
+    const res = await fetch(
+      `${URL}/deliveries/user?page=${page}&limit=${limit}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error) {
+    return { status: "error", message: "Failed to fetch deliveries" };
   }
 }
