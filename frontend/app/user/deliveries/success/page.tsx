@@ -1,8 +1,17 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
 import CopyToClipboard from "@/app/_components/CopyToClipboard";
+import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 
-export default function Success({ searchParams }) {
+export default function Success({ searchParams }: { searchParams: any }) {
+  const resetDeliveryData = useCreateDeliveryStore(
+    (store) => store.resetDeliveryData
+  );
+
+  useEffect(() => resetDeliveryData(), []);
+
   const { trackingNum } = searchParams;
   return (
     <div className="h-full grid place-items-center">

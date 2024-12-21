@@ -8,8 +8,17 @@ import CopyToClipboard from "@/app/_components/CopyToClipboard";
 import ConfirmDialog from "@/app/_components/Dialogs/ConfirmDialog2";
 import { useState } from "react";
 import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
-import { formatDateTime } from "@/app/_lib/utils";
-import { Delivery, DispatchEnum, EDeliveryStatus } from "@/app/_lib/types";
+import {
+  formatDateTime,
+  getBadgeStyle,
+  getParcelTotalAmount,
+} from "@/app/_lib/utils";
+import {
+  Delivery,
+  DispatchEnum,
+  EDeliveryStatus,
+  Parcel,
+} from "@/app/_lib/types";
 import { dispatches } from "@/app/_lib/constants";
 
 // Define the columns
@@ -48,7 +57,6 @@ export const getDeliveriesColumns = (deliveryActions: {
             <>
               <ConfirmDialog
                 onConfirm={() =>
-                  // handleCancelDelivery(row.original.trackingNumber)
                   handleCancelAndShowSuccess(row.original.trackingNumber)
                 }
                 title="Cancel delivery"
@@ -97,8 +105,9 @@ export const getDeliveriesColumns = (deliveryActions: {
       id: "amountStatus", // Custom ID for the combined column
       header: () => <div className="text-center">AMOUNT</div>,
       cell: ({ row }) => {
-        const amount = row.original.amount; // Access 'amount' directly from the row data
+        const amount = getParcelTotalAmount(row.original.parcelDetails); // Access 'amount' directly from the row data
         const status = row.original.status; // Access 'status' directly from the row data
+        console.log(row.original.status);
 
         // Format the amount as currency
         const formattedAmount = new Intl.NumberFormat("en-NG", {
@@ -106,40 +115,42 @@ export const getDeliveriesColumns = (deliveryActions: {
           currency: "NGN",
         }).format(amount);
 
-        console.log(status, EDeliveryStatus.ONGOING);
-
         // Determine badge based on status
-        const statusBadge = (() => {
-          switch (status) {
-            case EDeliveryStatus.ONGOING:
-            case EDeliveryStatus.PENDING:
-              return <Badge variant={BadgeVariant.neutralDark}>{status}</Badge>;
-            case EDeliveryStatus.COMPLETED:
-              return <Badge variant={BadgeVariant.blue}>Completed</Badge>;
-            case EDeliveryStatus.UNCOMPLETED:
-              return <Badge variant={BadgeVariant.orange}>Uncompleted</Badge>;
-            case EDeliveryStatus.CANCELLED:
-            case EDeliveryStatus.FAILED:
-              return <Badge variant={BadgeVariant.red}>{status}</Badge>;
-            default:
-              return <Badge variant={BadgeVariant.red}>Unknown status</Badge>;
-          }
-        })();
+        // const statusBadge = (() => {
+        //   switch (status) {
+        //     case EDeliveryStatus.ONGOING:
+        //     case EDeliveryStatus.PENDING:
+        //       return <Badge variant={getBadgeStyle(status)}>{status}</Badge>;
+        //     case EDeliveryStatus.COMPLETED:
+        //       return <Badge variant={getBadgeStyle(status)}>Completed</Badge>;
+        //     case EDeliveryStatus.UNCOMPLETED:
+        //       return <Badge variant={getBadgeStyle(status)}>Uncompleted</Badge>;
+        //     case EDeliveryStatus.CANCELLED:
+        //     case EDeliveryStatus.FAILED:
+        //       return <Badge variant={getBadgeStyle(status)}>{status}</Badge>;
+        //     default:
+        //       return (
+        //         <Badge variant={getBadgeStyle(status)}>Unknown status</Badge>
+        //       );
+        //   }
+        // })();
 
         return (
           <div className="flex items-center gap-10">
             <span className="font-medium">{formattedAmount}</span>
-            <div className="capitalize">{statusBadge}</div>
+            <Badge className="capitalize" variant={getBadgeStyle(status)}>
+              {status}
+            </Badge>
           </div>
         );
       },
     },
     // TRACKING NUM
     {
-      accessorKey: "trackingNumber",
+      accessorKey: "trackingId",
       header: "TRACKING NUMBER",
       cell: ({ row }) => {
-        const trackingNumber = row.original.trackingNumber;
+        const trackingNumber = row.original.trackingId;
         return (
           <div className="flex gap-2 items-center">
             <span>{trackingNumber}</span>
@@ -154,9 +165,9 @@ export const getDeliveriesColumns = (deliveryActions: {
       header: "DISPATCH",
       cell: ({ row }) => {
         const dispatch = dispatches.find(
-          (dispatch) => dispatch.name === row.original.dispatch
+          (dispatch) => dispatch.name.toLowerCase() === row.original.courier
         );
-        console.log(dispatch);
+
         if (!dispatch) return null;
         return (
           <Image
@@ -173,28 +184,46 @@ export const getDeliveriesColumns = (deliveryActions: {
     {
       accessorKey: "receiver",
       header: "RECEIVER",
-      cell: ({ row }) => (
-        <span>
-          {row.original.receiver.toFirstname} {row.original.receiver.toLastname}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const receiver = row.original.receiver; // Access receiver from the row data
+        console.log(receiver);
+        if (receiver && receiver.toFirstName && receiver.toLastName) {
+          return (
+            <span>
+              {receiver.toFirstName} {receiver.toLastName}
+            </span>
+          );
+        }
+        return <span>Receiver data not available</span>; // Fallback if receiver is undefined
+      },
     },
     // DESTINATION
     {
       accessorKey: "destination",
       header: "DESTINATION",
-      cell: ({ row }) => (
-        <span>
-          {row.original.receiver.toState}, {row.original.receiver.toCountry}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const receiver = row.original.receiver;
+        if (receiver && receiver.toState && receiver.toCountry) {
+          return (
+            <span>
+              {receiver.toState}, {receiver.toCountry}
+            </span>
+          );
+        }
+        return <span>Destination not available</span>; // Fallback if destination is undefined
+      },
     },
     // DATE
     {
       accessorKey: "date",
       header: "DATE",
       cell: ({ row }) => {
-        return <span>{formatDateTime(row.original.createdAt)}</span>;
+        const createdAt = row.original.createdAt;
+        return (
+          <span>
+            {createdAt ? formatDateTime(createdAt) : "Date not available"}
+          </span>
+        );
       },
     },
   ];

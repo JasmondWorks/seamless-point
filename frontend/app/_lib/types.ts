@@ -10,9 +10,10 @@ export enum EDeliveryStatus {
   FAILED = "failed",
   UNCOMPLETED = "uncompleted",
   COMPLETED = "completed",
+  UNCONFIRMED = "unconfirmed",
 }
 export type Delivery = {
-  trackingNumber: string;
+  trackingId: string;
   sender: Sender;
   receiver: Receiver;
   dispatch: DispatchEnum;
@@ -40,39 +41,44 @@ export enum DispatchEnum {
 }
 
 export interface Sender {
+  firstName: string;
+  lastName: string;
+  street: string;
+  aptUnit: string;
   country: string;
   state: string;
   city: string;
-  street: string;
-  aptUnit: string;
-  firstname: string;
-  lastname: string;
+  postCode: string;
   email: string;
   phoneNumber: string;
-  deliveryTitle: string;
-  summary: string;
-  amountOfItems?: number;
-  instructions?: string;
+  // phoneNumber: string;
+  // deliveryTitle: string;
+  // summary: string;
+  // amountOfItems?: number;
+  // instructions?: string;
 }
 export interface Receiver {
-  toCountry: string;
-  toState: string;
-  toFirstname: string;
-  toLastname: string;
-  toCity: string;
+  toFirstName: string;
+  toLastName: string;
   toStreet: string;
   toAptUnit: string;
+  toCountry: string;
+  toState: string;
+  toCity: string;
+  toPostCode: string;
   toEmail: string;
-  toPhone: string;
+  toPhoneNumber: string;
 }
 export interface Parcel {
-  itemName: string;
-  itemCategory?: string;
-  itemSubCategory?: string;
+  name: string;
+  category?: string;
+  subCategory?: string;
+  description?: string;
   hsCode?: string;
   weight: number;
   quantity: number;
   value?: number;
+  id?: string;
 }
 
 export interface ParcelDetails {
@@ -89,12 +95,17 @@ export interface newDelivery {
   receiver: Receiver | null;
   parcelDetails: ParcelDetails | null;
   courier: Dispatch | null;
+  userId: string;
   step: number; // Keep track of the current form step
   onSelectDeliveryType: (type: DeliveryType) => void;
   onSelectCourier: (courier: Dispatch | null) => void;
   updateSender: (sender: Sender) => void;
   updateReceiver: (receiver: Receiver) => void;
   addParcelDetails: (parcelDetails: ParcelDetails) => void;
+  addParcelFile: (
+    file: File,
+    fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
+  ) => void;
   resetDeliveryData: () => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;

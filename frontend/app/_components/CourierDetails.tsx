@@ -7,6 +7,10 @@ export default function CourierDetails({
   courier,
   selectedCourier,
   onSelectCourier,
+}: {
+  courier: any;
+  selectedCourier: any;
+  onSelectCourier: any;
 }) {
   const isSelected = selectedCourier?.name === courier.name;
 
@@ -27,7 +31,7 @@ export default function CourierDetails({
           className="w-10 object-contain"
         />
         <div className="flex flex-col">
-          <span className="uppercase font-bold text-lg">{courier.name}</span>
+          <span className="font-bold text-lg">{courier.name}</span>
           <span className="text-sm">Express shipping</span>
         </div>
       </div>
