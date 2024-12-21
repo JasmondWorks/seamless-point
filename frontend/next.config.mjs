@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: "export",
-  // images: { unoptimized: true },
-  images: {
-    domains: ["fbbyjmklczjmcezfztqx.supabase.co"],
-  },
+  output: "export",
+  images: { unoptimized: true },
   trailingSlash: true,
 };
 

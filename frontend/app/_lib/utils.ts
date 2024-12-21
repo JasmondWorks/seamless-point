@@ -70,10 +70,20 @@ export function getLocalStorageKey(key: string) {
 }
 
 export function getUserId() {
-  const user = JSON.parse(
-    localStorage.getItem(getLocalStorageKey("user")) || "{}"
-  );
-  return user?._id;
+  if (typeof window === "undefined") {
+    // If called on the server, return null
+    return null;
+  }
+
+  try {
+    const user = JSON.parse(
+      localStorage.getItem(getLocalStorageKey("user")) || "{}"
+    );
+    return user?.id || null; // Return null if no user ID is found
+  } catch (error) {
+    console.error("Error accessing user:", error);
+    return null;
+  }
 }
 
 export function loadPaystackScript(): Promise<boolean> {
