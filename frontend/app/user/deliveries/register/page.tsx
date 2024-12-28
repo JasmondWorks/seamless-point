@@ -5,8 +5,12 @@ import React from "react";
 export default function Register() {
   return (
     <DashboardLayout>
+      
       <h1 className="headline text-center">What are you trying to deliver</h1>
       <SelectDeliveryType />
+
+
+
     </DashboardLayout>
   );
 }

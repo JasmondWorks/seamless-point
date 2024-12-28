@@ -1,5 +1,3 @@
-"use client";
-
 import { BadgeVariant } from "@/app/_components/Badge";
 import { supabase } from "@/app/_lib/supabase";
 import { ECurrency, Parcel } from "@/app/_lib/types";
@@ -271,3 +269,33 @@ export async function uploadFile(
 //     limit: 10,
 //   })
 // }
+
+export const fileToBase64 = (file: File) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
+export function base64ToFile(base64String: string, fileName: string) {
+  const [prefix, base64Data] = base64String.split(",");
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = Array.from(byteCharacters, (char) => char.charCodeAt(0));
+  const byteArray = new Uint8Array(byteNumbers);
+
+  // const contentType = prefix.match(/:(.*?);/)[1];
+  const matchResult = prefix.match(/:(.*?);/);
+
+  // Safely check if matchResult exists
+  if (!matchResult || !matchResult[1]) {
+    throw new Error(
+      "Invalid prefix format: content type could not be extracted."
+    );
+  }
+
+  const contentType = matchResult[1];
+  const fileBlob = new Blob([byteArray], { type: contentType });
+
+  return new File([fileBlob], fileName, { type: contentType });
+}
