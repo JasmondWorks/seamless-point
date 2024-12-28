@@ -127,13 +127,15 @@ export default function PackageDetailsPage() {
           <div className="space-y-1">
             <p className="font-bold">Payment Method</p>
             <p className="text-muted">
-              {store.parcelDetails?.paymentMethod || "N/A"}
+              {/* {store.parcelDetails?.paymentMethod || "N/A"} */}
+              N/A
             </p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Payment Status</p>
             <p className="text-muted">
-              {store.parcelDetails?.paymentStatus || "N/A"}
+              {/* {store.parcelDetails?.paymentStatus || "N/A"} */}
+              N/A
             </p>
           </div>
           <div className="space-y-1">
