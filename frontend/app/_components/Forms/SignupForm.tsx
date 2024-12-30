@@ -86,7 +86,7 @@ export default function SignupForm() {
     scope: "profile email",
   });
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
-    console.log(data);
+    // console.log(data);
 
     setIsLoading(true);
     const response = await signupUser(data);

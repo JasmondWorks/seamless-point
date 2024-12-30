@@ -15,6 +15,7 @@ import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useDeliveriesStore } from "@/app/_stores/deliveriesStore";
 import { DispatchEnum, EDeliveryStatus } from "@/app/_lib/types";
 import {
+  base64ToFile,
   getNewDeliveryData,
   getParcelTotalAmount,
   uploadFile,
@@ -28,6 +29,9 @@ export default function Payment() {
   const addDelivery = useDeliveriesStore((store) => store.addDelivery);
   const [isLoading, setIsLoading] = useState(false);
 
+  const userId = useCreateDeliveryStore((state) => state.userId);
+    console.log(userId);
+  
   const state = getNewDeliveryData();
   console.log(state);
 
@@ -40,20 +44,37 @@ export default function Payment() {
   // TODO: upload packageImage and proofOfPurchase and get back urls
 
   let timeout: NodeJS.Timeout;
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("submitting...");
+    // console.log("submitting...");
 
     // upload files
     setIsLoading(true);
+
     const packageImageUrl = await uploadFile(
-      state.parcelDetails.packageImage,
-      "package_images"
+      base64ToFile(
+        state.parcelDetails.packageImage.base64File,
+        state.parcelDetails.packageImage.name
+      ),
+      "package_images",
+      "Package"
     );
+
     const proofOfPurchaseUrl = await uploadFile(
-      state.parcelDetails.proofOfPurchase,
-      "package_proofs"
+      base64ToFile(
+        state.parcelDetails.proofOfPurchase.base64File,
+        state.parcelDetails.proofOfPurchase.name
+      ),
+      "package_proofs",
+      "Package proof"
     );
+
+    if (!packageImageUrl || !proofOfPurchaseUrl) {
+      // toast.error("Failed to upload files");
+      return;
+    }
+    console.log(proofOfPurchaseUrl, packageImageUrl);
 
     const newDelivery = {
       ...state,

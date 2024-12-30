@@ -14,22 +14,27 @@ import React, { useState } from "react";
 import { FormControl } from "@/app/_components/ui/form";
 
 type Props = {
-  field?: any;
-  props?: any;
+  field: any;
+  props: any;
+  onChange: (value: string) => void;
 };
-export default function SelectBox({ field, props }: Props) {
+export default function SelectBox({ field, props, onChange }: Props) {
   const [selectedValue, setSelectedValue] = useState<string | undefined>();
 
   function handleValueChange(value: string) {
     field.onChange(value);
-    setSelectedValue(value);
+    onChange(value);
+    // setSelectedValue(value);
     console.log(value);
   }
 
   return (
     <Select
       value={props.selectValue || field.value}
-      onValueChange={(value) => handleValueChange(value)}
+      onValueChange={(value) => {
+        // field.onChange(value); // update field value
+        handleValueChange(value);
+      }}
       defaultValue={field.value}
     >
       <FormControl>

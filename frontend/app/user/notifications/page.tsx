@@ -1,8 +1,13 @@
-import Badge, { BadgeVariant } from "@/app/_components/Badge";
-import React from "react";
-import Notification from "./Notification";
+"use client";
 
-const notifications = [
+import Badge, { BadgeVariant } from "@/app/_components/Badge";
+import React, { useEffect } from "react";
+import Notification from "./Notification";
+import useNotifications from "@/app/_hooks/useNotifications";
+import { fetchDeliveries, fetchNotifications } from "@/app/_lib/actions";
+import { useQuery } from "@tanstack/react-query";
+
+const notificationsMockData = [
   {
     status: "",
     title: "",
@@ -24,10 +29,37 @@ const notifications = [
 ];
 
 export default function Notifications() {
-  const notifications = "";
+  // const { notifications, isLoading } = useNotifications();
+
+  const {
+    data: notifications,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => fetchNotifications(),
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Data will always be refetched on focus
+  });
+
+  console.log("here");
+  console.log(notifications);
+
+  // useEffect(() => {
+  //   async function loadNotifications() {
+  //     try {
+  //       const notifications = await fetchNotifications();
+
+  //       console.log(notifications);
+  //     } catch (error) {}
+  //   }
+  //   loadNotifications();
+  // }, []);
+
   return (
     <>
-      <div className="flex justify-between items-center border-b pb-3 border-neutral-300 h-full">
+      <div className="flex justify-between items-center border-b pb-3 border-neutral-300">
         <h1 className="headline">Notifications</h1>
         <button>
           <Badge className="font-bold" variant={BadgeVariant.red}>
@@ -35,14 +67,14 @@ export default function Notifications() {
           </Badge>
         </button>
       </div>
-      {notifications && (
+      {notifications?.data?.totalCount !== 0 && (
         <div className={`space-y-5`}>
           {Array.from({ length: 5 }, (_, i) => (
             <Notification key={i} />
           ))}
         </div>
       )}
-      {!notifications && (
+      {notifications?.data?.totalCount === 0 && (
         <div className="flex gap-5 flex-col items-center">
           <svg
             className=""

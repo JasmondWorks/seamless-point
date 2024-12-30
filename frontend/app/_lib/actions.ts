@@ -6,6 +6,9 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Create User function with proper error handling
 export async function signupUser(userDetails: any) {
+  console.log("***********");
+  console.log(userDetails);
+  console.log("***********");
   try {
     const res = await fetch(`${URL}/users/signUp`, {
       method: "POST",
@@ -15,6 +18,8 @@ export async function signupUser(userDetails: any) {
       body: JSON.stringify(userDetails),
     });
     const data = await res.json();
+
+    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 
@@ -471,9 +476,11 @@ export async function createDelivery(deliveryDetails: any) {
   }
 }
 
-export async function fetchDeliveries(page: number, limit: number) {
+export async function fetchDeliveries(page: number = 1, limit: number = 10) {
   try {
     const token = getUserToken();
+
+    console.log(token);
     const res = await fetch(
       `${URL}/deliveries/user?page=${page}&limit=${limit}`,
       {
@@ -483,10 +490,40 @@ export async function fetchDeliveries(page: number, limit: number) {
     );
     const data = await res.json();
 
+    console.log("*********");
+    console.log(data);
+    console.log("*********");
+
     if (!res.ok) throw new Error(data.message);
 
     return { status: "success", data };
   } catch (error) {
     return { status: "error", message: "Failed to fetch deliveries" };
+  }
+}
+
+export async function fetchNotifications() {
+  console.log("fetchNotifications is being called"); // Debug log
+
+  try {
+    const token = getUserToken();
+
+    Array.from({ length: 5 }, () => console.log("*****"));
+
+    const res = await fetch(`${URL}/notifications/user`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+
+    console.log("*********");
+    console.log(data);
+    console.log("*********");
+
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error) {
+    return { status: "error", message: "Failed to fetch notifications" };
   }
 }

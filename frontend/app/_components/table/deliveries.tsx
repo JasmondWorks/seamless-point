@@ -13,12 +13,7 @@ import {
   getBadgeStyle,
   getParcelTotalAmount,
 } from "@/app/_lib/utils";
-import {
-  Delivery,
-  DispatchEnum,
-  EDeliveryStatus,
-  Parcel,
-} from "@/app/_lib/types";
+import { Delivery } from "@/app/_lib/types";
 import { dispatches } from "@/app/_lib/constants";
 
 // Define the columns

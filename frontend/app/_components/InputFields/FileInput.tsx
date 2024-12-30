@@ -8,11 +8,20 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/app/_components/ui/dialog";
+import { base64ToFile } from "@/app/_lib/utils";
 
 const FileInput = ({ props, field }: { props: any; field: any }) => {
-  const [fileName, setFileName] = useState<string>("");
-  const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [fileType, setFileType] = useState<string>("");
+  const [fileName, setFileName] = useState<string>(props?.selectedFile?.name);
+  const selectedFile = {
+    file: base64ToFile(props?.selectedFile?.base64File),
+    name: props?.selectedFile?.name,
+  };
+  const [filePreview, setFilePreview] = useState<string | null>(
+    selectedFile.file ? URL.createObjectURL(selectedFile.file) : ""
+  );
+  const [fileType, setFileType] = useState<string>(
+    selectedFile.file ? selectedFile.file.type : ""
+  );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -20,12 +29,14 @@ const FileInput = ({ props, field }: { props: any; field: any }) => {
       setFileName(file.name);
       setFileType(file.type);
       field.onChange(file);
-      props?.addToStore(file, props.fieldName);
+      // props?.addToStore(file, props.fieldName);
 
       // Generate a preview URL for the file
       setFilePreview(URL.createObjectURL(file));
     }
   };
+
+  console.log(filePreview);
 
   return (
     <div className="rounded-lg bg-white space-y-5 p-5">
