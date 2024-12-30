@@ -77,7 +77,7 @@ export function getUserId() {
     const user = JSON.parse(
       localStorage.getItem(getLocalStorageKey("user")) || "{}"
     );
-    return user?.id || null; // Return null if no user ID is found
+    return user?._id || null; // Return null if no user ID is found
   } catch (error) {
     console.error("Error accessing user:", error);
     return null;
@@ -187,7 +187,7 @@ export function getBadgeStyle(tag: string): BadgeVariant | null {
 
 export function getParcelTotalAmount(parcelDetails: any) {
   return parcelDetails.parcelItems.reduce(
-    (acc: number, item: Parcel) => acc + (item?.value || 0),
+    (acc: number, item: Parcel) => acc + (item?.value * item?.quantity || 0),
     0
   );
 }
@@ -222,7 +222,8 @@ export function getNewDeliveryData() {
 
 export async function uploadFile(
   file: File,
-  bucket: string
+  bucket: string,
+  fileClassification?: string
 ): Promise<string | null> {
   try {
     // Generate a unique path for the file within the bucket
@@ -230,6 +231,11 @@ export async function uploadFile(
     const uniqueFileName = `${Date.now()}-${file.name}`; // Ensure a unique file name
     const path = `${folder}/${uniqueFileName}`; // Full path in the bucket
 
+    console.log("File details:", {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
     // Upload the file to the specified bucket and path
     const { data, error } = await supabase.storage
       .from(bucket)
@@ -237,8 +243,6 @@ export async function uploadFile(
         cacheControl: "3600", // Cache for 1 hour
         upsert: true, // Replace file if it already exists
       });
-
-    console.log(file);
 
     if (error) {
       console.error("File upload error:", error.message);
@@ -260,7 +264,14 @@ export async function uploadFile(
     return publicUrlData?.publicUrl || null;
   } catch (err) {
     console.error("Error uploading file:", err);
-    toast.error("Error uploading file");
+    toast.error(
+      fileClassification
+        ? `Error uploading ${fileClassification} ${
+            file.type.startsWith("image") ? "image" : "file"
+            // file.type.split("/")[0]
+          }`
+        : "Error uploading file"
+    );
     return null;
   }
 }

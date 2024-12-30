@@ -12,6 +12,8 @@ export default function SelectDeliveryType() {
     (state) => state.onSelectDeliveryType
   );
   const goToNextStep = useCreateDeliveryStore((state) => state.goToNextStep);
+  const userId = useCreateDeliveryStore((state) => state.userId);
+  console.log(userId);
 
   const setStep = useCreateDeliveryStore((state) => state.setStep);
   useEffect(() => setStep(1), []);

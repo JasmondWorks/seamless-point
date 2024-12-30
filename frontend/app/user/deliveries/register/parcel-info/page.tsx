@@ -45,6 +45,9 @@ const initialItems = [
 ];
 export default function ParcelInfo() {
   const parcelDetails = useCreateDeliveryStore((store) => store.parcelDetails);
+  // const receiver = useCreateDeliveryStore((store) => store.receiver);
+  // console.log(receiver);
+
   console.log(parcelDetails);
 
   const [parcelItems, setParcelItems] = useState<any[]>(
@@ -88,19 +91,21 @@ export default function ParcelInfo() {
     setSelectedParcelItem(item);
   }
 
+  console.log(base64ToFile(parcelDetailsCopy.packageImage?.base64File));
+
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
     defaultValues: {
       ...parcelDetailsCopy,
-      packageImage: parcelDetailsCopy?.packageImage?.base64file
+      packageImage: parcelDetailsCopy?.packageImage?.base64File
         ? base64ToFile(
-            parcelDetailsCopy.packageImage.base64file,
+            parcelDetailsCopy.packageImage.base64File,
             parcelDetailsCopy.packageImage.name || "defaultName.jpg"
           )
         : undefined,
-      proofOfPurchase: parcelDetailsCopy?.proofOfPurchase?.base64file
+      proofOfPurchase: parcelDetailsCopy?.proofOfPurchase?.base64File
         ? base64ToFile(
-            parcelDetailsCopy.proofOfPurchase.base64file,
+            parcelDetailsCopy.proofOfPurchase.base64File,
             parcelDetailsCopy.proofOfPurchase.name || "defaultName.pdf"
           )
         : undefined,
@@ -208,6 +213,7 @@ export default function ParcelInfo() {
             name="proofOfPurchase"
             control={form.control}
             fieldType={FormFieldType.FILE}
+            selectedFile={parcelDetailsCopy?.proofOfPurchase}
             // addToStore={addParcelFile}
             // fieldName="proofOfPurchase"
           />
@@ -217,6 +223,7 @@ export default function ParcelInfo() {
             name="packageImage"
             control={form.control}
             fieldType={FormFieldType.FILE}
+            selectedFile={parcelDetailsCopy?.packageImage}
             // addToStore={addParcelFile}
             // fieldName="packageImage"
           />

@@ -26,7 +26,12 @@ export default function DataTable({
   columns,
   data,
   searchQuery,
-  selectedTags = null,
+  selectedTags,
+}: {
+  columns: any;
+  data: any;
+  searchQuery: string;
+  selectedTags: string[];
 }) {
   // Table config variables
   const [sorting, setSorting] = React.useState<SortingState>([]);

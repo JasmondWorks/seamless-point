@@ -6,7 +6,7 @@ import {
   fetchStatesForCountry,
 } from "@/app/_utils/utils";
 
-export function useLocationData() {
+export function useLocationData(isSender: boolean = true) {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -42,7 +42,7 @@ export function useLocationData() {
       if (response.length === 0) toast.error("No cities available.");
     }
   }
-  async function loadStates(selectedCountryName:string) {
+  async function loadStates(selectedCountryName: string) {
     const country: any = countries.find(
       (c: any) => c.name === selectedCountryName
     );
@@ -55,13 +55,31 @@ export function useLocationData() {
     }
   }
 
+  function onCountryChange(selectedCountry: string, setValue: any) {
+    console.log(selectedCountry);
+
+    setValue(isSender ? "state" : "toState", ""); // Clear state
+    setValue(isSender ? "city" : "toCity", ""); // Clear city
+    loadStates(selectedCountry); // Fetch states
+  }
+  function onStateChange(
+    selectedCountryName: string,
+    selectedState: string,
+    setValue: any
+  ) {
+    console.log(selectedState);
+
+    setValue(isSender ? "city" : "toCity", ""); // Clear city
+    loadCities(selectedCountryName, selectedState); // Fetch states
+  }
+
   return {
     countries,
     states,
     cities,
     loadCities,
     loadStates,
-    // fetchStates,
-    // fetchCities,
+    onCountryChange,
+    onStateChange,
   };
 }

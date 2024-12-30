@@ -11,27 +11,26 @@ import { deliveryDestinationSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
-import { useEffect, useState } from "react";
-import {
-  fetchCitiesForState,
-  fetchCountries,
-  fetchStatesForCountry,
-} from "@/app/_utils/utils";
-import toast from "react-hot-toast";
+import { useEffect, useRef } from "react";
+
 import { useRouter } from "next/navigation";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { newDelivery } from "@/app/_lib/types";
 import { useLocationData } from "@/app/_hooks/useLocationData";
-import SpinnerFull from "@/app/_components/SpinnerFull";
+import React from "react";
 
 export default function DeliveryReceiverForm() {
   const receiver = useCreateDeliveryStore(
     (store: newDelivery) => store.receiver
   );
+  console.log(receiver);
+
+  const userId = useCreateDeliveryStore((state) => state.userId);
+  console.log(userId);
 
   const form = useForm<z.infer<typeof deliveryDestinationSchema>>({
     resolver: zodResolver(deliveryDestinationSchema),
-    defaultValues: receiver || {
+    defaultValues: {
       toFirstName: "", // Default: Empty string
       toLastName: "", // Default: Empty string
       toStreet: "", // Default: Empty string
@@ -42,6 +41,7 @@ export default function DeliveryReceiverForm() {
       toPostCode: "",
       toEmail: "", // Default: Empty string
       toPhoneNumber: "", // Default: Empty string
+      ...receiver, // Default: Empty string
     },
   });
 
@@ -50,23 +50,31 @@ export default function DeliveryReceiverForm() {
     (state) => state.updateReceiver
   );
 
-  const { countries, states, cities, loadCities, loadStates } =
-    useLocationData();
+  const {
+    countries,
+    states,
+    cities,
+    loadCities,
+    loadStates,
+    onCountryChange,
+    onStateChange,
+  } = useLocationData(false);
+  const isMounting = useRef(true); // Track component mounting
 
   const { watch, setValue } = form;
   const selectedCountryName = watch("toCountry");
   const selectedStateName = watch("toState");
 
-  // Clear selected state and cities when country changes
-  useEffect(() => {
-    setValue("toState", ""); // Clear state
-    setValue("toCity", ""); // Clear city
-  }, [selectedCountryName, setValue]);
+  // // Clear selected state and cities when country changes
+  // useEffect(() => {
+  //   setValue("toState", ""); // Clear state
+  //   setValue("toCity", ""); // Clear city
+  // }, [selectedCountryName, setValue]);
 
-  // Clear selected city when state changes
-  useEffect(() => {
-    setValue("toCity", ""); // Clear city
-  }, [selectedStateName, setValue]);
+  // // Clear selected city when state changes
+  // useEffect(() => {
+  //   setValue("toCity", ""); // Clear city
+  // }, [selectedStateName, setValue]);
 
   // Fetch states for selected country
   useEffect(() => {
@@ -77,6 +85,11 @@ export default function DeliveryReceiverForm() {
   useEffect(() => {
     loadCities(selectedCountryName, selectedStateName);
   }, [selectedStateName, states]);
+
+  // Mark as mounted after the first render
+  useEffect(() => {
+    isMounting.current = false;
+  }, []);
 
   // Form submission
   async function onSubmit(data: z.infer<typeof deliveryDestinationSchema>) {
@@ -125,6 +138,9 @@ export default function DeliveryReceiverForm() {
             fieldType={FormFieldType.SELECT}
             placeholder="Country"
             selectOptions={countries.map((country: any) => country.name)}
+            onChange={(selectedCountryName) =>
+              onCountryChange(selectedCountryName, setValue)
+            }
           />
 
           <CustomFormField
@@ -134,6 +150,10 @@ export default function DeliveryReceiverForm() {
             fieldType={FormFieldType.SELECT}
             placeholder="State"
             selectOptions={states.map((state: any) => state.name)}
+            selectMessage="Select a country first"
+            onChange={(selectedStateName) =>
+              onStateChange(selectedCountryName, selectedStateName, setValue)
+            }
           />
           <CustomFormField
             label="Receiver's city"
@@ -142,6 +162,7 @@ export default function DeliveryReceiverForm() {
             fieldType={FormFieldType.SELECT}
             placeholder="City"
             selectOptions={cities.map((city: any) => city.name)}
+            selectMessage="Select a state first"
           />
 
           <CustomFormField

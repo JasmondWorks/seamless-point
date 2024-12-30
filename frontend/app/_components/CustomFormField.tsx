@@ -16,22 +16,13 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+
 import { Textarea } from "./ui/textarea";
 import Password from "./InputFields/Password";
 import DatePicker from "./InputFields/DatePicker";
 import FileInput from "./InputFields/FileInput";
-import toast from "react-hot-toast";
-import { newDelivery } from "@/app/_lib/types";
 import SelectBox from "@/app/_components/SelectBox";
+import { StoredFile } from "@/app/_lib/types";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -64,6 +55,8 @@ interface CustomProps {
   selectGroupOptions?: { title: string; items: string[] }[];
   selectMessage?: string;
   selectValue?: string;
+  onChange?: (value: string) => void;
+  selectedFile?: StoredFile;
   // addToStore?: (
   //   file: File,
   //   fieldName: keyof Pick<newDelivery, "packageImage" | "proofOfPurchase">
@@ -72,6 +65,13 @@ interface CustomProps {
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
+  const handleChange = (value: any) => {
+    field.onChange(value); // Update field value
+    if (props.onChange) {
+      props.onChange(value); // Call custom onChange handler
+    }
+  };
+
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
@@ -130,7 +130,13 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     case FormFieldType.DATE_PICKER:
       return <DatePicker props={props} field={field} />;
     case FormFieldType.SELECT:
-      return <SelectBox field={field} props={props} />;
+      return (
+        <SelectBox
+          field={field}
+          props={props}
+          onChange={(value: string) => handleChange(value)} // Pass onChange to SelectBox
+        />
+      );
     case FormFieldType.SKELETON:
       return props.renderSkeleton ? props.renderSkeleton(field) : null;
     default:

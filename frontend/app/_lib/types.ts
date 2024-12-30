@@ -79,15 +79,15 @@ export interface Parcel {
   value?: number;
   id?: string;
 }
-type Tfile = {
+export type StoredFile = {
   base64file: string;
   name: string;
 };
 export interface ParcelDetails {
   packagingType: EPackagingType | string;
   currency: ECurrency | string;
-  packageImage?: Tfile;
-  proofOfPurchase?: Tfile;
+  packageImage?: StoredFile;
+  proofOfPurchase?: StoredFile;
   parcelItems: Parcel[];
 }
 export interface newDelivery {

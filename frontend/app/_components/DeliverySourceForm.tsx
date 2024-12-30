@@ -53,23 +53,30 @@ export default function DeliverySourceForm() {
   const router = useRouter();
   const updateSender = useCreateDeliveryStore((state) => state.updateSender);
 
-  const { countries, states, cities, loadCities, loadStates } =
-    useLocationData();
+  const {
+    countries,
+    states,
+    cities,
+    loadCities,
+    loadStates,
+    onCountryChange,
+    onStateChange,
+  } = useLocationData(false);
 
   const { watch, setValue } = form;
   const selectedCountryName = watch("country");
   const selectedStateName = watch("state");
 
-  // Clear selected state and cities when country changes
-  useEffect(() => {
-    setValue("state", ""); // Clear state
-    setValue("city", ""); // Clear city
-  }, [selectedCountryName, setValue]);
+  // // Clear selected state and cities when country changes
+  // useEffect(() => {
+  //   setValue("state", ""); // Clear state
+  //   setValue("city", ""); // Clear city
+  // }, [selectedCountryName, setValue]);
 
-  // Clear selected city when state changes
-  useEffect(() => {
-    setValue("city", ""); // Clear city
-  }, [selectedStateName, setValue]);
+  // // Clear selected city when state changes
+  // useEffect(() => {
+  //   setValue("city", ""); // Clear city
+  // }, [selectedStateName, setValue]);
 
   // Fetch states for selected country
   useEffect(() => {
@@ -130,6 +137,9 @@ export default function DeliverySourceForm() {
             fieldType={FormFieldType.SELECT}
             placeholder="Country"
             selectOptions={countries?.map((country: any) => country.name)}
+            onChange={(selectedCountryName) =>
+              onCountryChange(selectedCountryName, setValue)
+            }
           />
           <CustomFormField
             label="State"
@@ -138,6 +148,10 @@ export default function DeliverySourceForm() {
             fieldType={FormFieldType.SELECT}
             placeholder="State"
             selectOptions={states?.map((state: any) => state.name)}
+            selectMessage="Select a country first"
+            onChange={(selectedStateName) =>
+              onStateChange(selectedCountryName, selectedStateName, setValue)
+            }
           />
           <CustomFormField
             label="City"
@@ -146,6 +160,7 @@ export default function DeliverySourceForm() {
             fieldType={FormFieldType.SELECT}
             placeholder="City"
             selectOptions={cities.map((city: any) => city.name)}
+            selectMessage="Select a state first"
           />
           <CustomFormField
             label="Postcode"
