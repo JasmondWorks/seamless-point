@@ -71,17 +71,17 @@ export const useCreateDeliveryStore = create(
       // ) => {
       //   set({ [fieldName]: file });
       // },
-      addParcelFile: (
-        file: File,
-        fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
-      ) => {
-        set((state: newDelivery) => ({
-          parcelDetails: {
-            ...state.parcelDetails,
-            [fieldName]: file,
-          } as ParcelDetails,
-        }));
-      },
+      // addParcelFile: (
+      //   file: File,
+      //   fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
+      // ) => {
+      //   set((state: newDelivery) => ({
+      //     parcelDetails: {
+      //       ...state.parcelDetails,
+      //       [fieldName]: file,
+      //     } as ParcelDetails,
+      //   }));
+      // },
 
       // Step navigation
       goToNextStep: () =>

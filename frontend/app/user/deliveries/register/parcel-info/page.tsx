@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { currencies, packagingType } from "@/app/_lib/constants";
 import { set } from "mongoose";
+import { base64ToFile, fileToBase64 } from "@/app/_lib/utils";
 
 const initialItems = [
   {
@@ -54,7 +55,7 @@ export default function ParcelInfo() {
   const parcelDetailsCopy = { ...parcelDetails };
   delete parcelDetailsCopy.parcelItems;
 
-  const addParcelFile = useCreateDeliveryStore((store) => store.addParcelFile);
+  // const addParcelFile = useCreateDeliveryStore((store) => store.addParcelFile);
   const addParcelDetails = useCreateDeliveryStore(
     (store) => store.addParcelDetails
   );
@@ -89,32 +90,80 @@ export default function ParcelInfo() {
 
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
-    defaultValues:
-      parcelDetailsCopy || ({} as Partial<z.infer<typeof parcelInfoSchema>>),
+    defaultValues: {
+      ...parcelDetailsCopy,
+      packageImage: parcelDetailsCopy?.packageImage?.base64file
+        ? base64ToFile(
+            parcelDetailsCopy.packageImage.base64file,
+            parcelDetailsCopy.packageImage.name || "defaultName.jpg"
+          )
+        : undefined,
+      proofOfPurchase: parcelDetailsCopy?.proofOfPurchase?.base64file
+        ? base64ToFile(
+            parcelDetailsCopy.proofOfPurchase.base64file,
+            parcelDetailsCopy.proofOfPurchase.name || "defaultName.pdf"
+          )
+        : undefined,
+    },
   });
 
+  // const form = useForm<z.infer<typeof parcelInfoSchema>>({
+  //   resolver: zodResolver(parcelInfoSchema),
+  //   // defaultValues:
+  //   //   parcelDetailsCopy || ({} as Partial<z.infer<typeof parcelInfoSchema>>),
+  //   defaultValues: {
+  //     ...parcelDetailsCopy,
+  //     packageImage: parcelDetailsCopy?.packageImage?.base64file
+  //       ? base64ToFile(
+  //           parcelDetailsCopy.packageImage.base64file,
+  //           parcelDetailsCopy.packageImage.name
+  //         )
+  //       : undefined,
+  //     proofOfPurchase: parcelDetailsCopy?.proofOfPurchase?.base64file
+  //       ? base64ToFile(
+  //           parcelDetailsCopy.proofOfPurchase.base64file,
+  //           parcelDetailsCopy.proofOfPurchase.name
+  //         )
+  //       : undefined,
+  //     // packageImage: base64ToFile(
+  //     //   parcelDetailsCopy?.packageImage?.base64file || "",
+  //     //   parcelDetailsCopy?.packageImage?.name || ""
+  //     // ),
+  //     // proofOfPurchase: base64ToFile(
+  //     //   parcelDetailsCopy?.proofOfPurchase?.base64file || "",
+  //     //   parcelDetailsCopy?.proofOfPurchase?.name || ""
+  //     // ),
+  //   },
+  // });
+
+  // packageImage: {base64file: base64ToFile(parcelDetailsCopy?.packageImage), name: parcelDetailsCopy?.name}
+  // proofOfPurchase: {base64file: base64ToFile(parcelDetailsCopy?.proofOfPurchase), name: parcelDetailsCopy?.name},
   async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
     try {
-      // Submit logic
-      const parcelDetails = {
-        parcelItems,
-        ...data,
-      };
+      const base64packageImage = await fileToBase64(data.packageImage);
+      const base64proofOfPurchase = await fileToBase64(data.proofOfPurchase);
 
-      addParcelDetails(parcelDetails);
-      // Navigate to the next page
-      router.push("/user/deliveries/register/select-courier");
+      if (base64packageImage && base64proofOfPurchase) {
+        const parcelDetails = {
+          ...data,
+          packageImage: {
+            base64File: base64packageImage,
+            name: data.packageImage.name,
+          },
+          proofOfPurchase: {
+            base64File: base64proofOfPurchase,
+            name: data.proofOfPurchase.name,
+          },
+          parcelItems,
+        };
+
+        addParcelDetails(parcelDetails);
+        // Navigate to the next page
+        router.push("/user/deliveries/register/select-courier");
+      }
     } catch (error) {
       console.error(error);
     }
-  }
-  function handleSubmit() {
-    const isValid = form.formState.isValid;
-    // if (!isValid) {
-    //   toast.error("All fields must be filled");
-    //   return;
-    // }
-    form.handleSubmit(onSubmit)();
   }
 
   return (
@@ -159,8 +208,8 @@ export default function ParcelInfo() {
             name="proofOfPurchase"
             control={form.control}
             fieldType={FormFieldType.FILE}
-            addToStore={addParcelFile}
-            fieldName="proofOfPurchase"
+            // addToStore={addParcelFile}
+            // fieldName="proofOfPurchase"
           />
           <CustomFormField
             className="col-span-2"
@@ -168,8 +217,8 @@ export default function ParcelInfo() {
             name="packageImage"
             control={form.control}
             fieldType={FormFieldType.FILE}
-            addToStore={addParcelFile}
-            fieldName="packageImage"
+            // addToStore={addParcelFile}
+            // fieldName="packageImage"
           />
           <div className="flex flex-col gap-y-5 col-span-2">
             <PrivacyPolicyBlock />

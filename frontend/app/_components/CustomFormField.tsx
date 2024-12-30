@@ -64,11 +64,11 @@ interface CustomProps {
   selectGroupOptions?: { title: string; items: string[] }[];
   selectMessage?: string;
   selectValue?: string;
-  addToStore?: (
-    file: File,
-    fieldName: keyof Pick<newDelivery, "packageImage" | "proofOfPurchase">
-  ) => void;
-  fieldName?: string;
+  // addToStore?: (
+  //   file: File,
+  //   fieldName: keyof Pick<newDelivery, "packageImage" | "proofOfPurchase">
+  // ) => void;
+  // fieldName?: string;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
