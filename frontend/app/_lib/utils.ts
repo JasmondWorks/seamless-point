@@ -278,7 +278,12 @@ export const fileToBase64 = (file: File) => {
     reader.readAsDataURL(file);
   });
 };
-export function base64ToFile(base64String: string, fileName: string) {
+export function base64ToFile(
+  base64String: string,
+  fileName: string = "defaultName.jpg"
+) {
+  if (!base64String) return undefined;
+
   const [prefix, base64Data] = base64String.split(",");
   const byteCharacters = atob(base64Data);
   const byteNumbers = Array.from(byteCharacters, (char) => char.charCodeAt(0));

@@ -51,7 +51,6 @@ export interface Sender {
   postCode: string;
   email: string;
   phoneNumber: string;
-  // phoneNumber: string;
   // deliveryTitle: string;
   // summary: string;
   // amountOfItems?: number;
@@ -80,13 +79,16 @@ export interface Parcel {
   value?: number;
   id?: string;
 }
-
+type Tfile = {
+  base64file: string;
+  name: string;
+};
 export interface ParcelDetails {
-  currency: ECurrency | string;
-  packageImage: File | null;
   packagingType: EPackagingType | string;
+  currency: ECurrency | string;
+  packageImage?: Tfile;
+  proofOfPurchase?: Tfile;
   parcelItems: Parcel[];
-  proofOfPurchase: File | null;
 }
 export interface newDelivery {
   deliveryType: DeliveryType | string;
@@ -102,10 +104,10 @@ export interface newDelivery {
   updateSender: (sender: Sender) => void;
   updateReceiver: (receiver: Receiver) => void;
   addParcelDetails: (parcelDetails: ParcelDetails) => void;
-  addParcelFile: (
-    file: File,
-    fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
-  ) => void;
+  // addParcelFile: (
+  //   file: File,
+  //   fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
+  // ) => void;
   resetDeliveryData: () => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
