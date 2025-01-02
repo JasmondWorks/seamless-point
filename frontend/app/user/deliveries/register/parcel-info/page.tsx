@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { currencies, packagingType } from "@/app/_lib/constants";
 import { set } from "mongoose";
 import { base64ToFile, fileToBase64 } from "@/app/_lib/utils";
+import toast from "react-hot-toast";
 
 const initialItems = [
   {
@@ -112,38 +113,10 @@ export default function ParcelInfo() {
     },
   });
 
-  // const form = useForm<z.infer<typeof parcelInfoSchema>>({
-  //   resolver: zodResolver(parcelInfoSchema),
-  //   // defaultValues:
-  //   //   parcelDetailsCopy || ({} as Partial<z.infer<typeof parcelInfoSchema>>),
-  //   defaultValues: {
-  //     ...parcelDetailsCopy,
-  //     packageImage: parcelDetailsCopy?.packageImage?.base64file
-  //       ? base64ToFile(
-  //           parcelDetailsCopy.packageImage.base64file,
-  //           parcelDetailsCopy.packageImage.name
-  //         )
-  //       : undefined,
-  //     proofOfPurchase: parcelDetailsCopy?.proofOfPurchase?.base64file
-  //       ? base64ToFile(
-  //           parcelDetailsCopy.proofOfPurchase.base64file,
-  //           parcelDetailsCopy.proofOfPurchase.name
-  //         )
-  //       : undefined,
-  //     // packageImage: base64ToFile(
-  //     //   parcelDetailsCopy?.packageImage?.base64file || "",
-  //     //   parcelDetailsCopy?.packageImage?.name || ""
-  //     // ),
-  //     // proofOfPurchase: base64ToFile(
-  //     //   parcelDetailsCopy?.proofOfPurchase?.base64file || "",
-  //     //   parcelDetailsCopy?.proofOfPurchase?.name || ""
-  //     // ),
-  //   },
-  // });
-
-  // packageImage: {base64file: base64ToFile(parcelDetailsCopy?.packageImage), name: parcelDetailsCopy?.name}
-  // proofOfPurchase: {base64file: base64ToFile(parcelDetailsCopy?.proofOfPurchase), name: parcelDetailsCopy?.name},
   async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
+    if (!parcelItems.length)
+      return toast.error("Please add at least one parcel item");
+
     try {
       const base64packageImage = await fileToBase64(data.packageImage);
       const base64proofOfPurchase = await fileToBase64(data.proofOfPurchase);

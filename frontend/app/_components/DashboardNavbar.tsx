@@ -15,6 +15,7 @@ import SignOutButton from "./SignOutButton";
 import { IoClose, IoWalletOutline } from "react-icons/io5";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { getLocalStorageKey } from "@/app/_lib/utils";
 
 const navLinks = [
   {
@@ -217,7 +218,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isNavShowing, setIsNavShowing] = useState(false);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-  const storedUser = localStorage.getItem("user");
 
   const { user } = useUserAuth();
   const { role } = user;
@@ -294,11 +294,11 @@ export default function Navbar() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M13.5262 0.342651L231.678 141.445L0.403466 259.819L13.5262 0.342651Z"
+              d="M13.5262 0.344604L231.678 141.447L0.403466 259.821L13.5262 0.344604Z"
               fill="#D9D9D9"
             />
             <path
-              d="M35.5262 42.3427L253.678 183.445L222.4035 301.819L35.5262 42.3427Z"
+              d="M35.5262 42.3446L253.678 183.447L22.4035 301.821L35.5262 42.3446Z"
               fill="#EE5E21"
             />
           </svg>

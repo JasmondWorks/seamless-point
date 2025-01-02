@@ -13,7 +13,7 @@ export enum ButtonVariant {
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   children?: ReactNode;
-  text?: string;
+  text: string | ReactNode;
   className?: string;
   icon?: ReactNode;
   isReversed?: boolean;

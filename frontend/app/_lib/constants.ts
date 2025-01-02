@@ -69,3 +69,9 @@ export const itemSubCategory = [
   "furniture",
   "other",
 ];
+
+export const paginationSearchParams = {
+  page: "1",
+  limit: "10",
+  sortBy: "-createdAt",
+}

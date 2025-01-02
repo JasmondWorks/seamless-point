@@ -3,21 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function useNotifications() {
   const {
-    data: notifications,
+    data: notificationsResponse,
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["notifications"],
-    queryFn: fetchNotifications,
+    queryFn: () => fetchNotifications(),
     refetchOnWindowFocus: true,
-    staleTime: 0, // Data will always be refetched on focus
+    // refetchInterval: 60000, // Poll every 5 seconds for new notifications
+    staleTime: 5000, // Keep the data fresh for 5 seconds,
   });
 
   if (isError) {
     console.error("Error fetching notifications:", error);
   }
 
-  console.log(notifications);
-  return { notifications, isLoading, isError };
+  return { notificationsResponse, isLoading, isError, refetch };
 }

@@ -1,3 +1,4 @@
+import { Pagination } from "@/app/_components/Pagination";
 import { Button } from "@/app/_components/ui/button";
 import {
   Table,
@@ -27,11 +28,19 @@ export default function DataTable({
   data,
   searchQuery,
   selectedTags,
+  isBackendPaginated,
+  currentPage,
+  limit,
+  totalCount,
 }: {
   columns: any;
   data: any;
-  searchQuery: string;
-  selectedTags: string[];
+  searchQuery?: string;
+  selectedTags?: string[];
+  isBackendPaginated?: boolean;
+  currentPage?: number;
+  limit?: number;
+  totalCount?: number;
 }) {
   // Table config variables
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -42,18 +51,9 @@ export default function DataTable({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  // Dynamic filtering logic
-  // const filteredItems = React.useMemo(() => {
-  //   if (!searchQuery) return data;
-  //   return data.filter((item: any) =>
-  //     Object.values(item).some((value) =>
-  //       String(value).toLowerCase().includes(searchQuery.toLowerCase())
-  //     )
-  //   );
-  // }, [searchQuery, data]);
+  const numTotalPages = Math.ceil(totalCount / limit);
 
-  console.log(selectedTags);
-
+  
   let filteredItems;
 
   if (selectedTags)
@@ -120,7 +120,7 @@ export default function DataTable({
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
-                    className="whitespace-nowrap text-xs text-neutral-400 font-bold uppercase"
+                    className="whitespace-nowrap text-xs text-neutral-400 font-bold uppercase px-8"
                     key={header.id}
                   >
                     {header.isPlaceholder
@@ -144,7 +144,7 @@ export default function DataTable({
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell className="whitespace-nowrap" key={cell.id}>
+                  <TableCell className="whitespace-nowrap px-8" key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -159,30 +159,35 @@ export default function DataTable({
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-between space-x-2">
-        <div className="flex-1 text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+      {!isBackendPaginated && (
+        <div className="flex items-center justify-between space-x-2">
+          <div className="flex-1 text-sm text-muted-foreground">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </div>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      )}
+      {isBackendPaginated && (
+        <Pagination currentPage={currentPage} totalPages={numTotalPages} />
+      )}
     </div>
   );
 }

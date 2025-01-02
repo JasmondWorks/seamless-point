@@ -186,7 +186,7 @@ export function getBadgeStyle(tag: string): BadgeVariant | null {
 }
 
 export function getParcelTotalAmount(parcelDetails: any) {
-  return parcelDetails.parcelItems.reduce(
+  return parcelDetails?.parcelItems.reduce(
     (acc: number, item: Parcel) => acc + (item?.value * item?.quantity || 0),
     0
   );

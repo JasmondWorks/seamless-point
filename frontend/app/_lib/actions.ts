@@ -476,13 +476,27 @@ export async function createDelivery(deliveryDetails: any) {
   }
 }
 
-export async function fetchDeliveries(page: number = 1, limit: number = 10) {
+export async function fetchDeliveries({
+  page,
+  limit,
+  sort,
+}: {
+  page: number;
+  limit: number;
+  sort: string;
+}) {
   try {
     const token = getUserToken();
 
+    console.log(sort);
+
     console.log(token);
+
+    console.log(
+      `${URL}/deliveries/user?page=${page}&limit=${limit}&sort=${sort}`
+    );
     const res = await fetch(
-      `${URL}/deliveries/user?page=${page}&limit=${limit}`,
+      `${URL}/deliveries/user?page=${page}&limit=${limit}&sort=${sort}`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -490,25 +504,23 @@ export async function fetchDeliveries(page: number = 1, limit: number = 10) {
     );
     const data = await res.json();
 
+    const formattedData = formatDataDescending(data, "delivery");
+
     console.log("*********");
     console.log(data);
     console.log("*********");
 
     if (!res.ok) throw new Error(data.message);
 
-    return { status: "success", data };
+    return { status: "success", data: formattedData };
   } catch (error) {
     return { status: "error", message: "Failed to fetch deliveries" };
   }
 }
 
 export async function fetchNotifications() {
-  console.log("fetchNotifications is being called"); // Debug log
-
   try {
     const token = getUserToken();
-
-    Array.from({ length: 5 }, () => console.log("*****"));
 
     const res = await fetch(`${URL}/notifications/user`, {
       method: "GET",
@@ -516,14 +528,89 @@ export async function fetchNotifications() {
     });
     const data = await res.json();
 
-    console.log("*********");
-    console.log(data);
-    console.log("*********");
+    const formattedData = formatDataDescending(data, "notifications");
 
     if (!res.ok) throw new Error(data.message);
 
-    return { status: "success", data };
+    return {
+      status: "success",
+      data: formattedData,
+    };
   } catch (error) {
     return { status: "error", message: "Failed to fetch notifications" };
   }
+}
+
+export async function clearAllNotifications() {
+  const token = getUserToken();
+  try {
+    const res = await fetch(`${URL}/notifications/user`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    const { message } = data;
+
+    return { status: "success", message };
+  } catch (error) {
+    return { status: "error", message: "Failed to clear all notifications" };
+  }
+}
+
+export async function markNotificationsAsRead(notificationIds: string[]) {
+  const token = getUserToken();
+  console.log("marking as read...");
+  console.log(notificationIds);
+
+  try {
+    const res = await fetch(`${URL}/notifications/user/markAsRead`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ notificationIds: notificationIds }),
+    });
+
+    // const res = await fetch(`${URL}/deliveries`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    //   body: JSON.stringify(deliveryDetails),
+    // });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    console.log(res);
+
+    return { status: "success", data };
+  } catch (error) {
+    return { status: "error", message: "Failed to mark notifications as read" };
+  }
+}
+
+function formatDataDescending(data: any, resourceName: string) {
+  const unformattedData = data.data[resourceName];
+  const formattedList = unformattedData.sort(
+    (a: any, b: any) =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  );
+  const formattedData = {
+    ...data,
+    data: {
+      [resourceName]: formattedList,
+    },
+  };
+
+  return formattedData;
 }
