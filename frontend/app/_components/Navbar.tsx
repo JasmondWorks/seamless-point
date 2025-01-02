@@ -9,6 +9,8 @@ import { IoClose } from "react-icons/io5";
 import { useUserAuth } from "../_contexts/UserAuthContext";
 import { Bell } from "lucide-react";
 import { usePathname } from "next/navigation";
+import useNotifications from "@/app/_hooks/notifications/useNotifications";
+import { TNotification } from "@/app/_lib/types";
 
 const navLinks = [
   { title: "Home", href: "/#home" },
@@ -21,6 +23,13 @@ export default function Navbar({ className = "" }) {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isNavShowing, setIsNavShowing] = useState(false);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const { notificationsResponse } = useNotifications();
+
+  const numUnreadNotifications =
+    notificationsResponse?.data?.data?.notifications.filter(
+      (noti: TNotification) => !noti.isRead
+    ).length;
+  
 
   const { user } = useUserAuth();
 
@@ -95,9 +104,12 @@ export default function Navbar({ className = "" }) {
             <div className="flex items-center gap-8 md:gap-10">
               <Link href="/user/notifications" className="relative">
                 <Bell className="text-neutral-600" />
-                <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
-                  2
-                </span>
+
+                {Boolean(numUnreadNotifications) && (
+                  <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
+                    {numUnreadNotifications}
+                  </span>
+                )}
               </Link>
               <Link href="/user/dashboard">
                 <Image
@@ -115,8 +127,8 @@ export default function Navbar({ className = "" }) {
         {!user && (
           <div
             className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              isNavShowing 
-                ? "max-h-[800px] opacity-100 pb-4 md:pb-0 translate-y-0" 
+              isNavShowing
+                ? "max-h-[800px] opacity-100 pb-4 md:pb-0 translate-y-0"
                 : "max-h-0 md:max-h-none md:opacity-100 opacity-0 -translate-y-4 md:-translate-y-0"
             }`}
           >

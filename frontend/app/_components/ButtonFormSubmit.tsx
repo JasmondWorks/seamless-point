@@ -1,7 +1,7 @@
 import React from "react";
 import Button, { ButtonVariant } from "./Button";
 import clsx from "clsx";
-import Loader from "./Loader";
+import Spinner from "./Spinner";
 
 interface Props {
   text?: string;
@@ -27,7 +27,7 @@ export default function ButtonFormSubmit({
       type="submit"
       disabled={isLoading}
       onClick={onClick}
-      text={isLoading ? <Loader /> : text}
+      text={isLoading ? <Spinner /> : text}
       className={clsx("py-10 !h-14 items-center font-normal w-full", className)}
       isRoundedLarge
       variant={ButtonVariant.fill}

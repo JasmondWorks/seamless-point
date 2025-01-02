@@ -109,10 +109,30 @@ export const getDeliveriesColumns = (deliveryActions: {
           currency: "NGN",
         }).format(amount);
 
+        // Determine badge based on status
+        // const statusBadge = (() => {
+        //   switch (status) {
+        //     case EDeliveryStatus.ONGOING:
+        //     case EDeliveryStatus.PENDING:
+        //       return <Badge variant={getBadgeStyle(status)}>{status}</Badge>;
+        //     case EDeliveryStatus.COMPLETED:
+        //       return <Badge variant={getBadgeStyle(status)}>Completed</Badge>;
+        //     case EDeliveryStatus.UNCOMPLETED:
+        //       return <Badge variant={getBadgeStyle(status)}>Uncompleted</Badge>;
+        //     case EDeliveryStatus.CANCELLED:
+        //     case EDeliveryStatus.FAILED:
+        //       return <Badge variant={getBadgeStyle(status)}>{status}</Badge>;
+        //     default:
+        //       return (
+        //         <Badge variant={getBadgeStyle(status)}>Unknown status</Badge>
+        //       );
+        //   }
+        // })();
+
         return (
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-10 min-w-[200px]">
             <span className="font-medium min-w-32">{formattedAmount}</span>
-            <Badge className="capitalize font-medium" variant={getBadgeStyle(status)}>
+            <Badge className="capitalize" variant={getBadgeStyle(status)}>
               {status}
             </Badge>
           </div>

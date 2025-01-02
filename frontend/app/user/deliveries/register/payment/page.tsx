@@ -5,33 +5,29 @@ import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFormContext } from "@/app/_contexts/FormContext";
-import toast from "react-hot-toast";
+
 import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
-import { useDeliveriesStore } from "@/app/_stores/deliveriesStore";
-import { DispatchEnum, EDeliveryStatus } from "@/app/_lib/types";
+
 import {
   base64ToFile,
   getNewDeliveryData,
   getParcelTotalAmount,
   uploadFile,
 } from "@/app/_lib/utils";
-import { createDelivery } from "@/app/_lib/actions";
+import useCreateDelivery from "@/app/_hooks/deliveries/useCreateDelivery";
 
 export default function Payment() {
-  const [amount, setAmount] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const store = useCreateDeliveryStore((store) => store);
-  const addDelivery = useDeliveriesStore((store) => store.addDelivery);
   const [isLoading, setIsLoading] = useState(false);
+  const { createDelivery, isCreating, isError } = useCreateDelivery();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const userId = useCreateDeliveryStore((state) => state.userId);
-    console.log(userId);
-  
+  console.log(userId);
+
   const state = getNewDeliveryData();
   console.log(state);
 
@@ -49,7 +45,7 @@ export default function Payment() {
     e.preventDefault();
     // console.log("submitting...");
 
-    // upload files
+    // UPLOADING OF PACKAGE IMAGE AND PROOF OF PURCHASE
     setIsLoading(true);
 
     const packageImageUrl = await uploadFile(
@@ -72,10 +68,12 @@ export default function Payment() {
 
     if (!packageImageUrl || !proofOfPurchaseUrl) {
       // toast.error("Failed to upload files");
+      setIsLoading(false);
       return;
     }
     console.log(proofOfPurchaseUrl, packageImageUrl);
 
+    // FORMATTING NEW DELIVERY DATA
     const newDelivery = {
       ...state,
       ...state.sender,
@@ -91,15 +89,21 @@ export default function Payment() {
     console.log(newDelivery);
 
     try {
-      const res = await createDelivery(newDelivery);
-      console.log(res);
+      createDelivery(newDelivery);
+
+      if (!isError) {
+        resetDeliveryData();
+        timeout = setTimeout(
+          () => router.push("/user/deliveries/success"),
+          5000
+        );
+        setIsDialogOpen(true);
+      }
     } catch (error) {
       console.log(error);
     }
-    setIsDialogOpen(true);
     setIsLoading(false);
 
-    timeout = setTimeout(() => router.push("/user/deliveries/success"), 5000);
     return () => clearTimeout(timeout);
   }
   return (
@@ -123,7 +127,10 @@ export default function Payment() {
         </div>
 
         <PrivacyPolicyBlock />
-        <ButtonFormSubmit isLoading={isLoading} text="I UNDERSTAND" />
+        <ButtonFormSubmit
+          isLoading={isLoading || isCreating}
+          text="I UNDERSTAND"
+        />
       </form>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

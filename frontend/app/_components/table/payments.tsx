@@ -9,7 +9,7 @@ import ConfirmDialog from "@/app/_components/Dialogs/ConfirmDialog2";
 import { useState } from "react";
 import SuccessDialog from "@/app/_components/Dialogs/SuccessDialog";
 import { formatDate } from "react-datepicker/dist/date_utils";
-import { formatDateTime } from "@/app/_lib/utils";
+import { formatDateTime, getBadgeStyle } from "@/app/_lib/utils";
 
 export type Payment = {
   id: string;
@@ -86,14 +86,25 @@ export const getPaymentColumns = (): ColumnDef<Payment>[] => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "minmax(80px, 1fr) minmax(100px, 1fr)",
+              gridTemplateColumns: "minmax(7rem, 1fr) minmax(130px, 1fr)",
               gap: "10px",
               alignItems: "center",
             }}
           >
             <span className="font-medium">{formattedAmount}</span>
-            <div className="flex justify-center">{statusBadge}</div>
+            {/* <div className="flex justify-center">{statusBadge}</div> */}
+            <div className="flex justify-center">
+              <Badge
+                className="capitalize font-medium"
+                variant={getBadgeStyle(status)}
+              >
+                {status}
+              </Badge>
+            </div>
           </div>
+          // <div className="flex items-center gap-5">
+          //   <span className="font-medium min-w-32">{formattedAmount}</span>
+          // </div>
         );
       },
     },

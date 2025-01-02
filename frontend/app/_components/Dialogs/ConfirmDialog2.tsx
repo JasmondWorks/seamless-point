@@ -1,5 +1,5 @@
 // components/ConfirmDialog.tsx
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -20,9 +20,11 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   triggerEl: ReactNode;
+  isLoading?: boolean;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+  isLoading,
   triggerEl, // Content for the trigger (button or custom UI)
   onConfirm,
   title = "Are you sure you want to proceed with this action?",
@@ -34,14 +36,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     <Dialog>
       <DialogTrigger>{triggerEl}</DialogTrigger>
       <DialogContent>
-        <DialogTitle className="flex flex-col items-start gap-5">
-          <Badge
-            className="!rounded-full !border-[10px] !border-[#fef3f2]"
-            variant={BadgeVariant.red}
-          >
-            <AlertCircle color="red" />
-          </Badge>
-          <h3 className="text-xl">{title}</h3>
+        <Badge
+          className="!rounded-full w-fit !border-[10px] !border-[#fef3f2]"
+          variant={BadgeVariant.red}
+        >
+          <AlertCircle color="red" />
+        </Badge>
+        <DialogTitle className="flex flex-col text-xl items-start gap-5">
+          {title}
         </DialogTitle>
         <DialogDescription>{description}</DialogDescription>
         <DialogFooter className="grid grid-cols-2 gap-3 mt-5">
@@ -54,7 +56,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             />
           </DialogClose>
           <Button
-            onClick={() => onConfirm()}
+            disabled={isLoading}
+            onClick={() => {
+              onConfirm();
+              // !isLoading && setOpen(false);
+            }}
             variant={ButtonVariant.fill}
             isRoundedLarge
             className="bg-red-600 flex-1"

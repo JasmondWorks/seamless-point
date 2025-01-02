@@ -123,3 +123,20 @@ export enum ECurrency {
   NGN = "NGN",
   USD = "USD",
 }
+export enum NotificationType {
+  INFO = "info",
+  ERROR = "error",
+  SUCCESS = "success",
+}
+export type TNotification = {
+  type: NotificationType; // A string literal type for notification type.
+  isRead: boolean; // A boolean to indicate whether the notification is read.
+  _id: string; // A unique identifier for the notification.
+  user: string; // The ID of the user the notification belongs to.
+  title: string; // The title of the notification.
+  message: string; // The content or message of the notification.
+  referenceType: "Delivery"; // A string literal type for the reference type.
+  referenceId: string; // The ID of the related reference object.
+  createdAt: string; // ISO date string representing when the notification was created.
+  updatedAt: string; // ISO date string representing when the notification was last updated.
+};

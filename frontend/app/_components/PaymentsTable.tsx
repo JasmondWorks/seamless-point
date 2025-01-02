@@ -17,6 +17,27 @@ export const initialPaymentsData: Payment[] = [
     status: "completed",
   },
   {
+    id: "1d8f87e5-90f0-4c13-bf82-4047fe881828a",
+    amount: 250,
+    remark: "Payment for order #4536",
+    date: new Date("2024-11-20T14:32:00"),
+    status: "completed",
+  },
+  {
+    id: "1d8f87e5-90f0-4c13-bf82-4047fe881828b",
+    amount: 250,
+    remark: "Payment for order #4536",
+    date: new Date("2024-11-20T14:32:00"),
+    status: "completed",
+  },
+  {
+    id: "1d8f87e5-90f0-4c13-bf82-4047fe881828c",
+    amount: 250,
+    remark: "Payment for order #4536",
+    date: new Date("2024-11-20T14:32:00"),
+    status: "completed",
+  },
+  {
     id: "7b9a48b7-3c38-49e5-bfd2-651e6fe9d37c",
     amount: 1200,
     remark: "Refund for cancellation of order #3211",
@@ -84,7 +105,7 @@ export const initialPaymentsData: Payment[] = [
 export function PaymentsTable() {
   // Data variables
   const [payments, setPayments] =
-    React.useState<Delivery[]>(initialPaymentsData);
+    React.useState<Payment[]>(initialPaymentsData);
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Table layout variables

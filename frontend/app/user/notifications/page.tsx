@@ -3,78 +3,84 @@
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import React, { useEffect } from "react";
 import Notification from "./Notification";
-import useNotifications from "@/app/_hooks/useNotifications";
-import { fetchDeliveries, fetchNotifications } from "@/app/_lib/actions";
-import { useQuery } from "@tanstack/react-query";
-
-const notificationsMockData = [
-  {
-    status: "",
-    title: "",
-    desc: "",
-    addedAt: new Date(),
-  },
-  {
-    status: "",
-    title: "",
-    desc: "",
-    addedAt: new Date(),
-  },
-  {
-    status: "",
-    title: "",
-    desc: "",
-    addedAt: new Date(),
-  },
-];
+import useNotifications from "@/app/_hooks/notifications/useNotifications";
+import SpinnerFull from "@/app/_components/SpinnerFull";
+import { TNotification } from "@/app/_lib/types";
+import useMarkNotificationsAsRead from "@/app/_hooks/notifications/useMarkNotificationsAsRead";
+import ConfirmDialog from "@/app/_components/Dialogs/ConfirmDialog2";
+import useClearAllNotifications from "@/app/_hooks/notifications/useClearAllNotifications";
 
 export default function Notifications() {
-  // const { notifications, isLoading } = useNotifications();
+  const { notificationsResponse, isLoading, isError } = useNotifications();
+  const { markNotificationsAsRead } = useMarkNotificationsAsRead();
+  const { clearAllNotifications, isClearing, isCleared, setIsCleared } =
+    useClearAllNotifications();
 
-  const {
-    data: notifications,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: () => fetchNotifications(),
-    refetchOnWindowFocus: true,
-    staleTime: 0, // Data will always be refetched on focus
-  });
+  console.log(isCleared);
+
+  const notifications = notificationsResponse?.data?.data?.notifications;
+
+  // Detect new unread notifications and call mark as read API
+  useEffect(() => {
+    if (notifications) {
+      setIsCleared(false);
+
+      const unreadNotificationIds =
+        notificationsResponse?.data?.data?.notifications
+          .filter((noti: TNotification) => !noti.isRead)
+          .map((noti: TNotification) => noti._id);
+
+      console.log("unreadNotificationIds", unreadNotificationIds);
+
+      // Call the API to mark unread notifications as read
+      if (unreadNotificationIds.length > 0) {
+        markNotificationsAsRead(unreadNotificationIds);
+      }
+    }
+  }, [notifications, markNotificationsAsRead]);
 
   console.log("here");
-  console.log(notifications);
+  console.log(notificationsResponse);
 
-  // useEffect(() => {
-  //   async function loadNotifications() {
-  //     try {
-  //       const notifications = await fetchNotifications();
-
-  //       console.log(notifications);
-  //     } catch (error) {}
-  //   }
-  //   loadNotifications();
-  // }, []);
+  if (isLoading) return <SpinnerFull />;
+  if (isError) return <div>Failed to load notifications</div>;
 
   return (
     <>
       <div className="flex justify-between items-center border-b pb-3 border-neutral-300">
         <h1 className="headline">Notifications</h1>
-        <button>
-          <Badge className="font-bold" variant={BadgeVariant.red}>
-            Clear all
-          </Badge>
-        </button>
+
+        {notifications.length > 0 && !isCleared && (
+          <ConfirmDialog
+            isLoading={isClearing}
+            onConfirm={clearAllNotifications}
+            title="Clear All Notifications"
+            description="This action will permanently clear all your notifications. Are you sure you want to proceed?"
+            confirmText="Yes, clear all"
+            cancelText="Cancel"
+            triggerEl={
+              <button>
+                <Badge className="font-bold" variant={BadgeVariant.red}>
+                  Clear all
+                </Badge>
+              </button>
+            }
+          />
+        )}
       </div>
-      {notifications?.data?.totalCount !== 0 && (
+      {notificationsResponse?.data?.totalCount !== 0 && (
         <div className={`space-y-5`}>
-          {Array.from({ length: 5 }, (_, i) => (
-            <Notification key={i} />
-          ))}
+          {notificationsResponse?.data?.data?.notifications?.map(
+            (notification: TNotification) => (
+              <Notification
+                key={notification._id}
+                notification={notification}
+              />
+            )
+          )}
         </div>
       )}
-      {notifications?.data?.totalCount === 0 && (
+      {notificationsResponse?.data?.totalCount === 0 && (
         <div className="flex gap-5 flex-col items-center">
           <svg
             className=""
@@ -91,7 +97,7 @@ export default function Notifications() {
               fill="#E7E8EC"
             />
           </svg>
-          <span>You do not have any current notifications</span>
+          <span>You currently do not have any notifications</span>
         </div>
       )}
     </>
