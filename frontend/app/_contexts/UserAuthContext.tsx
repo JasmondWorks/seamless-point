@@ -11,6 +11,7 @@ type User = {
   lastName: string;
   role: string;
   email: string;
+  profileImage: string;
 };
 
 type AuthType = {
