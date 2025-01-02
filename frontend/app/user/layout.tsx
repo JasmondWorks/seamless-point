@@ -15,7 +15,7 @@ export default async function DashboardLayout({
         <Navbar />
         <div className="bg-neutral-50 h-full overflow-auto relative flex">
           <DashboardNavbar />
-          <ScrollArea
+          {/* <ScrollArea
             // style={{ height: "calc(100% - 80px)" }}
             className="md:mt-0 ml-14 lg:ml-0 flex-1"
           >
@@ -34,8 +34,8 @@ export default async function DashboardLayout({
                 height={500}
               />
             </main>
-            {/* </div> */}
-          </ScrollArea>
+          </div>
+          {/* </ScrollArea> */}
         </div>
       </div>
     </ProtectedRoutes>
