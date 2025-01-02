@@ -29,7 +29,7 @@ export default function Navbar({ className = "" }) {
     notificationsResponse?.data?.data?.notifications.filter(
       (noti: TNotification) => !noti.isRead
     ).length;
-  
+  console.log(numUnreadNotifications);
 
   const { user } = useUserAuth();
 
@@ -105,7 +105,7 @@ export default function Navbar({ className = "" }) {
               <Link href="/user/notifications" className="relative">
                 <Bell className="text-neutral-600" />
 
-                {Boolean(numUnreadNotifications) && (
+                {numUnreadNotifications?.length > 0 && (
                   <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
                     {numUnreadNotifications}
                   </span>
@@ -116,7 +116,7 @@ export default function Navbar({ className = "" }) {
                   width={50}
                   height={50}
                   alt="profile"
-                  src="/assets/images/avatar.jpg"
+                  src={user.profileImage || "/assets/images/avatar.png"}
                   className="w-12 h-12 rounded-full object-cover"
                 />
               </Link>
