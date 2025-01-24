@@ -26,10 +26,9 @@ export default function Navbar({ className = "" }) {
   const { notificationsResponse } = useNotifications();
 
   const numUnreadNotifications =
-    notificationsResponse?.data?.data?.notifications.filter(
+    notificationsResponse?.data?.notifications.filter(
       (noti: TNotification) => !noti.isRead
     ).length;
-  console.log(numUnreadNotifications);
 
   const { user } = useUserAuth();
 
@@ -101,11 +100,11 @@ export default function Navbar({ className = "" }) {
             </button>
           )}
           {user && (
-            <div className="flex items-center gap-8 md:gap-10">
+            <div className="flex items-center gap-8">
               <Link href="/user/notifications" className="relative">
                 <Bell className="text-neutral-600" />
 
-                {numUnreadNotifications?.length > 0 && (
+                {numUnreadNotifications > 0 && (
                   <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
                     {numUnreadNotifications}
                   </span>

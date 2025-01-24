@@ -1,3 +1,5 @@
+"use client";
+
 import { Pagination } from "@/app/_components/Pagination";
 import { Button } from "@/app/_components/ui/button";
 import {
@@ -10,9 +12,6 @@ import {
 } from "@/app/_components/ui/table";
 
 import {
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -23,6 +22,8 @@ import {
 
 import React from "react";
 
+import { usePathname, useRouter } from "next/navigation";
+
 export default function DataTable({
   columns,
   data,
@@ -32,6 +33,8 @@ export default function DataTable({
   currentPage,
   limit,
   totalCount,
+  linkRows = true, // New boolean prop to toggle row linking
+  linkRowsBy = "_id",
 }: {
   columns: any;
   data: any;
@@ -41,56 +44,42 @@ export default function DataTable({
   currentPage?: number;
   limit?: number;
   totalCount?: number;
+  linkRows?: boolean; // Boolean to determine if rows should be linked
+  linkRowsBy?: string;
 }) {
-  // Table config variables
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const pathname = usePathname(); // Get the current pathname
+  const router = useRouter(); // Next.js router for programmatic navigation
+
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const numTotalPages = Math.ceil(totalCount / limit);
 
-  
-  let filteredItems;
+  const filteredItems = React.useMemo(() => {
+    if (!searchQuery && (!selectedTags || selectedTags.length === 0))
+      return data;
 
-  if (selectedTags)
-    filteredItems = React.useMemo(() => {
-      if (!searchQuery && selectedTags.length === 0) return data;
+    return data.filter((item: any) => {
+      const matchesSearch = !searchQuery
+        ? true
+        : Object.values(item).some((value) =>
+            String(value).toLowerCase().includes(searchQuery.toLowerCase())
+          );
 
-      return data.filter((item: any) => {
-        // Check if item matches search query
-        const matchesSearch = Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(searchQuery.toLowerCase())
-        );
+      const matchesTags =
+        !selectedTags || selectedTags.length === 0
+          ? true
+          : selectedTags.some((tag) =>
+              tag === "cancelled/failed"
+                ? item.status === "cancelled" || item.status === "failed"
+                : item.status.toLowerCase() === tag.toLowerCase()
+            );
 
-        // Check if item matches selected tags (with special handling for "cancelled/failed" tag)
-        const matchesTags =
-          selectedTags.length === 0 ||
-          selectedTags.some((tag) => {
-            if (tag === "cancelled/failed") {
-              // Match either "cancelled" or "failed" status
-              return item.status === "cancelled" || item.status === "failed";
-            }
-            return item.status.toLowerCase() === tag.toLowerCase();
-          });
-
-        // Only return items that match both search query and tags criteria
-        return matchesSearch && matchesTags;
-      });
-    }, [searchQuery, selectedTags, data]);
-
-  if (!selectedTags)
-    filteredItems = React.useMemo(() => {
-      if (!searchQuery) return data;
-      return data.filter((item: any) =>
-        Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
-    }, [searchQuery, data]);
+      return matchesSearch && matchesTags;
+    });
+  }, [searchQuery, selectedTags, data]);
 
   const table = useReactTable({
     data: filteredItems,
@@ -117,39 +106,52 @@ export default function DataTable({
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow className="border-b" key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    className="whitespace-nowrap text-xs text-neutral-400 font-bold uppercase px-8"
-                    key={header.id}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead
+                  className="whitespace-nowrap text-xs text-neutral-400 font-bold uppercase px-8"
+                  key={header.id}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                className="border-b"
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell className="whitespace-nowrap px-8" key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            table.getRowModel().rows.map((row) => {
+              const rowHref = `${pathname}/${row.original[linkRowsBy]}`; // Generate row link
+
+              return (
+                <TableRow
+                  className={`border-b ${
+                    linkRows ? "cursor-pointer hover:bg-gray-100" : ""
+                  }`}
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  role={linkRows ? "button" : undefined} // Add button role for accessibility
+                  onClick={
+                    linkRows
+                      ? () => router.push(rowHref) // Navigate programmatically
+                      : undefined
+                  }
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell className="whitespace-nowrap px-8" key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow className="border-b">
               <TableCell colSpan={columns.length} className="h-24 text-center">
@@ -165,24 +167,26 @@ export default function DataTable({
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
+          {Number(totalCount) >= 10 && (
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       )}
       {isBackendPaginated && (

@@ -1,6 +1,8 @@
 "use server";
 
 import { getUserToken } from "@/app/_utils/server-utils";
+import { revalidatePath } from "next/cache";
+import { date } from "zod";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -239,7 +241,6 @@ export async function loginAdmin(userDetails: {
     };
   }
 }
-
 export async function forgotUserPassword(email: string) {
   console.log(email);
   try {
@@ -437,6 +438,49 @@ export async function getUser() {
     };
   }
 }
+export async function updateUser(updatedUserInfo: any) {
+  const token = getUserToken();
+  console.log("The token: ", token);
+  console.log(updatedUserInfo);
+  try {
+    const res = await fetch(`${URL}/users/me`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedUserInfo),
+    });
+    const data = await res.json();
+
+    console.log("**********");
+    console.log("Updated data:", data);
+    console.log("**********");
+
+    if (!res.ok) throw new Error(data.message);
+
+    revalidatePath("/user/settings");
+    revalidatePath("/admin/settings");
+
+    const {
+      data: { user },
+    } = data;
+
+    return {
+      status: "success",
+      message: "User updated successfully",
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
+}
 export async function createDelivery(deliveryDetails: any) {
   const token = getUserToken();
 
@@ -476,6 +520,47 @@ export async function createDelivery(deliveryDetails: any) {
   }
 }
 
+export async function fetchAllDeliveries({
+  page,
+  limit,
+  sort,
+}: {
+  page: number;
+  limit: number;
+  sort: string;
+}) {
+  try {
+    const token = getUserToken();
+
+    console.log(sort);
+
+    console.log(token);
+
+    const res = await fetch(
+      `${URL}/deliveries?page=${page}&limit=${limit}&sort=${sort}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await res.json();
+
+    console.log(data);
+
+    console.log("*********");
+    console.log(data);
+    console.log("*********");
+
+    if (!res.ok) throw new Error(data.message);
+
+    return data;
+  } catch (error: any) {
+    return {
+      status: "error",
+      message: error.message || "Failed to fetch deliveries",
+    };
+  }
+}
 export async function fetchDeliveries({
   page,
   limit,
@@ -492,9 +577,6 @@ export async function fetchDeliveries({
 
     console.log(token);
 
-    console.log(
-      `${URL}/deliveries/user?page=${page}&limit=${limit}&sort=${sort}`
-    );
     const res = await fetch(
       `${URL}/deliveries/user?page=${page}&limit=${limit}&sort=${sort}`,
       {
@@ -504,7 +586,9 @@ export async function fetchDeliveries({
     );
     const data = await res.json();
 
-    const formattedData = formatDataDescending(data, "delivery");
+    console.log(data);
+
+    // const formattedData = formatDataDescending(data, "delivery");
 
     console.log("*********");
     console.log(data);
@@ -512,9 +596,97 @@ export async function fetchDeliveries({
 
     if (!res.ok) throw new Error(data.message);
 
-    return { status: "success", data: formattedData };
-  } catch (error) {
-    return { status: "error", message: "Failed to fetch deliveries" };
+    return data;
+  } catch (error: any) {
+    return {
+      status: "error",
+      message: error.message || "Failed to fetch deliveries",
+    };
+  }
+}
+export async function fetchDelivery(id: string) {
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/deliveries/${id}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    console.log(data);
+
+    console.log("*********");
+    console.log(data);
+    console.log("*********");
+
+    if (!res.ok) throw new Error(data.message);
+
+    return data;
+  } catch (error: any) {
+    return {
+      status: "error",
+      message: error.message || "Failed to fetch deliveries",
+    };
+  }
+}
+export async function fetchLatestDeliveries() {
+  try {
+    const token = getUserToken();
+    const res = await fetch(`${URL}/deliveries/latest`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (err: any) {
+    return { status: "error", message: err.message };
+  }
+}
+export async function fetchAllCustomers({
+  page,
+  limit,
+  sort,
+}: {
+  page: number;
+  limit: number;
+  sort: string;
+}) {
+  try {
+    const token = getUserToken();
+    const res = await fetch(
+      `${URL}/users?page=${page}&limit=${limit}&sort=${sort}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    console.log(data);
+
+    return data;
+  } catch (err: any) {
+    return { status: "error", message: err.message };
+  }
+}
+export async function fetchLatestCustomers() {
+  try {
+    const token = getUserToken();
+    const res = await fetch(`${URL}/users/latest`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    console.log(data);
+
+    return { status: "success", data };
+  } catch (err: any) {
+    return { status: "error", message: err.message };
   }
 }
 
@@ -532,10 +704,7 @@ export async function fetchNotifications() {
 
     if (!res.ok) throw new Error(data.message);
 
-    return {
-      status: "success",
-      data: formattedData,
-    };
+    return formattedData;
   } catch (error) {
     return { status: "error", message: "Failed to fetch notifications" };
   }

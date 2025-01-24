@@ -1,17 +1,12 @@
 "use client";
 
-// import SquadPay from "react-squadpay";
-// import { PaystackButton } from "react-paystack";
 import styles from "./page.module.css";
 
 import { Input } from "@/app/_components/ui/input";
-import SelectDebitCardButton from "@/app/_components/SelectDebitCard";
-import DepositAccountDetailsCard from "@/app/_components/DepositAccountDetailsCard";
 import React, { useCallback, useEffect, useState } from "react";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import SelectPaymentMethod from "@/app/_components/SelectPaymentMethod";
-import { useFormContext } from "@/app/_contexts/FormContext";
 import toast from "react-hot-toast";
 import {
   DialogClose,
@@ -22,13 +17,20 @@ import {
   DialogHeader,
 } from "@/app/_components/ui/dialog";
 import { Dialog } from "@/app/_components/ui/dialog";
-import { getLocalStorageKey } from "@/app/_lib/utils";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { CreditCardForm } from "@/app/_components/CreditCardForm";
 import { IoIosClose } from "react-icons/io";
-import CountdownTimer from "@/app/_components/CountdownTimer";
 import { copyToClipboard } from "@/app/_utils/utils";
 import { useRouter } from "next/navigation";
+
+import dynamic from "next/dynamic";
+const PaystackButton = dynamic(
+  () => import("react-paystack").then((mod) => mod.PaystackButton),
+  { ssr: false }
+);
+
+import DashboardLayout from "@/app/_components/DashboardLayout";
+import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 
 enum EDialogContent {
   cardDetails = "CARD_DETAILS",
@@ -38,18 +40,6 @@ enum EDialogContent {
   success = "SUCCESS",
 }
 
-const onSuccess = (reference: any) => {
-  console.log("success");
-  // Implementation for whatever you want to do with reference and after success call.
-  console.log(reference);
-};
-
-// you can call this function anything
-const onClose = () => {
-  // implementation for  whatever you want to do when the Paystack dialog closed.
-  console.log("closed");
-};
-
 interface User {
   email: string;
   [key: string]: any;
@@ -58,21 +48,48 @@ interface User {
 export default function DepositPage() {
   const [step, setStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [amount, setAmount] = useState("");
 
   function incrementStep() {
     setStep((step) => step + 1);
   }
 
-  if (step === 1) return <Funding incrementStep={incrementStep} />;
-  if (step === 2) return <Amount incrementStep={incrementStep} />;
-  if (step === 3) return <Summary />;
+  return (
+    <DashboardLayout>
+      {step === 1 && (
+        <Funding
+          selectedPaymentMethod={selectedPaymentMethod}
+          setSelectedPaymentMethod={setSelectedPaymentMethod}
+          incrementStep={incrementStep}
+        />
+      )}
+      {step === 2 && (
+        <Amount
+          incrementStep={incrementStep}
+          amount={amount}
+          setAmount={setAmount}
+        />
+      )}
+      {step === 3 && (
+        <Summary
+          amount={amount}
+          selectedPaymentMethod={selectedPaymentMethod}
+        />
+      )}
+    </DashboardLayout>
+  );
 }
 
 // Step 1
-function Funding({ incrementStep }: { incrementStep: () => void }) {
-  const { addFormData } = useFormContext();
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-
+function Funding({
+  incrementStep,
+  selectedPaymentMethod,
+  setSelectedPaymentMethod,
+}: {
+  incrementStep: () => void;
+  selectedPaymentMethod: string;
+  setSelectedPaymentMethod: (paymentMethod: string) => void;
+}) {
   function handleSelectPaymentMethod(type: string) {
     setSelectedPaymentMethod(type);
   }
@@ -83,46 +100,48 @@ function Funding({ incrementStep }: { incrementStep: () => void }) {
     if (!selectedPaymentMethod)
       return toast.error("Please select a payment method");
 
-    addFormData({ selectedPaymentMethod });
     incrementStep();
   }
 
   console.log(selectedPaymentMethod);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-10">
+    <form onSubmit={handleSubmit} className="flex flex-col space-y-16">
       <div className="space-y-2">
-        <h1 className="headline text-center">Funding of Account</h1>
+        <h1 className="headline text-center">Select a Payment Method</h1>
         <p className="text-center text-muted">
-          Please Transfer Money To The Account Below Or Choose The Other Option
+          Please select one of the two payment methods listed below
         </p>
       </div>
-      <DepositAccountDetailsCard />
+      {/* <DepositAccountDetailsCard /> */}
       <SelectPaymentMethod
         onSelect={handleSelectPaymentMethod}
         selectedPaymentMethod={selectedPaymentMethod}
       />
-
-      <PrivacyPolicyBlock />
-      <ButtonFormSubmit onClick={handleSubmit} text="I UNDERSTAND" />
+      <div className="space-y-6">
+        <PrivacyPolicyBlock />
+        <ButtonFormSubmit onClick={handleSubmit} text="Continue" />
+      </div>
     </form>
   );
 }
 
 // Step 2
-function Amount({ incrementStep }: { incrementStep: () => void }) {
-  const { addFormData, formData } = useFormContext();
-  const [amount, setAmount] = useState("");
-
-  console.log(formData);
-
+function Amount({
+  incrementStep,
+  amount,
+  setAmount,
+}: {
+  incrementStep: () => void;
+  amount: string;
+  setAmount: (amount: string) => void;
+}) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!amount) return toast.error("Please enter an amount");
     if (isNaN(Number(amount))) return toast.error("Amount must be a number");
 
-    addFormData({ amount: Number(amount) });
     incrementStep();
   }
 
@@ -148,9 +167,14 @@ function Amount({ incrementStep }: { incrementStep: () => void }) {
 }
 
 // Step 3
-function Summary() {
-  const { formData } = useFormContext();
-  const [user, setUser] = useState<User>({} as User);
+function Summary({
+  amount,
+  selectedPaymentMethod,
+}: {
+  amount: string;
+  selectedPaymentMethod: string;
+}) {
+  const { user } = useUserAuth();
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
@@ -159,35 +183,35 @@ function Summary() {
   //   Paystack config
   const config = {
     reference: new Date().getTime().toString(),
-    email: user.email,
-    amount: formData.amount * 100,
+    email: user?.email,
+    amount: Number(amount) * 100,
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+    payment_channels: ["card"], // Only show card payment option
   };
 
-  //   const initializePayment = usePaystackPayment(config);
+  const onSuccess = (reference: string) => {
+    console.log("Payment successful", reference);
+    toast.success("Payment successful");
 
-  // Move localStorage access to useEffect
-  useEffect(() => {
-    const userData = JSON.parse(
-      localStorage.getItem(getLocalStorageKey("user")) || "{}"
-    ) as User;
-    setUser(userData);
-  }, []);
+    setTimeout(() => router.push("/user/dashboard"), 2000);
+  };
+
+  const onClose = () => {
+    toast("Payment popup closed", {
+      duration: 4000,
+      position: "top-center",
+      style: {
+        background: "#007bff", // Info blue background
+        color: "#ffffff", // White text
+        fontWeight: "bold", // Bold font
+      },
+    });
+    console.log("Payment popup closed");
+  };
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsDialogOpen(true);
-
-    switch (formData.selectedPaymentMethod) {
-      case "bank-transfer":
-        handleOpenAccountDetailsDialog();
-        break;
-      case "debit-card":
-        handleOpenCardDetailsDialog();
-        break;
-      default:
-        return;
-    }
   }
 
   function handleOpenCardDetailsDialog() {
@@ -195,6 +219,7 @@ function Summary() {
     setSelectedDialogContent(EDialogContent.cardDetails);
   }
   function handleOpenAccountDetailsDialog() {
+    setIsDialogOpen(true);
     setSelectedDialogContent(EDialogContent.accountDetails);
   }
   function handleOpenBankValidationDialog() {
@@ -205,56 +230,35 @@ function Summary() {
   }
   function handleOpenSuccessDialog() {
     setSelectedDialogContent(EDialogContent.success);
+
+    setTimeout(() => router.push("/user/dashboard"), 2000);
   }
   function handleCloseDialog() {
     setIsDialogOpen(false);
     setSelectedDialogContent("");
   }
 
-  //   Squadpay config
-  const params = {
-    key: process.env.NEXT_PUBLIC_SQUADCO_PUBLIC_KEY!,
-    email: user.email, // from HTML form
-    amount: formData.amount, // no need to multiply by 100 for kobo, its taken care for you
-    currencyCode: "NGN",
-  };
-
-  const Close = () => {
-    console.log("Widget closed");
-  };
-
-  const Load = () => {
-    console.log("Widget Loaded");
-  };
-
-  /**
-   * @param {object} data
-   * @description  reponse when payment is successful
-   */
-  const Success = (data: any) => {
-    console.log(data);
-    console.log("Widget success");
-  };
-
   return (
     <>
       <div className="flex flex-col gap-10">
-        <h1 className="headline text-center">{formData.amount} NGN</h1>
+        <h1 className="headline text-center">
+          {Number(amount) + transactionFee} NGN
+        </h1>
         <div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
             <div>
               Pay with{" "}
               <span className="capitalize">
-                {formData.selectedPaymentMethod.split("-").join(" ")}
+                {selectedPaymentMethod.split("-").join(" ")}
               </span>
             </div>
             <span className="capitalize">
-              {formData.selectedPaymentMethod.split("-").join(" ")}
+              {selectedPaymentMethod.split("-").join(" ")}
             </span>
           </div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
             <span>Amount to add</span>
-            <span>{formData.amount}</span>
+            <span>{amount}</span>
           </div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
             <span>Transaction fee</span>
@@ -262,13 +266,11 @@ function Summary() {
           </div>
           <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
             <span>Amount to pay</span>
-            <span className="font-bold">
-              {Number(formData.amount) + transactionFee}
-            </span>
+            <span className="font-bold">{Number(amount) + transactionFee}</span>
           </div>
         </div>
         <PrivacyPolicyBlock />
-        {/* {formData.selectedPaymentMethod === "debit-card" && (
+        {selectedPaymentMethod === "debit-card" && (
           <PaystackButton
             {...config}
             text="I UNDERSTAND"
@@ -276,22 +278,19 @@ function Summary() {
             onClose={onClose}
             className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
           />
-        )} */}
-        {/* {formData.selectedPaymentMethod === "bank-transfer" && (
-          <SquadPay
-            className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
-            text="Pay now"
-            params={params}
-            onClose={Close}
-            onLoad={Load}
-            onSuccess={(res: any) => Success(res)}
+        )}
+        {selectedPaymentMethod === "bank-transfer" && (
+          <ButtonFormSubmit
+            onClick={handleOpenAccountDetailsDialog}
+            text="Show account details"
           />
-        )} */}
+        )}
       </div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className={`${styles.dialogContainer}`}>
           {selectedDialogContent === EDialogContent.cardDetails && (
             <CardDetailsDialogContent
+              amount={amount}
               onOpenBankValidationDialog={handleOpenBankValidationDialog}
             />
           )}
@@ -302,6 +301,7 @@ function Summary() {
           )}
           {selectedDialogContent === EDialogContent.accountDetails && (
             <AccountDetailsContent
+              totalAmount={Number(amount) + transactionFee}
               onOpenVerifyDialog={handleOpenVerifyDialog}
             />
           )}
@@ -322,12 +322,14 @@ function Summary() {
 
 function CardDetailsDialogContent({
   onOpenBankValidationDialog,
+  amount,
 }: {
   onOpenBankValidationDialog: () => void;
+  amount: string;
 }) {
   return (
     <div className={`flex flex-col gap-y-8`}>
-      <TotalPriceHeader />
+      <TotalPriceHeader totalAmount={amount} />
       <div className="space-y-8">
         <h3 className="text-2xl font-bold">Enter your card details to pay</h3>
         <CreditCardForm onSubmit={onOpenBankValidationDialog} />
@@ -364,12 +366,11 @@ function BankValidationContent({
 }
 function AccountDetailsContent({
   onOpenVerifyDialog,
+  totalAmount,
 }: {
   onOpenVerifyDialog: () => void;
+  totalAmount: number;
 }) {
-  const { formData } = useFormContext();
-  const transactionFee = 1.5;
-  const totalAmount = formData.amount + transactionFee;
   const accountNum = "12345678901";
 
   function handleCopyAccount() {
@@ -378,7 +379,7 @@ function AccountDetailsContent({
 
   return (
     <div className={`flex flex-col gap-y-8`}>
-      <TotalPriceHeader />
+      <TotalPriceHeader totalAmount={totalAmount} />
       <div className="flex flex-col gap-5 md:px-12">
         <h3 className="text-lg font-medium text-center">
           Transfer {totalAmount} to the account below
@@ -456,17 +457,13 @@ function VerifyContent({
   );
 }
 
-function TotalPriceHeader() {
-  const { formData } = useFormContext();
-  const transactionFee = 1.5;
-  const totalAmount = formData.amount + transactionFee;
-
+function TotalPriceHeader({ totalAmount }: { totalAmount: number }) {
   return (
     <DialogHeader>
       <div className="flex justify-between items-center">
-        <div>
-          <DialogTitle asChild>
-            <h1 className="text-xl font-bold">NGN {totalAmount}</h1>
+        <div className="text-left">
+          <DialogTitle>
+            <span className="text-2xl font-bold">NGN {totalAmount}</span>
           </DialogTitle>
           <DialogDescription>
             <span className="text-muted">Fund account</span>

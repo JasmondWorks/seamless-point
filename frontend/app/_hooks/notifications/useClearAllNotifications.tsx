@@ -1,4 +1,8 @@
-import { QueryClient, useMutation } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { clearAllNotifications as clearAllNotificationsApi } from "../../_lib/actions";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -6,7 +10,7 @@ import toast from "react-hot-toast";
 export default function useClearAllNotifications() {
   const [isCleared, setIsCleared] = useState(false);
 
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
   const { mutate: clearAllNotifications, isLoading: isClearing } = useMutation({
     mutationFn: clearAllNotificationsApi,
     onSuccess: () => {

@@ -19,11 +19,18 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { useGoogleRedirectLogin } from "@/app/_hooks/useGoogleRedirectLogin";
+import { GoogleLoginButton } from "@/app/_components/GoogleLoginButton";
 
-export default function LoginForm({ userType = "user" }) {
+export default function LoginForm({
+  userType = "user",
+}: {
+  userType: "user" | "admin";
+}) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const { login } = useUserAuth();
+
+  const router = useRouter();
 
   console.log(isLoading);
 
@@ -48,59 +55,59 @@ export default function LoginForm({ userType = "user" }) {
     }
   }
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (response) => {
-      try {
-        const userDetailsResponse = await fetch(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${response.access_token}`,
-            },
-          }
-        );
+  // const googleLogin = useGoogleLogin({
+  //   onSuccess: async (response) => {
+  //     try {
+  //       const userDetailsResponse = await fetch(
+  //         "https://www.googleapis.com/oauth2/v3/userinfo",
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             Authorization: `Bearer ${response.access_token}`,
+  //           },
+  //         }
+  //       );
 
-        console.log(userDetailsResponse);
-        if (userDetailsResponse.ok) {
-          const userInfo = await userDetailsResponse.json();
-          console.log(userInfo); // Logs the user info
+  //       console.log(userDetailsResponse);
+  //       if (userDetailsResponse.ok) {
+  //         const userInfo = await userDetailsResponse.json();
+  //         console.log(userInfo); // Logs the user info
 
-          const userDetails = {
-            email: userInfo.email,
-            firstName: userInfo.given_name,
-            lastName: userInfo.family_name,
-            authType: "google",
-          };
+  //         const userDetails = {
+  //           email: userInfo.email,
+  //           firstName: userInfo.given_name,
+  //           lastName: userInfo.family_name,
+  //           authType: "google",
+  //         };
 
-          let response;
-          if (userType === "user") response = await signinUser(userDetails);
-          else if (userType === "admin")
-            response = await signinAdmin(userDetails);
+  //         let response;
+  //         if (userType === "user") response = await signinUser(userDetails);
+  //         else if (userType === "admin")
+  //           response = await signinAdmin(userDetails);
 
-          if (response?.status === "success") {
-            const { user, token } = response;
-            onLogin(user, token);
-            toast.success(response?.message);
-          } else {
-            toast.error(response?.message);
-          }
+  //         if (response?.status === "success") {
+  //           const { user, token } = response;
+  //           onLogin(user, token);
+  //           toast.success(response?.message);
+  //         } else {
+  //           toast.error(response?.message);
+  //         }
 
-          setIsLoading(false);
-        } else {
-          toast.error("Failed to fetch user info");
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("An unexpected error occurred");
-        }
-      }
-    },
-    scope: "profile email",
-  });
+  //         setIsLoading(false);
+  //       } else {
+  //         toast.error("Failed to fetch user info");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user info:", error);
+  //       if (error instanceof Error) {
+  //         toast.error(error.message);
+  //       } else {
+  //         toast.error("An unexpected error occurred");
+  //       }
+  //     }
+  //   },
+  //   scope: "profile email",
+  // });
 
   async function onSubmit(data: z.infer<typeof baseUserSchema>) {
     console.log(data);
@@ -125,11 +132,13 @@ export default function LoginForm({ userType = "user" }) {
         className="px-10 sm:px-16 py-8 space-y-8"
       >
         <div className="flex gap-4 justify-center flex-wrap lg:flex-nowrap">
-          <Button
+          {/* <Button
             onClick={(e) => {
               e.preventDefault();
-              googleLogin();
+              redirectToGoogleLogin();
+              // googleLogin();
             }}
+            disabled={isGoogleLoginLoading}
             className="text-sm !px-3"
             variant={ButtonVariant.neutralLight}
           >
@@ -166,8 +175,11 @@ export default function LoginForm({ userType = "user" }) {
                 fill="#EA4335"
               />
             </svg>
-            <span>Sign in with Google</span>
-          </Button>
+            <span>
+              {isGoogleLoginLoading ? "Loading..." : "Sign in with Google"}
+            </span>
+          </Button> */}
+          <GoogleLoginButton userType={userType} />
 
           <Button
             onClick={(e) => e.preventDefault()}
@@ -216,7 +228,7 @@ export default function LoginForm({ userType = "user" }) {
             text="Sign in"
             isReversed
             icon={<FaChevronRight />}
-            isLoading={isLoading}
+            disabled={isLoading}
           />
           <p className="mt-5 flex items-center justify-center leading-snug gap-2">
             Don't have an account?{" "}

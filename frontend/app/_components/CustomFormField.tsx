@@ -23,6 +23,7 @@ import DatePicker from "./InputFields/DatePicker";
 import FileInput from "./InputFields/FileInput";
 import SelectBox from "@/app/_components/SelectBox";
 import { StoredFile } from "@/app/_lib/types";
+import BasicDatePicker from "@/app/_components/DatePicker2";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -57,11 +58,6 @@ interface CustomProps {
   selectValue?: string;
   onChange?: (value: string) => void;
   selectedFile?: StoredFile;
-  // addToStore?: (
-  //   file: File,
-  //   fieldName: keyof Pick<newDelivery, "packageImage" | "proofOfPurchase">
-  // ) => void;
-  // fieldName?: string;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
@@ -78,6 +74,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         <div className="flex rounded-md border border-dark-500 bg-dark-400">
           <FormControl>
             <Input
+              disabled={props.disabled}
               placeholder={props.placeholder}
               {...field}
               className="shad-input border-0"
@@ -91,6 +88,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       return (
         <FormControl>
           <Textarea
+            disabled={props.disabled}
             placeholder={props.placeholder}
             {...field}
             className="shad-textArea"
@@ -102,6 +100,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       return (
         <FormControl>
           <PhoneInput
+            disabled={props.disabled}
             defaultCountry="NG"
             placeholder={props.placeholder}
             international
@@ -117,6 +116,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         <FormControl>
           <div className="flex items-center gap-4">
             <Checkbox
+              disabled={props.disabled}
               id={props.name}
               checked={field.value}
               onCheckedChange={field.onChange}
@@ -129,6 +129,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.DATE_PICKER:
       return <DatePicker props={props} field={field} />;
+    // return <BasicDatePicker />;
     case FormFieldType.SELECT:
       return (
         <SelectBox
