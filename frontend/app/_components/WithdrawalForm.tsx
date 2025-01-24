@@ -15,21 +15,19 @@ import toast from "react-hot-toast";
 
 export default function WithdrawalForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { formData, addFormData } = useFormContext();
   const [amount, setAmount] = useState("");
-  console.log(formData);
+  const [selectedDebitCard, setSelectedDebitCard] = useState(null);
   const router = useRouter();
 
-  function handleSetAmount(e) {
+  function handleSetAmount(e: any) {
     setAmount(e.target.value);
-    addFormData({ amount: e.target.value });
   }
 
   function onSubmit() {
-    if (!formData.selectedDebitCard || !formData.amount) {
-      if (!formData.selectedDebitCard)
-        toast.error("Select a debit card to proceed");
-      if (!formData.amount) toast.error("Enter an amount to proceed");
+    // if (!selectedDebitCard || !amount) {
+    if (!amount) {
+      // if (!selectedDebitCard) toast.error("Select a debit card to proceed");
+      if (!amount) toast.error("Enter an amount to proceed");
 
       return;
     }
@@ -48,9 +46,6 @@ export default function WithdrawalForm() {
         <Label htmlFor="withdrawAmount">
           Enter the amount that you wish to withdraw
         </Label>
-        {/* <label htmlFor="withdrawAmount">
-          Enter the amount that you wish to withdraw
-        </label> */}
         <Input
           value={amount}
           onChange={handleSetAmount}
@@ -64,7 +59,7 @@ export default function WithdrawalForm() {
           this account
         </p>
       </div>
-      <SelectDebitCard />
+      {/* <SelectDebitCard /> */}
       <PrivacyPolicyBlock />
       <ButtonFormSubmit onClick={onSubmit} text="I UNDERSTAND" />
 

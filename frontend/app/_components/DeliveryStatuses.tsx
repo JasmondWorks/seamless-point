@@ -1,5 +1,6 @@
 import React from "react";
 import DeliveryStatusItem from "./DeliveryStatusItem";
+import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
 
 const stepsData = [
   {
@@ -24,12 +25,31 @@ const stepsData = [
   },
 ];
 
-export default function DeliveryStatuses() {
+export default function DeliveryStatuses({
+  direction = "responsive",
+}: {
+  direction: string;
+}) {
   return (
-    <div className="flex flex-col overflow-y-hidden">
-      {stepsData.map((step, index) => (
-        <DeliveryStatusItem key={step.id} step={step} index={index} />
-      ))}
+    <div>
+      <div
+        className={`${
+          direction === "responsive" ? "grid grid-rows-4" : "flex"
+        }`}
+      >
+        {stepsData.map((step, index) => (
+          <DeliveryStatusItem
+            direction={direction}
+            key={step.id}
+            step={step}
+            index={index}
+          />
+        ))}
+      </div>
+      <div className="space-y-1 flex flex-col items-start mt-8">
+        <CopyPhoneNumber />
+        <p className="text-sm font-medium">{"Rider's"} number</p>
+      </div>
     </div>
   );
 }

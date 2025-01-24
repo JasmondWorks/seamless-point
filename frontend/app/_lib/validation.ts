@@ -63,51 +63,44 @@ export const changePasswordSchema = z
       });
     }
   });
-export const updateUserSchema = z
-  .object({
-    firstName: z
-      .string({
-        required_error: "Please provide a first name",
-      })
-      .trim()
-      .min(1, "Please provide a first name"),
-    lastName: z
-      .string({
-        required_error: "Please provide a last name",
-      })
-      .trim()
-      .min(1, "Please provide a last name"),
-    phoneNumber: z
-      .string({
-        required_error: "Phone number is required",
-      })
-      .trim()
-      .min(10, { message: "Phone number must be at least 10 digits long" })
-      .regex(/^\+?\d{10,14}$/, {
-        message: "Phone number must be valid and can include a country code",
-      }),
-    password: z
-      .string({
-        required_error: "Please provide a password",
-      })
-      .trim()
-      .min(8, "Password must be at least 8 characters"),
-    confirmPassword: z
-      .string({
-        required_error: "Please confirm your password",
-      })
-      .trim()
-      .min(8, "Password must be at least 8 characters"),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
-      ctx.addIssue({
-        code: "custom", // Specify the type of issue
-        path: ["confirmPassword"], // Target confirmPassword field
-        message: "Passwords do not match!",
-      });
-    }
-  });
+export const updateUserSchema = z.object({
+  firstName: z
+    .string({
+      required_error: "Please provide a first name",
+    })
+    .trim()
+    .min(1, "Please provide a first name"),
+  lastName: z
+    .string({
+      required_error: "Please provide a last name",
+    })
+    .trim()
+    .min(1, "Please provide a last name"),
+  email: z
+    .string({
+      required_error: "Please provide a valid email",
+    })
+    .trim()
+    .email("Please provide a valid email"),
+  dob: z
+    .date({
+      required_error: "Please provide a date of birth",
+    })
+    .refine((value) => value <= new Date(), {
+      message: "Date of birth cannot be in the future",
+    }),
+  gender: z
+    .string({
+      required_error: "Please select a gender",
+    })
+    .refine(
+      (value) => ["male", "female"].includes(value.trim().toLowerCase()),
+      {
+        message: "Gender must be 'Male' or 'Female'",
+      }
+    ),
+});
+
 export const baseUserSchema = z.object({
   ...emailSchema.shape,
   password: z

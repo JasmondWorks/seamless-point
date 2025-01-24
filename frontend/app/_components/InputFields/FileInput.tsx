@@ -53,6 +53,7 @@ const FileInput = ({ props, field }: { props: any; field: any }) => {
         </div>
       </label>
       <input
+        disabled={props.disabled}
         type="file"
         className="hidden"
         id={props.name}

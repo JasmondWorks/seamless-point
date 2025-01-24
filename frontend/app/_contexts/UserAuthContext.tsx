@@ -15,7 +15,7 @@ type User = {
 };
 
 type AuthType = {
-  user: User | null;
+  user: User;
   setUser: (user: User | null) => void;
   isAuthenticating: boolean;
   // authenticated: boolean;
@@ -45,7 +45,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove("token");
     // setAuthenticated(false);
   }
-  function login(user: User | undefined, token: string) {
+  function login(user: User | undefined = undefined, token: string) {
     user && localStorage.setItem(userKey, JSON.stringify(user));
     user && setUser(user);
     Cookies.set("token", token);

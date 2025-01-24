@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 function useDeliveries(page: number, limit: number, sort: string) {
   const {
-    data: deliveriesResponse,
+    data: deliveries,
     isLoading,
     isError,
   } = useQuery({
@@ -15,7 +15,9 @@ function useDeliveries(page: number, limit: number, sort: string) {
     refetchOnReconnect: true,
   });
 
-  return { deliveriesResponse, isLoading, isError };
+  console.log(deliveries);
+
+  return { deliveries, isLoading, isError };
 }
 
 export default useDeliveries;

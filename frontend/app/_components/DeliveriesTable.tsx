@@ -15,6 +15,7 @@ import { useDeliveriesStore } from "@/app/_stores/deliveriesStore";
 import { formatDeliveries, getBadgeStyle } from "@/app/_lib/utils";
 import { EDeliveryStatus } from "@/app/_lib/types";
 import useDeliveries from "@/app/_hooks/deliveries/useDeliveries";
+import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 
 export function DeliveriesTable({
   page,
@@ -28,16 +29,16 @@ export function DeliveriesTable({
   // Data variables
   const { updateDelivery, cancelDelivery } = useDeliveriesStore();
 
-  const { deliveriesResponse, isLoading, isError } = useDeliveries(
-    page,
-    limit,
-    sort
-  );
+  const {
+    deliveries: deliveriesResponse,
+    isLoading,
+    isError,
+  } = useDeliveries(page, limit, sort);
 
   console.log(sort);
 
-  const deliveries = formatDeliveries(deliveriesResponse?.data?.data.delivery);
-  const totalCount = deliveriesResponse?.data?.totalCount;
+  const deliveries = formatDeliveries(deliveriesResponse?.data.delivery);
+  const totalCount = deliveriesResponse?.totalCount;
 
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
@@ -74,12 +75,7 @@ export function DeliveriesTable({
     );
   }
 
-  if (isLoading)
-    return (
-      <div className="justify-center flex py-10">
-        <div className="loader !w-16 !h-16 !border-[3px] !border-b-transparent"></div>
-      </div>
-    );
+  if (isLoading) return <DataFetchSpinner />;
 
   if (isError)
     return (
@@ -90,7 +86,7 @@ export function DeliveriesTable({
 
   if (
     !totalCount
-    // || deliveriesResponse?.data.results === 0
+    // || deliveries?.data.results === 0
   )
     return (
       <h2 className="text-lg font-bold py-10 text-center">
