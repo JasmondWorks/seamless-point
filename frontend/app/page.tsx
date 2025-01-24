@@ -16,14 +16,16 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
-      {/* <ScrollArea className="flex-1 h-full mt-20 md:mt-0"> */}
-      <div className="flex-1 h-full mt-20 md:mt-0">
+      <ScrollArea className="flex-1 h-full mt-20 md:mt-0">
         <section id="home" className="py-32 lg:py-16">
           <div className="container-custom">
             <div className="grid gap-10 gap-y-5 lg:grid-cols-2 items-center">
               <div className="space-y-8">
                 <div className="relative">
-                  <h1 className="headline !text-left">
+                  <h1
+                    style={{ fontSize: "2.85rem" }}
+                    className="headline !text-left"
+                  >
                     Providing <span className="text-brandPry">seamless, </span>
                     simplified and efficient logistics processes
                   </h1>
@@ -1522,7 +1524,7 @@ export default function Home() {
           </div>
         </section>
         <Footer />
-      </div>
+      </ScrollArea>
     </div>
   );
 }

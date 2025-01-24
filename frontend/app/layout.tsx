@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import { Toaster } from "react-hot-toast";
 import { UserAuthProvider } from "@/app/_contexts/UserAuthContext";
@@ -57,11 +56,7 @@ export default function RootLayout({
       <body className={`antialiased overflow-x-hidden no-scrollbar`}>
         <QueryProvider>
           <IsClientCtxProvider>
-            <GoogleOAuthProvider
-              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}
-            >
-              <UserAuthProvider>{children}</UserAuthProvider>
-            </GoogleOAuthProvider>
+            <UserAuthProvider>{children}</UserAuthProvider>
           </IsClientCtxProvider>
         </QueryProvider>
         <Toaster

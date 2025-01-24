@@ -61,7 +61,7 @@ body {
   @apply text-neutral-400;
 }
 .headline {
-  @apply text-3xl font-bold !leading-snug text-center;
+  @apply text-3xl md:text-4xl !leading-tight font-bold text-center;
 }
 
 .section-heading {
@@ -448,10 +448,6 @@ h2.react-datepicker__current-month {
 }
 
 .loader {
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--clr-brand-sec);
-  border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;
   box-sizing: border-box;

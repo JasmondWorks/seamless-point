@@ -1,5 +1,5 @@
 import React from "react";
-import DeliveryStatuses from "../components/DeliveryStatuses";
+import DeliveryStatuses from "../../../_components/DeliveryStatuses";
 // import StepsMarker from "@/app/_components/StepsMarker";
 
 // export function generateStaticParams() {

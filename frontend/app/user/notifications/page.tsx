@@ -18,17 +18,16 @@ export default function Notifications() {
 
   console.log(isCleared);
 
-  const notifications = notificationsResponse?.data?.data?.notifications;
+  const notifications = notificationsResponse?.data?.notifications;
 
   // Detect new unread notifications and call mark as read API
   useEffect(() => {
     if (notifications) {
       setIsCleared(false);
 
-      const unreadNotificationIds =
-        notificationsResponse?.data?.data?.notifications
-          .filter((noti: TNotification) => !noti.isRead)
-          .map((noti: TNotification) => noti._id);
+      const unreadNotificationIds = notificationsResponse?.data?.notifications
+        .filter((noti: TNotification) => !noti.isRead)
+        .map((noti: TNotification) => noti._id);
 
       console.log("unreadNotificationIds", unreadNotificationIds);
 
@@ -70,7 +69,7 @@ export default function Notifications() {
       </div>
       {notificationsResponse?.data?.totalCount !== 0 && (
         <div className={`space-y-5`}>
-          {notificationsResponse?.data?.data?.notifications?.map(
+          {notificationsResponse?.data?.notifications?.map(
             (notification: TNotification) => (
               <Notification
                 key={notification._id}
@@ -80,7 +79,7 @@ export default function Notifications() {
           )}
         </div>
       )}
-      {notificationsResponse?.data?.totalCount === 0 && (
+      {notificationsResponse?.totalCount === 0 && (
         <div className="flex gap-5 flex-col items-center">
           <svg
             className=""
