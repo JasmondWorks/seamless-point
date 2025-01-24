@@ -77,7 +77,7 @@ export default function Navbar({ className = "" }) {
         } `}
       ></div>
       <div
-        className={`h-20 md:h-auto fixed md:static flex flex-wrap md:flex-row items-center justify-between bg-white w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
+        className={`h-20 md:h-auto md:static flex flex-wrap md:flex-row items-center justify-between bg-white w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
           border-b border-neutral-200 transition-shadow duration-300
           ${hasScrolled ? "shadow-md" : ""} ${className}`}
       >
