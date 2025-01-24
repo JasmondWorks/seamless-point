@@ -15,7 +15,6 @@ import SignOutButton from "./SignOutButton";
 import { IoClose, IoWalletOutline } from "react-icons/io5";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
-import { getLocalStorageKey } from "@/app/_lib/utils";
 
 const navLinks = [
   {
@@ -222,7 +221,18 @@ export default function Navbar() {
   const { user } = useUserAuth();
   const { role } = user;
 
-  // console.log(overlayRef.current);
+  const getLinkStyles = (path?: string | null, paths?: string[]) => {
+    return `font-medium lg:px-10 px-3 py-4 lg:py-3  flex items-center gap-3 w-full transition-all duration-300 ease-in-out ${
+      !isNavShowing ? "g:justify-start" : "lg:justify-start px-6"
+    } hover:bg-neutral-200 ${
+      pathname === path ? "text-brandSec pointer-events-none" : ""
+    } 
+    
+    // If an array of pathname if passed in e.g /user/settings or /admin/settings
+    ${paths?.includes(pathname ? "text-brandSec pointer-events-none" : "")}`;
+  };
+  const iconStyles =
+    "w-8 lg:w-6 aspect-square flex items-center justify-center flex-shrink-0";
 
   function handleToggleNav() {
     setIsNavShowing((cur) => !cur);
@@ -254,8 +264,8 @@ export default function Navbar() {
 
       <div
         className={`${
-          isNavShowing ? "w-72" : "w-12"
-        } fixed top-0 h-full pt-24 bg-[#fafafa] z-20 lg:relative lg:pt-32 lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-[width] duration-300 ease-in-out`}
+          isNavShowing ? "w-72" : "w-14"
+        } fixed top-0 h-full bg-[#fafafa] z-20 lg:relative lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-all duration-300 ease-in-out`}
       >
         {/* Rectangle shapes */}
         <div className="hidden lg:block absolute top-0 left-0 -z-10">
@@ -305,7 +315,7 @@ export default function Navbar() {
         </div>
         <button
           onClick={handleToggleNav}
-          className={`text-[1.65rem] flex lg:hidden transition-all duration-300 ease-in-out ${
+          className={`text-3xl flex lg:hidden transition-all duration-300 ease-in-out ${
             !isNavShowing
               ? "justify-center lg:justify-start mx-auto"
               : "ml-auto px-5 lg:justify-start"
@@ -317,7 +327,7 @@ export default function Navbar() {
             <IoClose className="pointer-events-none" />
           )}
         </button>
-        <div className="w-full flex flex-col gap-16 items-center lg:items-start">
+        <div className="w-full flex-1 flex flex-col gap-16 items-center justify-center">
           <nav className="w-full">
             <ul>
               {(role === "user" ? navLinks : adminNavLinks).map((link) => (
@@ -327,19 +337,9 @@ export default function Navbar() {
                       <li>
                         <Link
                           href={link.path}
-                          className={`font-medium lg:px-10 px-3 py-3 flex items-center gap-3 w-full transition-all duration-300 ease-in-out ${
-                            !isNavShowing
-                              ? "justify-center lg:justify-start"
-                              : "lg:justify-start px-8"
-                          } hover:bg-neutral-200 ${
-                            pathname === link.path
-                              ? "text-brandSec pointer-events-none"
-                              : ""
-                          }`}
+                          className={getLinkStyles(link.path)}
                         >
-                          <div className="w-[1.65rem] aspect-square lg:w-5 lg:h-5 flex items-center justify-center flex-shrink-0">
-                            {link.icon}
-                          </div>
+                          <div className={iconStyles}>{link.icon}</div>
                           <span
                             className={`whitespace-nowrap transition-all duration-300 ease-in-out lg:block ${
                               isNavShowing
@@ -364,17 +364,12 @@ export default function Navbar() {
         <div className="lg:mx-0 w-full flex flex-col items-center">
           <Link
             href={role === "user" ? "/user/settings" : "/admin/settings"}
-            className={`w-full items-center font-medium lg:px-10 py-3 flex gap-3 transition-all duration-300 ease-in-out ${
-              !isNavShowing
-                ? "justify-center lg:justify-start"
-                : "lg:justify-start px-8"
-            } hover:bg-neutral-200 ${
-              pathname === "/user/settings" || pathname === "/admin/settings"
-                ? "text-brandSec pointer-events-none"
-                : ""
-            }`}
+            className={getLinkStyles(null, [
+              "/user/settings",
+              "/admin/settings",
+            ])}
           >
-            <div className="w-[1.65rem] aspect-square lg:w-5 lg:h-5 flex items-center justify-center flex-shrink-0 transition-all duration-300 ease-in-out">
+            <div className={iconStyles}>
               <svg
                 className="w-full h-full"
                 width={16}
@@ -409,7 +404,10 @@ export default function Navbar() {
               Settings
             </span>
           </Link>
-          <SignOutButton isNavShowing={isNavShowing} />
+          <SignOutButton
+            styles={{ linkStyles: getLinkStyles(), iconStyles }}
+            isNavShowing={isNavShowing}
+          />
         </div>
       </div>
     </>

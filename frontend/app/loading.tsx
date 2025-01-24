@@ -1,7 +1,7 @@
 import SpinnerFull from "@/app/_components/SpinnerFull";
 
-function loading() {
+function Loader() {
   return <SpinnerFull />;
 }
 
-export default loading;
+export default Loader;

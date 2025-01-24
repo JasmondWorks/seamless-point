@@ -32,14 +32,6 @@ export const formatDateTime = (dateString: Date | string) => {
   return formattedDateTime;
 };
 
-export function encryptKey(passkey: string) {
-  return btoa(passkey);
-}
-
-export function decryptKey(passkey: string) {
-  return atob(passkey);
-}
-
 export function capitalise(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -184,6 +176,65 @@ export function getBadgeStyle(tag: string): BadgeVariant | null {
       return null;
   }
 }
+
+// export function getPackageSenderDetails(package) {
+//   return {
+//     firstName: package.firstName,
+//     lastName: package.lastName,
+//     street: package.street,
+//     aptUnit: package.aptUnit,
+//     country: package.country,
+//     state: package.state,
+//     city: package.city,
+//     postCode: package.postCode,
+//     email: package.email,
+//     phoneNumber: package.phoneNumber
+//   }
+// }
+export function getPackageSenderReceiver(
+  packageData: any,
+  prefix: string = ""
+) {
+  const fields = [
+    "firstName",
+    "lastName",
+    "street",
+    "aptUnit",
+    "country",
+    "state",
+    "city",
+    "postCode",
+    "email",
+    "phoneNumber",
+  ];
+
+  const details: { [key: string]: any } = {};
+
+  fields.forEach((field) => {
+    const key = prefix
+      ? `${prefix}${field.charAt(0).toUpperCase()}${field.slice(1)}`
+      : field; // Add prefix for receiver fields, use camelCase for sender fields
+
+    details[key] = packageData[key]; // Use the constructed key for both access and assignment
+  });
+
+  return details;
+}
+
+export function getParcelDetails(packageData: any) {
+  return {
+    parcelItems: packageData.parcelItems,
+    packagingType: packageData.packagingType,
+    currency: packageData.currency,
+    // proofOfPurchase: package.proofOfPurchase,
+  };
+}
+console.log("Selected code is empty, no modifications can be made.");
+console.log("Entire code file has been analyzed for potential log additions.");
+console.log("No specific logs were requested, default logs will be added.");
+console.log("Please note that excessive logging can impact performance.");
+console.log("Logs will be added at the beginning of each function.");
+console.log("Example log: 'Function [functionName] has been called.'");
 
 export function getParcelTotalAmount(parcelDetails: any) {
   return parcelDetails?.parcelItems.reduce(

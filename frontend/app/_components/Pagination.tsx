@@ -1,5 +1,5 @@
 import { Button } from "@/app/_components/ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
 type PaginationProps = {
@@ -11,14 +11,16 @@ type PaginationProps = {
 export function Pagination({ totalPages, onPageChange }: PaginationProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
+  console.log(pathname);
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   function handleGoToPreviousPage() {
-    router.push(`/user/deliveries?page=${currentPage - 1}`);
+    router.push(`${pathname}?page=${currentPage - 1}`);
   }
   function handleGoToNextPage() {
-    router.push(`/user/deliveries?page=${currentPage + 1}`);
+    router.push(`${pathname}?page=${currentPage + 1}`);
   }
 
   return (

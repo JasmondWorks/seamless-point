@@ -44,7 +44,6 @@ export default function SelectDebitCard() {
     //   id: "be8fec82-6f71-49ee-869f-818b2c5bd361",
     // },
   ]);
-  const { setFormData, formData, addFormData } = useFormContext();
   const [selectedDebitCard, setSelectedDebitCard] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDialogContent, setSelectedDialogContent] = useState("");
@@ -53,7 +52,6 @@ export default function SelectDebitCard() {
 
   useEffect(() => {
     setFormData({
-      ...formData,
       onAddDebitCard: handleAddDebitCard,
       onRemoveDebitCard: handleRemoveDebitCard,
       onSelectDebitCard: handleSelectDebitCard,

@@ -30,6 +30,7 @@ export default function SelectBox({ field, props, onChange }: Props) {
 
   return (
     <Select
+      disabled={props.disabled}
       value={props.selectValue || field.value}
       onValueChange={(value) => {
         // field.onChange(value); // update field value

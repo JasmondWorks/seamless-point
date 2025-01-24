@@ -80,7 +80,6 @@ export const getShipmentsColumns = (): ColumnDef<Shipment>[] => {
             <Badge variant={variant} className="capitalize">
               {status}
             </Badge>
-            ;
           </div>
         );
       },
