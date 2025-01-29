@@ -36,7 +36,8 @@ export default function ForgotPassword() {
 
     if (res.status === "success") {
       toast.success(
-        "A link has been sent to your email.\nClick on it to reset your password"
+        // "A link has been sent to your email.\nClick on it to reset your password"
+        res.message
       );
       form.reset();
     } else {
