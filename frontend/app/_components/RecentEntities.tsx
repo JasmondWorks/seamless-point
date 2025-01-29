@@ -127,7 +127,7 @@ export default function RecentEntities({
   data: { deliveriesResponse, customersResponse },
 }: any) {
   return (
-    <div className="grid lg:grid-cols-3 gap-5">
+    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
       <RecentEntityData
         data={customersResponse?.data?.data?.users}
         entity="customers"

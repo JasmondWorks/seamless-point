@@ -73,7 +73,10 @@ export default function Customers({
             <TableBody>
               {customers.data.users.map((user: any) => (
                 <TableRow key={user._id}>
-                  <TableCell className="h-12">{user.firstName}</TableCell>
+                  <TableCell className="h-12">
+                    {user.firstName} {user.lastName}
+                    {(!user.firstName && !user.lastName) && "N/A"}
+                  </TableCell>
                   <TableCell className="h-12">{user.email}</TableCell>
                   <TableCell className="h-12">{user.phone || "N/A"}</TableCell>
                 </TableRow>
