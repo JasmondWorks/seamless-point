@@ -25,9 +25,16 @@
   height: 0;
 }
 
-*::-webkit-scrollbar {
+html,
+body {
+  overscroll-behavior: contain;
+}
+
+::-webkit-scrollbar {
   width: 0;
   height: 0;
+  display: none;
+  scrollbar-width: none;
 }
 html {
   scroll-behavior: smooth !important;
