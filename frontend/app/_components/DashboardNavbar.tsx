@@ -268,7 +268,7 @@ export default function Navbar() {
         } absolute lg:static h-full bg-[#fafafa] z-20 lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-all duration-300 ease-in-out`}
       >
         {/* Rectangle shapes */}
-        <div className="hidden lg:block absolute top-0 left-0 -z-10">
+        <div className="hidden  absolute top-0 left-0 -z-10">
           <svg
             width="156"
             height="169"
@@ -295,7 +295,7 @@ export default function Navbar() {
           </svg>
         </div>
         {/* Triangle shapes */}
-        <div className="hidden lg:block absolute bottom-0 right-0 -z-10">
+        <div className="hidden  absolute bottom-0 right-0 -z-10">
           <svg
             width="111"
             height="213"
