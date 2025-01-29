@@ -27,9 +27,7 @@ export default function AdminAuthLayout({
     !user && (
       <div className="flex flex-col h-screen">
         <Navbar />
-        <ScrollArea className="flex-1 h-full mt-20 md:mt-0">
-          {children}
-        </ScrollArea>
+        <ScrollArea className="flex-1 h-full">{children}</ScrollArea>
       </div>
     )
   );
