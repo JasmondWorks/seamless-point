@@ -34,6 +34,8 @@ export default function Navbar({ className = "" }) {
 
   const pathname = usePathname();
 
+  console.log(pathname);
+
   useEffect(() => {
     const handleScroll = () => {
       setHasScrolled(window.scrollY > 10);
@@ -77,7 +79,9 @@ export default function Navbar({ className = "" }) {
         } `}
       ></div>
       <div
-        className={`h-20 md:h-auto md:static flex flex-wrap md:flex-row items-center justify-between bg-white w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
+        className={`h-20 md:h-auto md:static flex flex-wrap md:flex-row items-center justify-between ${
+          pathname.includes("forgot-password") ? "bg-[#f0f9ff]" : "bg-white"
+        } w-full z-50 gap-x-12 md:gap-20 px-0 md:px-5 md:py-2
           border-b border-neutral-200 transition-shadow duration-300
           ${hasScrolled ? "shadow-md" : ""} ${className}`}
       >
@@ -125,7 +129,9 @@ export default function Navbar({ className = "" }) {
         {/* Nav Menu */}
         {!user && (
           <div
-            className={`bg-white flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            className={`${
+              pathname.includes("forgot-password") ? "bg-[#f0f9ff]" : "bg-white"
+            } flex flex-col md:flex-row md:items-center flex-1 gap-y-5 px-5 md:px-0 border-b md:border-b-0 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
               isNavShowing
                 ? "max-h-[800px] opacity-100 pb-4 md:pb-0 translate-y-0"
                 : "max-h-0 md:max-h-none md:opacity-100 opacity-0 -translate-y-4 md:-translate-y-0"
