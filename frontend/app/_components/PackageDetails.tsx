@@ -15,7 +15,7 @@ export default function PackageDetails({
   console.log(parcel);
 
   const dispatch = dispatches.find(
-    (d) => d.name.toLowerCase() === delivery.courier
+    (d) => d.name.toLowerCase() === delivery?.courier
   )?.name;
 
   console.log(dispatch);
@@ -152,7 +152,7 @@ export default function PackageDetails({
             <p className="text-muted">
               {
                 dispatches.find(
-                  (d) => d.name.toLowerCase() === delivery.courier
+                  (d) => d.name.toLowerCase() === delivery?.courier
                 )?.name
               }
             </p>
@@ -160,7 +160,7 @@ export default function PackageDetails({
           <div className="space-y-1">
             <p className="font-bold">Approved by</p>
             <p className="text-muted">
-              {delivery.deliveryStatus === "pending"
+              {delivery?.deliveryStatus === "pending"
                 ? "Not approved yet"
                 : delivery?.approvedBy}
             </p>

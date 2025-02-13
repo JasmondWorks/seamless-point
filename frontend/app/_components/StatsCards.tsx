@@ -9,7 +9,7 @@ import React from "react";
 let initialStats = [
   { name: "today's sales", percentDiff: -34 },
   { name: "total sales", percentDiff: 28, isPrice: true },
-  { name: "total orders", percentDiff: 22 },
+  { name: "total shipments", percentDiff: 22 },
   { name: "total customers", percentDiff: -16 },
 ];
 

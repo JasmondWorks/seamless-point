@@ -6,7 +6,7 @@ import { getUser } from "@/app/_lib/actions";
 export default async function UserDetails() {
   const res = await getUser();
 
-  console.log(res.user)
+  console.log(res.user);
 
   return (
     <>

@@ -339,12 +339,12 @@ function AddParcelItemDialogContent({
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="document" id="document" />
-                <Label htmlFor="document">Document</Label>
-              </div>
-              <div className="flex items-center space-x-2">
                 <RadioGroupItem value="item" id="item" />
                 <Label htmlFor="item">Item</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="document" id="document" />
+                <Label htmlFor="document">Document</Label>
               </div>
             </RadioGroup>
           </DialogDescription>
