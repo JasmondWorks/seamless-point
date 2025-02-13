@@ -10,7 +10,7 @@ import { FaApple, FaChevronRight } from "react-icons/fa";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { baseUserSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
-import { loginUser } from "@/app/_lib/actions";
+import { loginAdmin, loginUser } from "@/app/_lib/actions";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -56,9 +56,13 @@ export default function LoginForm({
 
   async function onSubmit(data: z.infer<typeof baseUserSchema>) {
     console.log(data);
+    console.log(userType);
+
+    // const loginFn = userType === "user" ? loginUser(data) : loginAdmin(data);
 
     setIsLoading(true);
-    const response = await loginUser(data);
+    const response =
+      userType === "user" ? await loginUser(data) : await loginAdmin(data);
 
     if (response.status === "success") {
       const { user, token } = response;
