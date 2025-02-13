@@ -27,6 +27,408 @@ export default function SelectDeliveryType() {
   return (
     <div className="gap-10 grid md:grid-cols-2 justify-center">
       <button
+        onClick={() => handleSetDeliveryType(DeliveryType.REGULAR)}
+        className="flex flex-col gap-3 justify-center items-center w-fit"
+      >
+        <div className="card flex-1 bg-white flex flex-col">
+          <div className="flex-1 grid place-items-center px-5 py-10">
+            <svg
+              className="max-w-full h-auto"
+              width={300}
+              height={300}
+              viewBox="0 0 300 300"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M76.1565 117.107V126.386M76.1565 126.386H57.5979M76.1565 126.386H94.7148M66.8772 126.386H85.4358M66.8772 126.386V135.665M66.8772 126.386H51.2715M85.4358 126.386V135.665M85.4358 126.386H91.8687M85.4358 135.665H66.8772M85.4358 135.665H98.8281M66.8772 135.665H57.5979H76.1565M81.4296 144.945H76.1565M76.1565 144.945V135.665M76.1565 144.945H61.1076M76.1565 135.665H94.7148M226.943 114.621V123.901M226.943 123.901H208.385M226.943 123.901H245.502M236.223 123.901H217.664V133.18H236.223M236.223 123.901V133.18M236.223 123.901H242.656M236.223 133.18H249.615M199.873 86.4609H215.479V95.7402H206.2"
+                stroke="#8DB5C6"
+                strokeWidth={2}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M70.0398 157.199H86.2398V163.799H70.0398V157.199Z"
+                fill="#6D95A5"
+              />
+              <path
+                d="M70.0398 157.199H86.2398V163.799H70.0398V157.199Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M114.783 175.35C121.41 175.35 126.783 169.977 126.783 163.35C126.783 156.722 121.41 151.35 114.783 151.35C108.155 151.35 102.783 156.722 102.783 163.35C102.783 169.977 108.155 175.35 114.783 175.35Z"
+                fill="#0DACED"
+              />
+              <path
+                opacity="0.74"
+                d="M110.383 163.35C110.383 158.051 113.819 153.557 118.583 151.968C117.357 151.558 116.074 151.349 114.782 151.35C108.155 151.35 102.782 156.722 102.782 163.35C102.782 169.977 108.155 175.35 114.782 175.35C116.111 175.35 117.388 175.13 118.583 174.732C113.819 173.142 110.383 168.649 110.383 163.35Z"
+                fill="#0DACED"
+              />
+              <path
+                d="M114.783 175.35C121.41 175.35 126.783 169.977 126.783 163.35C126.783 156.722 121.41 151.35 114.783 151.35C108.155 151.35 102.783 156.722 102.783 163.35C102.783 169.977 108.155 175.35 114.783 175.35Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M114.783 149.75V123.9"
+                stroke="#313030"
+                strokeWidth={5}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M133.85 131.026H95.7156L101.163 103.787H128.402L133.85 131.026Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M133.85 131.026H95.7156L101.163 103.787H128.402L133.85 131.026Z"
+                fill="#F7F2F0"
+              />
+              <path
+                d="M101.163 103.787L95.7156 131.026H109.575L112.593 103.787H101.163Z"
+                fill="#DBDBDB"
+              />
+              <path
+                d="M133.85 131.026H95.7156L101.163 103.787H128.402L133.85 131.026Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M123.85 131.025V138.5"
+                stroke="#313030"
+                strokeWidth={4}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M123.85 143.225C125.155 143.225 126.212 142.167 126.212 140.862C126.212 139.558 125.155 138.5 123.85 138.5C122.545 138.5 121.487 139.558 121.487 140.862C121.487 142.167 122.545 143.225 123.85 143.225Z"
+                stroke="#313030"
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M123.85 143.225C125.155 143.225 126.212 142.167 126.212 140.862C126.212 139.558 125.155 138.5 123.85 138.5C122.545 138.5 121.487 139.558 121.487 140.862C121.487 142.167 122.545 143.225 123.85 143.225Z"
+                fill="#313030"
+              />
+              <path
+                d="M65.4498 211.801H75.0498V217.801H65.4498V211.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M65.4498 211.801H75.0498V217.801H65.4498V211.801Z"
+                fill="#313030"
+              />
+              <path
+                d="M114.35 211.801H123.95V217.801H114.35V211.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M114.35 211.801H123.95V217.801H114.35V211.801Z"
+                fill="#313030"
+              />
+              <path
+                d="M164.148 185.4V146.1C164.148 137.484 171.132 130.5 179.748 130.5H208.052C216.668 130.5 223.652 137.484 223.652 146.1V185.4H164.148Z"
+                fill="#FF9057"
+              />
+              <path
+                opacity="0.6"
+                d="M208.052 130.801H179.748C171.132 130.801 164.148 137.785 164.148 146.401V150.051C164.148 141.435 171.132 134.451 179.748 134.451H208.052C216.668 134.451 223.652 141.435 223.652 150.051V146.401C223.652 137.785 216.668 130.801 208.052 130.801Z"
+                fill="#FF9057"
+              />
+              <path
+                d="M164.148 185.4V146.1C164.148 137.484 171.132 130.5 179.748 130.5H208.052C216.668 130.5 223.652 137.484 223.652 146.1V185.4H164.148Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M58.2501 187.801H131.45V211.801H58.2501V187.801Z"
+                fill="#7C5A49"
+              />
+              <path
+                opacity="0.24"
+                d="M84.9498 199.801H102.783V202.551H84.9498V199.801Z"
+                stroke="#7C5A49"
+                strokeWidth={10}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                opacity="0.54"
+                d="M58.2501 187.975H131.45V190.875H58.2501V187.975Z"
+                fill="#7C5A49"
+              />
+              <path
+                opacity="0.24"
+                d="M58.2501 208.85H131.45V211.75H58.2501V208.85Z"
+                fill="#7C5A49"
+              />
+              <path
+                d="M58.2501 187.801H131.45V211.801H58.2501V187.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M58.2501 163.801H131.45V187.801H58.2501V163.801Z"
+                fill="#7C5A49"
+              />
+              <path
+                opacity="0.24"
+                d="M84.9498 175.801H102.783V178.551H84.9498V175.801Z"
+                stroke="#7C5A49"
+                strokeWidth={10}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                opacity="0.24"
+                d="M58.2501 184.801H131.45V187.701H58.2501V184.801Z"
+                fill="#7C5A49"
+              />
+              <path
+                opacity="0.54"
+                d="M58.2501 163.801H131.45V166.701H58.2501V163.801Z"
+                fill="#7C5A49"
+              />
+              <path
+                d="M58.2501 163.801H131.45V187.801H58.2501V163.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M237.1 211.975H220.9V168.775C220.9 166.124 223.049 163.975 225.7 163.975H232.3C234.951 163.975 237.1 166.124 237.1 168.775V211.975Z"
+                fill="#FF9057"
+              />
+              <path
+                opacity="0.6"
+                d="M232.3 163.801H225.7C223.049 163.801 220.9 165.95 220.9 168.601V171.601C220.9 168.95 223.049 166.801 225.7 166.801H232.3C234.951 166.801 237.1 168.95 237.1 171.601V168.601C237.1 165.95 234.951 163.801 232.3 163.801Z"
+                fill="#FF9057"
+              />
+              <path
+                d="M237.1 211.801H220.9V168.601C220.9 165.95 223.049 163.801 225.7 163.801H232.3C234.951 163.801 237.1 165.95 237.1 168.601V211.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M217.089 77.8789V113.879H167.889V77.8789H217.089Z"
+                fill="white"
+              />
+              <path
+                d="M217.089 77.8789V113.879H167.889V77.8789H217.089Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M172.689 82.6797H212.289V109.08H172.689V82.6797Z"
+                fill="#C6C6C6"
+              />
+              <path
+                d="M172.689 82.6797H212.289V109.08H172.689V82.6797Z"
+                stroke="#313030"
+                strokeWidth={2}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M179.809 103.786L186.094 92.9004L192.379 103.786H179.809Z"
+                fill="#313030"
+              />
+              <path
+                d="M179.809 103.786L186.094 92.9004L192.379 103.786H179.809Z"
+                stroke="#313030"
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M186.094 103.786L193.418 91.0996L200.743 103.786H186.094Z"
+                fill="#0DACED"
+              />
+              <path
+                d="M186.094 103.786L193.418 91.0996L200.743 103.786H186.094Z"
+                stroke="#313030"
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M203.543 92.9006C205.089 92.9006 206.343 91.647 206.343 90.1007C206.343 88.5543 205.089 87.3008 203.543 87.3008C201.996 87.3008 200.743 88.5543 200.743 90.1007C200.743 91.647 201.996 92.9006 203.543 92.9006Z"
+                fill="#FF9057"
+              />
+              <path
+                d="M203.543 92.9006C205.089 92.9006 206.343 91.647 206.343 90.1007C206.343 88.5543 205.089 87.3008 203.543 87.3008C201.996 87.3008 200.743 88.5543 200.743 90.1007C200.743 91.647 201.996 92.9006 203.543 92.9006Z"
+                stroke="#313030"
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M176.546 77.8783L192.152 67.1992L207.752 77.8723"
+                stroke="#313030"
+                strokeWidth={2}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M102.783 175.801H84.9498M84.9498 199.801H102.783"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M220.9 211.801H230.5V217.801H220.9V211.801Z"
+                fill="#313030"
+              />
+              <path
+                d="M220.9 211.801H230.5V217.801H220.9V211.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M157.225 211.801H166.825V217.801H157.225V211.801Z"
+                fill="#313030"
+              />
+              <path
+                d="M157.225 211.801H166.825V217.801H157.225V211.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M166.825 211.801H150.625V168.601C150.625 165.95 152.774 163.801 155.425 163.801H162.025C164.676 163.801 166.825 165.95 166.825 168.601V211.801Z"
+                fill="#FF9057"
+              />
+              <path
+                opacity="0.6"
+                d="M162.025 163.801H155.425C152.774 163.801 150.625 165.95 150.625 168.601V171.601C150.625 168.95 152.774 166.801 155.425 166.801H162.025C164.676 166.801 166.825 168.95 166.825 171.601V168.601C166.825 165.95 164.676 163.801 162.025 163.801Z"
+                fill="#FF9057"
+              />
+              <path
+                d="M166.825 211.801H150.625V168.601C150.625 165.95 152.774 163.801 155.425 163.801H162.025C164.676 163.801 166.825 165.95 166.825 168.601V211.801Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M166.9 198.901V184.376C166.9 181.297 169.396 178.801 172.475 178.801H215.325C218.404 178.801 220.9 181.297 220.9 184.376V198.901H166.9Z"
+                fill="#FF9057"
+              />
+              <path
+                opacity="0.6"
+                d="M215.325 178.801H172.475C169.396 178.801 166.9 181.297 166.9 184.376V187.976C166.9 184.897 169.396 182.401 172.475 182.401H215.325C218.404 182.401 220.9 184.897 220.9 187.976V184.376C220.9 181.297 218.404 178.801 215.325 178.801Z"
+                fill="#FF9057"
+              />
+              <path
+                d="M166.9 198.901V184.376C166.9 181.297 169.396 178.801 172.475 178.801H215.325C218.404 178.801 220.9 181.297 220.9 184.376V198.901H166.9Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path d="M220.9 198.9V210.3H166.9V198.9H220.9Z" fill="#FF9057" />
+              <path d="M220.9 198.9V210.3H166.9V198.9H220.9Z" fill="#FF9057" />
+              <path d="M220.9 198.9V202.5H166.9V198.9H220.9Z" fill="#F2844C" />
+              <path
+                d="M220.9 198.9V210.3H166.9V198.9H220.9Z"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                opacity="0.69"
+                d="M194.025 157.95C195.848 157.95 197.325 156.472 197.325 154.65C197.325 152.827 195.848 151.35 194.025 151.35C192.202 151.35 190.725 152.827 190.725 154.65C190.725 156.472 192.202 157.95 194.025 157.95Z"
+                fill="white"
+              />
+              <path
+                d="M194.025 157.95C195.848 157.95 197.325 156.472 197.325 154.65C197.325 152.827 195.848 151.35 194.025 151.35C192.202 151.35 190.725 152.827 190.725 154.65C190.725 156.472 192.202 157.95 194.025 157.95Z"
+                stroke="#313030"
+                strokeWidth={2}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M49.95 217.801H244.225M126.992 232.374H150.75M116.555 232.374H121.745M249.615 217.801H253.725"
+                stroke="#313030"
+                strokeWidth={3}
+                strokeMiterlimit={10}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M124.463 140.15C124.801 140.15 125.075 139.915 125.075 139.625C125.075 139.335 124.801 139.1 124.463 139.1C124.124 139.1 123.85 139.335 123.85 139.625C123.85 139.915 124.124 140.15 124.463 140.15Z"
+                fill="#DBDBDB"
+              />
+            </svg>
+          </div>
+          <div className="mx-5">
+            <hr />
+          </div>
+          <div className="p-3 border-t border-neutral-100">
+            <span className="text-lg font-bold text-neutral-600">
+              Regular items{" "}
+            </span>{" "}
+          </div>
+        </div>
+        <span className="text-muted">Furniture, etc.</span>
+      </button>
+      <button
         onClick={() => handleSetDeliveryType(DeliveryType.FOOD)}
         className="flex flex-col gap-3 justify-center items-center w-fit"
       >
@@ -922,409 +1324,6 @@ export default function SelectDeliveryType() {
           </div>
         </div>
         <span className="text-muted">Food stuff, drinks and meat, etc.</span>
-      </button>
-
-      <button
-        onClick={() => handleSetDeliveryType(DeliveryType.REGULAR)}
-        className="flex flex-col gap-3 justify-center items-center w-fit"
-      >
-        <div className="card flex-1 bg-white flex flex-col">
-          <div className="flex-1 grid place-items-center px-5 py-10">
-            <svg
-              className="max-w-full h-auto"
-              width={300}
-              height={300}
-              viewBox="0 0 300 300"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M76.1565 117.107V126.386M76.1565 126.386H57.5979M76.1565 126.386H94.7148M66.8772 126.386H85.4358M66.8772 126.386V135.665M66.8772 126.386H51.2715M85.4358 126.386V135.665M85.4358 126.386H91.8687M85.4358 135.665H66.8772M85.4358 135.665H98.8281M66.8772 135.665H57.5979H76.1565M81.4296 144.945H76.1565M76.1565 144.945V135.665M76.1565 144.945H61.1076M76.1565 135.665H94.7148M226.943 114.621V123.901M226.943 123.901H208.385M226.943 123.901H245.502M236.223 123.901H217.664V133.18H236.223M236.223 123.901V133.18M236.223 123.901H242.656M236.223 133.18H249.615M199.873 86.4609H215.479V95.7402H206.2"
-                stroke="#8DB5C6"
-                strokeWidth={2}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M70.0398 157.199H86.2398V163.799H70.0398V157.199Z"
-                fill="#6D95A5"
-              />
-              <path
-                d="M70.0398 157.199H86.2398V163.799H70.0398V157.199Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M114.783 175.35C121.41 175.35 126.783 169.977 126.783 163.35C126.783 156.722 121.41 151.35 114.783 151.35C108.155 151.35 102.783 156.722 102.783 163.35C102.783 169.977 108.155 175.35 114.783 175.35Z"
-                fill="#0DACED"
-              />
-              <path
-                opacity="0.74"
-                d="M110.383 163.35C110.383 158.051 113.819 153.557 118.583 151.968C117.357 151.558 116.074 151.349 114.782 151.35C108.155 151.35 102.782 156.722 102.782 163.35C102.782 169.977 108.155 175.35 114.782 175.35C116.111 175.35 117.388 175.13 118.583 174.732C113.819 173.142 110.383 168.649 110.383 163.35Z"
-                fill="#0DACED"
-              />
-              <path
-                d="M114.783 175.35C121.41 175.35 126.783 169.977 126.783 163.35C126.783 156.722 121.41 151.35 114.783 151.35C108.155 151.35 102.783 156.722 102.783 163.35C102.783 169.977 108.155 175.35 114.783 175.35Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M114.783 149.75V123.9"
-                stroke="#313030"
-                strokeWidth={5}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M133.85 131.026H95.7156L101.163 103.787H128.402L133.85 131.026Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M133.85 131.026H95.7156L101.163 103.787H128.402L133.85 131.026Z"
-                fill="#F7F2F0"
-              />
-              <path
-                d="M101.163 103.787L95.7156 131.026H109.575L112.593 103.787H101.163Z"
-                fill="#DBDBDB"
-              />
-              <path
-                d="M133.85 131.026H95.7156L101.163 103.787H128.402L133.85 131.026Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M123.85 131.025V138.5"
-                stroke="#313030"
-                strokeWidth={4}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M123.85 143.225C125.155 143.225 126.212 142.167 126.212 140.862C126.212 139.558 125.155 138.5 123.85 138.5C122.545 138.5 121.487 139.558 121.487 140.862C121.487 142.167 122.545 143.225 123.85 143.225Z"
-                stroke="#313030"
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M123.85 143.225C125.155 143.225 126.212 142.167 126.212 140.862C126.212 139.558 125.155 138.5 123.85 138.5C122.545 138.5 121.487 139.558 121.487 140.862C121.487 142.167 122.545 143.225 123.85 143.225Z"
-                fill="#313030"
-              />
-              <path
-                d="M65.4498 211.801H75.0498V217.801H65.4498V211.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M65.4498 211.801H75.0498V217.801H65.4498V211.801Z"
-                fill="#313030"
-              />
-              <path
-                d="M114.35 211.801H123.95V217.801H114.35V211.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M114.35 211.801H123.95V217.801H114.35V211.801Z"
-                fill="#313030"
-              />
-              <path
-                d="M164.148 185.4V146.1C164.148 137.484 171.132 130.5 179.748 130.5H208.052C216.668 130.5 223.652 137.484 223.652 146.1V185.4H164.148Z"
-                fill="#FF9057"
-              />
-              <path
-                opacity="0.6"
-                d="M208.052 130.801H179.748C171.132 130.801 164.148 137.785 164.148 146.401V150.051C164.148 141.435 171.132 134.451 179.748 134.451H208.052C216.668 134.451 223.652 141.435 223.652 150.051V146.401C223.652 137.785 216.668 130.801 208.052 130.801Z"
-                fill="#FF9057"
-              />
-              <path
-                d="M164.148 185.4V146.1C164.148 137.484 171.132 130.5 179.748 130.5H208.052C216.668 130.5 223.652 137.484 223.652 146.1V185.4H164.148Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M58.2501 187.801H131.45V211.801H58.2501V187.801Z"
-                fill="#7C5A49"
-              />
-              <path
-                opacity="0.24"
-                d="M84.9498 199.801H102.783V202.551H84.9498V199.801Z"
-                stroke="#7C5A49"
-                strokeWidth={10}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                opacity="0.54"
-                d="M58.2501 187.975H131.45V190.875H58.2501V187.975Z"
-                fill="#7C5A49"
-              />
-              <path
-                opacity="0.24"
-                d="M58.2501 208.85H131.45V211.75H58.2501V208.85Z"
-                fill="#7C5A49"
-              />
-              <path
-                d="M58.2501 187.801H131.45V211.801H58.2501V187.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M58.2501 163.801H131.45V187.801H58.2501V163.801Z"
-                fill="#7C5A49"
-              />
-              <path
-                opacity="0.24"
-                d="M84.9498 175.801H102.783V178.551H84.9498V175.801Z"
-                stroke="#7C5A49"
-                strokeWidth={10}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                opacity="0.24"
-                d="M58.2501 184.801H131.45V187.701H58.2501V184.801Z"
-                fill="#7C5A49"
-              />
-              <path
-                opacity="0.54"
-                d="M58.2501 163.801H131.45V166.701H58.2501V163.801Z"
-                fill="#7C5A49"
-              />
-              <path
-                d="M58.2501 163.801H131.45V187.801H58.2501V163.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M237.1 211.975H220.9V168.775C220.9 166.124 223.049 163.975 225.7 163.975H232.3C234.951 163.975 237.1 166.124 237.1 168.775V211.975Z"
-                fill="#FF9057"
-              />
-              <path
-                opacity="0.6"
-                d="M232.3 163.801H225.7C223.049 163.801 220.9 165.95 220.9 168.601V171.601C220.9 168.95 223.049 166.801 225.7 166.801H232.3C234.951 166.801 237.1 168.95 237.1 171.601V168.601C237.1 165.95 234.951 163.801 232.3 163.801Z"
-                fill="#FF9057"
-              />
-              <path
-                d="M237.1 211.801H220.9V168.601C220.9 165.95 223.049 163.801 225.7 163.801H232.3C234.951 163.801 237.1 165.95 237.1 168.601V211.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M217.089 77.8789V113.879H167.889V77.8789H217.089Z"
-                fill="white"
-              />
-              <path
-                d="M217.089 77.8789V113.879H167.889V77.8789H217.089Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M172.689 82.6797H212.289V109.08H172.689V82.6797Z"
-                fill="#C6C6C6"
-              />
-              <path
-                d="M172.689 82.6797H212.289V109.08H172.689V82.6797Z"
-                stroke="#313030"
-                strokeWidth={2}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M179.809 103.786L186.094 92.9004L192.379 103.786H179.809Z"
-                fill="#313030"
-              />
-              <path
-                d="M179.809 103.786L186.094 92.9004L192.379 103.786H179.809Z"
-                stroke="#313030"
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M186.094 103.786L193.418 91.0996L200.743 103.786H186.094Z"
-                fill="#0DACED"
-              />
-              <path
-                d="M186.094 103.786L193.418 91.0996L200.743 103.786H186.094Z"
-                stroke="#313030"
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M203.543 92.9006C205.089 92.9006 206.343 91.647 206.343 90.1007C206.343 88.5543 205.089 87.3008 203.543 87.3008C201.996 87.3008 200.743 88.5543 200.743 90.1007C200.743 91.647 201.996 92.9006 203.543 92.9006Z"
-                fill="#FF9057"
-              />
-              <path
-                d="M203.543 92.9006C205.089 92.9006 206.343 91.647 206.343 90.1007C206.343 88.5543 205.089 87.3008 203.543 87.3008C201.996 87.3008 200.743 88.5543 200.743 90.1007C200.743 91.647 201.996 92.9006 203.543 92.9006Z"
-                stroke="#313030"
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M176.546 77.8783L192.152 67.1992L207.752 77.8723"
-                stroke="#313030"
-                strokeWidth={2}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M102.783 175.801H84.9498M84.9498 199.801H102.783"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M220.9 211.801H230.5V217.801H220.9V211.801Z"
-                fill="#313030"
-              />
-              <path
-                d="M220.9 211.801H230.5V217.801H220.9V211.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M157.225 211.801H166.825V217.801H157.225V211.801Z"
-                fill="#313030"
-              />
-              <path
-                d="M157.225 211.801H166.825V217.801H157.225V211.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M166.825 211.801H150.625V168.601C150.625 165.95 152.774 163.801 155.425 163.801H162.025C164.676 163.801 166.825 165.95 166.825 168.601V211.801Z"
-                fill="#FF9057"
-              />
-              <path
-                opacity="0.6"
-                d="M162.025 163.801H155.425C152.774 163.801 150.625 165.95 150.625 168.601V171.601C150.625 168.95 152.774 166.801 155.425 166.801H162.025C164.676 166.801 166.825 168.95 166.825 171.601V168.601C166.825 165.95 164.676 163.801 162.025 163.801Z"
-                fill="#FF9057"
-              />
-              <path
-                d="M166.825 211.801H150.625V168.601C150.625 165.95 152.774 163.801 155.425 163.801H162.025C164.676 163.801 166.825 165.95 166.825 168.601V211.801Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M166.9 198.901V184.376C166.9 181.297 169.396 178.801 172.475 178.801H215.325C218.404 178.801 220.9 181.297 220.9 184.376V198.901H166.9Z"
-                fill="#FF9057"
-              />
-              <path
-                opacity="0.6"
-                d="M215.325 178.801H172.475C169.396 178.801 166.9 181.297 166.9 184.376V187.976C166.9 184.897 169.396 182.401 172.475 182.401H215.325C218.404 182.401 220.9 184.897 220.9 187.976V184.376C220.9 181.297 218.404 178.801 215.325 178.801Z"
-                fill="#FF9057"
-              />
-              <path
-                d="M166.9 198.901V184.376C166.9 181.297 169.396 178.801 172.475 178.801H215.325C218.404 178.801 220.9 181.297 220.9 184.376V198.901H166.9Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path d="M220.9 198.9V210.3H166.9V198.9H220.9Z" fill="#FF9057" />
-              <path d="M220.9 198.9V210.3H166.9V198.9H220.9Z" fill="#FF9057" />
-              <path d="M220.9 198.9V202.5H166.9V198.9H220.9Z" fill="#F2844C" />
-              <path
-                d="M220.9 198.9V210.3H166.9V198.9H220.9Z"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                opacity="0.69"
-                d="M194.025 157.95C195.848 157.95 197.325 156.472 197.325 154.65C197.325 152.827 195.848 151.35 194.025 151.35C192.202 151.35 190.725 152.827 190.725 154.65C190.725 156.472 192.202 157.95 194.025 157.95Z"
-                fill="white"
-              />
-              <path
-                d="M194.025 157.95C195.848 157.95 197.325 156.472 197.325 154.65C197.325 152.827 195.848 151.35 194.025 151.35C192.202 151.35 190.725 152.827 190.725 154.65C190.725 156.472 192.202 157.95 194.025 157.95Z"
-                stroke="#313030"
-                strokeWidth={2}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M49.95 217.801H244.225M126.992 232.374H150.75M116.555 232.374H121.745M249.615 217.801H253.725"
-                stroke="#313030"
-                strokeWidth={3}
-                strokeMiterlimit={10}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M124.463 140.15C124.801 140.15 125.075 139.915 125.075 139.625C125.075 139.335 124.801 139.1 124.463 139.1C124.124 139.1 123.85 139.335 123.85 139.625C123.85 139.915 124.124 140.15 124.463 140.15Z"
-                fill="#DBDBDB"
-              />
-            </svg>
-          </div>
-          <div className="mx-5">
-            <hr />
-          </div>
-          <div className="p-3 border-t border-neutral-100">
-            <span className="text-lg font-bold text-neutral-600">
-              Regular items{" "}
-            </span>{" "}
-          </div>
-        </div>
-        <span className="text-muted">Furniture, etc.</span>
       </button>
     </div>
   );
