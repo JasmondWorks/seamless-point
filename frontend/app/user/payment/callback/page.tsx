@@ -42,6 +42,8 @@ export default function PaymentCallback() {
       });
       console.log(depositResponse);
 
+      localStorage.removeItem("totalAmount");
+
       if (depositResponse.status === "success") {
         toast.success("Payment successful");
         router.push("/user/dashboard");
