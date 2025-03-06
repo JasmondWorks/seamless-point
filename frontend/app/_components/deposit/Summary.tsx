@@ -33,10 +33,10 @@ function Summary({
         amount: (Number(amount) + transactionFee) * 100,
       });
 
-      if (url) {
-        router.push(url); // Redirect to Paystack payment page
+      if (url?.status === "success") {
+        router.push(url.data); // Redirect to Paystack payment page
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
       alert("Failed to initialize payment.");
     } finally {

@@ -706,8 +706,8 @@ export async function fetchNotifications() {
     if (!res.ok) throw new Error(data.message);
 
     return formattedData;
-  } catch (error) {
-    return { status: "error", message: "Failed to fetch notifications" };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
   }
 }
 
@@ -729,8 +729,8 @@ export async function clearAllNotifications() {
     const { message } = data;
 
     return { status: "success", message };
-  } catch (error) {
-    return { status: "error", message: "Failed to clear all notifications" };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
   }
 }
 
@@ -749,14 +749,6 @@ export async function markNotificationsAsRead(notificationIds: string[]) {
       body: JSON.stringify({ notificationIds: notificationIds }),
     });
 
-    // const res = await fetch(`${URL}/deliveries`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    //   body: JSON.stringify(deliveryDetails),
-    // });
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.message);
@@ -764,8 +756,8 @@ export async function markNotificationsAsRead(notificationIds: string[]) {
     console.log(res);
 
     return { status: "success", data };
-  } catch (error) {
-    return { status: "error", message: "Failed to mark notifications as read" };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
   }
 }
 
@@ -776,17 +768,56 @@ export const initiatePayment = async ({
   email: string;
   amount: number;
 }) => {
-  const response = await fetch(`${URL}/transactions/paystack/initialize`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, amount }), // Amount in kobo
-  });
+  try {
+    const response = await fetch(`${URL}/transactions/paystack/initialize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, amount }), // Amount in kobo
+    });
 
-  const data = await response.json();
-  if (data.status) {
-    return data.data.authorization_url; // Return the URL instead of redirecting
-  } else {
-    console.error("Error initializing payment:", data.error);
+    const data = await response.json();
+    if (data.status) {
+      return { status: "success", data: data.data.authorization_url }; // Return the URL instead of redirecting
+    } else {
+      console.error("Error initializing payment:", data.error);
+    }
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
+};
+
+export const verifyPayment = async (reference: string) => {
+  try {
+    const response = await fetch(
+      `${URL}/transactions/paystack/verify?reference=${reference}`
+    );
+    const data = await response.json();
+    console.log(data);
+
+    if (!response.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error);
+    return { status: "error", message: error.message };
+  }
+};
+
+export const updateUserBalance = async (balance: number) => {
+  try {
+    const token = getUserToken();
+    const res = await fetch(`${URL}/users/me`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ balance }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
   }
 };
 
