@@ -7,7 +7,15 @@ import { initiatePayment } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { PaystackButton } from "react-paystack";
+import dynamic from "next/dynamic";
+
+// dynamic import for paystack button
+const PaystackButton = dynamic(
+  () => import("react-paystack").then((mod) => mod.PaystackButton),
+  {
+    ssr: false,
+  }
+);
 
 function Summary({
   amount,
