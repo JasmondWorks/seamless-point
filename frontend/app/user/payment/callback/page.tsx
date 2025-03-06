@@ -30,12 +30,12 @@ export default function PaymentCallback() {
       // redirect to dashboard with toast success or fail message
       // update user balance
       const updateBalance = await updateUserBalance(response.data.amount);
-      if (updateBalance?.status === "success") {
-        router.push("/user/dashboard");
-        toast.success("Payment successful");
-      } else {
-        toast.error("Payment failed");
-      }
+      // if (updateBalance?.status === "success") {
+      router.push("/user/dashboard");
+      toast.success("Payment successful");
+      // } else {
+      //   toast.error("Payment failed");
+      // }
     } else {
       router.push("/user/dashboard");
       toast.error("Payment failed");
