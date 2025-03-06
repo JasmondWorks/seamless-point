@@ -6,6 +6,7 @@ import React from "react";
 export default async function BalanceDisplay({ className = "" }) {
   const user = await getUser();
   console.log(user);
+
   return (
     <div
       style={{
