@@ -8,9 +8,6 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Create User function with proper error handling
 export async function signupUser(userDetails: any) {
-  console.log("***********");
-  console.log(userDetails);
-  console.log("***********");
   try {
     const res = await fetch(`${URL}/users/signUp`, {
       method: "POST",
@@ -20,8 +17,6 @@ export async function signupUser(userDetails: any) {
       body: JSON.stringify(userDetails),
     });
     const data = await res.json();
-
-    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 
@@ -81,7 +76,6 @@ export async function loginUser(userDetails: {
   email: string;
   password: string;
 }) {
-  console.log("Login Data Sent:", userDetails);
   try {
     const res = await fetch(`${URL}/users/login`, {
       method: "POST",
@@ -93,7 +87,6 @@ export async function loginUser(userDetails: {
 
     const data = await res.json();
 
-    console.log("Login Response:", data);
     if (!res.ok) throw new Error(data.message);
 
     const {
@@ -125,8 +118,6 @@ export async function signinUser(userDetails: {
   lastName: string;
   authType: string;
 }) {
-  console.log(userDetails);
-
   try {
     const res = await fetch(`${URL}/users/signIn`, {
       method: "POST",
@@ -175,8 +166,6 @@ export async function signinAdmin(userDetails: {
       },
       body: JSON.stringify(userDetails),
     });
-
-    console.log(res);
 
     const data = await res.json();
 
@@ -242,7 +231,6 @@ export async function loginAdmin(userDetails: {
   }
 }
 export async function forgotUserPassword(email: string) {
-  console.log(email);
   try {
     const res = await fetch(`${URL}/users/forgotPassword`, {
       method: "POST",
@@ -253,7 +241,6 @@ export async function forgotUserPassword(email: string) {
     });
 
     const data = await res.json();
-    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 
@@ -349,7 +336,6 @@ export async function changeUserPassword(
 }
 
 export async function authenticateUser(token: string) {
-  console.log("authenticating");
   try {
     const res = await fetch(`${URL}/users/authenticate`, {
       method: "GET",
@@ -359,7 +345,7 @@ export async function authenticateUser(token: string) {
       },
     });
     const data = await res.json();
-    console.log(data);
+
     if (!res.ok) throw new Error(data.message);
     return {
       status: "success",
@@ -377,7 +363,6 @@ export async function authenticateUser(token: string) {
 }
 
 export async function authenticateAdmin(token: string) {
-  console.log("authenticating");
   try {
     const res = await fetch(`${URL}/admins/authenticate`, {
       method: "GET",
@@ -387,7 +372,7 @@ export async function authenticateAdmin(token: string) {
       },
     });
     const data = await res.json();
-    console.log(data);
+
     if (!res.ok) throw new Error(data.message);
     return { status: "success", message: "Admin authenticated successfully" };
   } catch (error: any) {
@@ -403,7 +388,7 @@ export async function authenticateAdmin(token: string) {
 
 export async function getUser() {
   const token = getUserToken();
-  console.log("The token: ", token);
+
   try {
     const res = await fetch(`${URL}/users/me`, {
       method: "GET",
@@ -411,18 +396,15 @@ export async function getUser() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      cache: "no-store",
     });
     const data = await res.json();
-
-    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 
     const {
       data: { user },
     } = data;
-
-    console.log("user is ", user);
 
     return {
       status: "success",
@@ -441,8 +423,7 @@ export async function getUser() {
 }
 export async function updateUser(updatedUserInfo: any) {
   const token = getUserToken();
-  console.log("The token: ", token);
-  console.log(updatedUserInfo);
+
   try {
     const res = await fetch(`${URL}/users/me`, {
       method: "PATCH",
@@ -453,10 +434,6 @@ export async function updateUser(updatedUserInfo: any) {
       body: JSON.stringify(updatedUserInfo),
     });
     const data = await res.json();
-
-    console.log("**********");
-    console.log("Updated data:", data);
-    console.log("**********");
 
     if (!res.ok) throw new Error(data.message);
 
@@ -497,8 +474,6 @@ export async function createDelivery(deliveryDetails: any) {
 
     const data = await res.json();
 
-    console.log(data);
-
     const {
       data: { delivery },
     } = data;
@@ -533,10 +508,6 @@ export async function fetchAllDeliveries({
   try {
     const token = getUserToken();
 
-    console.log(sort);
-
-    console.log(token);
-
     const res = await fetch(
       `${URL}/deliveries?page=${page}&limit=${limit}&sort=${sort}`,
       {
@@ -545,12 +516,6 @@ export async function fetchAllDeliveries({
       }
     );
     const data = await res.json();
-
-    console.log(data);
-
-    console.log("*********");
-    console.log(data);
-    console.log("*********");
 
     if (!res.ok) throw new Error(data.message);
 
@@ -574,10 +539,6 @@ export async function fetchDeliveries({
   try {
     const token = getUserToken();
 
-    console.log(sort);
-
-    console.log(token);
-
     const res = await fetch(
       `${URL}/deliveries/user?page=${page}&limit=${limit}&sort=${sort}`,
       {
@@ -587,13 +548,7 @@ export async function fetchDeliveries({
     );
     const data = await res.json();
 
-    console.log(data);
-
     // const formattedData = formatDataDescending(data, "delivery");
-
-    console.log("*********");
-    console.log(data);
-    console.log("*********");
 
     if (!res.ok) throw new Error(data.message);
 
@@ -614,11 +569,6 @@ export async function fetchDelivery(id: string) {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    console.log(data);
-
-    console.log("*********");
-    console.log(data);
-    console.log("*********");
 
     if (!res.ok) throw new Error(data.message);
 
@@ -666,8 +616,6 @@ export async function fetchAllCustomers({
     const data = await res.json();
     if (!res.ok) throw new Error(data.message);
 
-    console.log(data);
-
     return data;
   } catch (err: any) {
     return { status: "error", message: err.message };
@@ -682,8 +630,6 @@ export async function fetchLatestCustomers() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message);
-
-    console.log(data);
 
     return { status: "success", data };
   } catch (err: any) {
@@ -736,8 +682,6 @@ export async function clearAllNotifications() {
 
 export async function markNotificationsAsRead(notificationIds: string[]) {
   const token = getUserToken();
-  console.log("marking as read...");
-  console.log(notificationIds);
 
   try {
     const res = await fetch(`${URL}/notifications/user/markAsRead`, {
@@ -753,8 +697,6 @@ export async function markNotificationsAsRead(notificationIds: string[]) {
 
     if (!res.ok) throw new Error(data.message);
 
-    console.log(res);
-
     return { status: "success", data };
   } catch (error: any) {
     return { status: "error", message: error.message };
@@ -768,10 +710,15 @@ export const initiatePayment = async ({
   email: string;
   amount: number;
 }) => {
+  const token = getUserToken();
+
   try {
     const response = await fetch(`${URL}/transactions/paystack/initialize`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ email, amount }), // Amount in kobo
     });
 
@@ -787,32 +734,50 @@ export const initiatePayment = async ({
 };
 
 export const verifyPayment = async (reference: string) => {
+  const token = getUserToken();
+
   try {
     const response = await fetch(
-      `${URL}/transactions/paystack/verify?reference=${reference}`
+      `${URL}/transactions/paystack/verify?reference=${reference}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
     );
     const data = await response.json();
-    console.log(data);
 
     if (!response.ok) throw new Error(data.message);
 
     return { status: "success", data };
   } catch (error: any) {
-    console.log(error);
     return { status: "error", message: error.message };
   }
 };
-
-export const updateUserBalance = async (balance: number) => {
+export const createTransaction = async ({ amount, type }: any) => {
+  console.log("transactionDetails");
+  console.log({ amount, type });
+  console.log("**********");
   try {
     const token = getUserToken();
-    const res = await fetch(`${URL}/users/me`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ balance }),
+
+    console.log(`${URL}/transactions/create`);
+
+    const res = await fetch(`${URL}/transactions/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        amount,
+        type,
+      }),
     });
 
     const data = await res.json();
+    console.log("data");
+    console.log(data);
+    console.log("**********");
     if (!res.ok) throw new Error(data.message);
 
     return { status: "success", data };

@@ -14,9 +14,9 @@ export default function Dashboard() {
         </strong>{" "}
         Let's get you started for today
       </h1>
-      <div className="max-w-xl">
-        <BalanceDisplay />
-      </div>
+
+      <BalanceDisplay />
+
       <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 [background-color: red]">
         <Link href="/user/deposit">
           <ActionButton
