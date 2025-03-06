@@ -769,6 +769,27 @@ export async function markNotificationsAsRead(notificationIds: string[]) {
   }
 }
 
+export const initiatePayment = async ({
+  email,
+  amount,
+}: {
+  email: string;
+  amount: number;
+}) => {
+  const response = await fetch(`${URL}/transactions/paystack/initialize`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, amount }), // Amount in kobo
+  });
+
+  const data = await response.json();
+  if (data.status) {
+    return data.data.authorization_url; // Return the URL instead of redirecting
+  } else {
+    console.error("Error initializing payment:", data.error);
+  }
+};
+
 function formatDataDescending(data: any, resourceName: string) {
   const unformattedData = data.data[resourceName];
   const formattedList = unformattedData.sort(

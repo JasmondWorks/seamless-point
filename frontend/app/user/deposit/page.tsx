@@ -7,6 +7,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import SelectPaymentMethod from "@/app/_components/SelectPaymentMethod";
+
+import { calculatePaystackFee as calculateTransactionFee } from "@/app/_utils/paystack";
+
 import toast from "react-hot-toast";
 import {
   DialogClose,
@@ -31,6 +34,10 @@ const PaystackButton = dynamic(
 
 import DashboardLayout from "@/app/_components/DashboardLayout";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { set } from "mongoose";
+import EnterAmount from "@/app/_components/deposit/EnterAmount";
+import Summary from "@/app/_components/deposit/Summary";
+import SpinnerFull from "@/app/_components/SpinnerFull";
 
 enum EDialogContent {
   cardDetails = "CARD_DETAILS",
@@ -49,22 +56,52 @@ export default function DepositPage() {
   const [step, setStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [isInternational, setIsInternational] = useState(false);
+  const transactionFee = calculateTransactionFee(
+    Number(amount),
+    isInternational
+  );
+
+  console.log(isInternational);
+
+  useEffect(() => {
+    async function getInternationalStatus() {
+      // check if user is international
+      try {
+        setLoading(true);
+        const response = await fetch("localhost:3000/api/location");
+
+        console.log(response);
+
+        setIsInternational(response.isInternational);
+
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    }
+    getInternationalStatus();
+  }, []);
 
   function incrementStep() {
     setStep((step) => step + 1);
   }
 
+  if (loading) return <SpinnerFull />;
+
   return (
     <DashboardLayout>
       {step === 1 && (
-        <Funding
+        <SelectPaymentMethod
           selectedPaymentMethod={selectedPaymentMethod}
           setSelectedPaymentMethod={setSelectedPaymentMethod}
           incrementStep={incrementStep}
         />
       )}
       {step === 2 && (
-        <Amount
+        <EnterAmount
           incrementStep={incrementStep}
           amount={amount}
           setAmount={setAmount}
@@ -74,249 +111,10 @@ export default function DepositPage() {
         <Summary
           amount={amount}
           selectedPaymentMethod={selectedPaymentMethod}
+          transactionFee={transactionFee}
         />
       )}
     </DashboardLayout>
-  );
-}
-
-// Step 1
-function Funding({
-  incrementStep,
-  selectedPaymentMethod,
-  setSelectedPaymentMethod,
-}: {
-  incrementStep: () => void;
-  selectedPaymentMethod: string;
-  setSelectedPaymentMethod: (paymentMethod: string) => void;
-}) {
-  function handleSelectPaymentMethod(type: string) {
-    setSelectedPaymentMethod(type);
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    console.log("here");
-    if (!selectedPaymentMethod)
-      return toast.error("Please select a payment method");
-
-    incrementStep();
-  }
-
-  console.log(selectedPaymentMethod);
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-16">
-      <div className="space-y-2">
-        <h1 className="headline text-center">Select a Payment Method</h1>
-        <p className="text-center text-muted">
-          Please select one of the two payment methods listed below
-        </p>
-      </div>
-      {/* <DepositAccountDetailsCard /> */}
-      <SelectPaymentMethod
-        onSelect={handleSelectPaymentMethod}
-        selectedPaymentMethod={selectedPaymentMethod}
-      />
-      <div className="space-y-6">
-        <PrivacyPolicyBlock />
-        <ButtonFormSubmit onClick={handleSubmit} text="Continue" />
-      </div>
-    </form>
-  );
-}
-
-// Step 2
-function Amount({
-  incrementStep,
-  amount,
-  setAmount,
-}: {
-  incrementStep: () => void;
-  amount: string;
-  setAmount: (amount: string) => void;
-}) {
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (!amount) return toast.error("Please enter an amount");
-    if (isNaN(Number(amount))) return toast.error("Amount must be a number");
-
-    incrementStep();
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
-      <h1 className="headline text-center">
-        How much are you adding to your Account?
-      </h1>
-      <div className="flex flex-col gap-3">
-        <span>Amount</span>
-        <Input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="h-11 bg-white"
-          type="text"
-          placeholder="100NGN"
-        />
-      </div>
-      <PrivacyPolicyBlock />
-      <ButtonFormSubmit onClick={handleSubmit} text="I UNDERSTAND" />
-    </form>
-  );
-}
-
-// Step 3
-function Summary({
-  amount,
-  selectedPaymentMethod,
-}: {
-  amount: string;
-  selectedPaymentMethod: string;
-}) {
-  const { user } = useUserAuth();
-  const [selectedDialogContent, setSelectedDialogContent] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const router = useRouter();
-  const transactionFee = 1.5;
-
-  //   Paystack config
-  const config = {
-    reference: new Date().getTime().toString(),
-    email: user?.email,
-    amount: Number(amount) * 100,
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
-    payment_channels: ["card"], // Only show card payment option
-  };
-
-  const onSuccess = (reference: string) => {
-    console.log("Payment successful", reference);
-    toast.success("Payment successful");
-
-    setTimeout(() => router.push("/user/dashboard"), 2000);
-  };
-
-  const onClose = () => {
-    toast("Payment popup closed", {
-      duration: 4000,
-      position: "top-center",
-      style: {
-        background: "#007bff", // Info blue background
-        color: "#ffffff", // White text
-        fontWeight: "bold", // Bold font
-      },
-    });
-    console.log("Payment popup closed");
-  };
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsDialogOpen(true);
-  }
-
-  function handleOpenCardDetailsDialog() {
-    setIsDialogOpen(false);
-    setSelectedDialogContent(EDialogContent.cardDetails);
-  }
-  function handleOpenAccountDetailsDialog() {
-    setIsDialogOpen(true);
-    setSelectedDialogContent(EDialogContent.accountDetails);
-  }
-  function handleOpenBankValidationDialog() {
-    setSelectedDialogContent(EDialogContent.bankValidation);
-  }
-  function handleOpenVerifyDialog() {
-    setSelectedDialogContent(EDialogContent.verify);
-  }
-  function handleOpenSuccessDialog() {
-    setSelectedDialogContent(EDialogContent.success);
-
-    setTimeout(() => router.push("/user/dashboard"), 2000);
-  }
-  function handleCloseDialog() {
-    setIsDialogOpen(false);
-    setSelectedDialogContent("");
-  }
-
-  return (
-    <>
-      <div className="flex flex-col gap-10">
-        <h1 className="headline text-center">
-          {Number(amount) + transactionFee} NGN
-        </h1>
-        <div>
-          <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
-            <div>
-              Pay with{" "}
-              <span className="capitalize">
-                {selectedPaymentMethod.split("-").join(" ")}
-              </span>
-            </div>
-            <span className="capitalize">
-              {selectedPaymentMethod.split("-").join(" ")}
-            </span>
-          </div>
-          <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
-            <span>Amount to add</span>
-            <span>{amount}</span>
-          </div>
-          <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
-            <span>Transaction fee</span>
-            <span>1.50</span>
-          </div>
-          <div className="flex border-b border-neutral-200 justify-between items-center py-3 text-lg">
-            <span>Amount to pay</span>
-            <span className="font-bold">{Number(amount) + transactionFee}</span>
-          </div>
-        </div>
-        <PrivacyPolicyBlock />
-        {selectedPaymentMethod === "debit-card" && (
-          <PaystackButton
-            {...config}
-            text="I UNDERSTAND"
-            onSuccess={onSuccess}
-            onClose={onClose}
-            className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
-          />
-        )}
-        {selectedPaymentMethod === "bank-transfer" && (
-          <ButtonFormSubmit
-            onClick={handleOpenAccountDetailsDialog}
-            text="Show account details"
-          />
-        )}
-      </div>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className={`${styles.dialogContainer}`}>
-          {selectedDialogContent === EDialogContent.cardDetails && (
-            <CardDetailsDialogContent
-              amount={amount}
-              onOpenBankValidationDialog={handleOpenBankValidationDialog}
-            />
-          )}
-          {selectedDialogContent === EDialogContent.bankValidation && (
-            <BankValidationContent
-              onOpenSuccessDialog={handleOpenSuccessDialog}
-            />
-          )}
-          {selectedDialogContent === EDialogContent.accountDetails && (
-            <AccountDetailsContent
-              totalAmount={Number(amount) + transactionFee}
-              onOpenVerifyDialog={handleOpenVerifyDialog}
-            />
-          )}
-          {selectedDialogContent === EDialogContent.verify && (
-            <VerifyContent onOpenSuccessDialog={handleOpenSuccessDialog} />
-          )}
-          {selectedDialogContent === EDialogContent.success && (
-            <SuccessDialogContent
-              title="Deposit successful"
-              onConfirmSuccess={handleCloseDialog}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
   );
 }
 

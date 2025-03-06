@@ -1,6 +1,5 @@
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
-import React from "react";
 import toast from "react-hot-toast";
 
 function SelectPaymentMethod({
@@ -40,7 +39,7 @@ function SelectPaymentMethod({
         <label className="pb-3 cursor-pointer border-b border-neutral-200 flex justify-between items-center">
           <span>Debit card</span>
           <input
-            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+            onChange={handleSelectPaymentMethod}
             value="debit-card"
             type="radio"
             checked={selectedPaymentMethod === "debit-card"}
@@ -50,7 +49,7 @@ function SelectPaymentMethod({
         <label className="pb-3 cursor-pointer border-b border-neutral-200 flex justify-between items-center">
           <span>Virtual bank transfer</span>
           <input
-            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+            onChange={handleSelectPaymentMethod}
             value="bank-transfer"
             type="radio"
             checked={selectedPaymentMethod === "bank-transfer"}
