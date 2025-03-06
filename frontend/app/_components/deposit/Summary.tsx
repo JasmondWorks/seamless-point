@@ -113,7 +113,7 @@ function Summary({
         {selectedPaymentMethod === "debit-card" && (
           <PaystackButton
             {...config}
-            text="I UNDERSTAND"
+            text="Pay Now"
             onSuccess={onSuccess}
             onClose={onClose}
             className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
