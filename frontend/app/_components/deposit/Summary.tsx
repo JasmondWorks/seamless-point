@@ -1,3 +1,5 @@
+"use client";
+
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
@@ -25,9 +27,14 @@ function Summary({
 
   const [loading, setLoading] = useState(false);
 
+  const totalAmount = Number(amount) + transactionFee;
+
   const handlePayment = async () => {
     try {
       setLoading(true);
+
+      localStorage.setItem("totalAmount", totalAmount.toString());
+
       const url = await initiatePayment({
         email: user.email,
         amount: (Number(amount) + transactionFee) * 100,
@@ -43,8 +50,6 @@ function Summary({
       setLoading(false);
     }
   };
-
-  const totalAmount = Number(amount) + transactionFee;
 
   //   Paystack config
   const config = {

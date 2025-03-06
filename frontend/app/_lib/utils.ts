@@ -42,13 +42,33 @@ export function capitalizeWords(string: string, separator: string = " ") {
     .join(" ");
 }
 
+type CurrencyFormatOptions = {
+  currency?: string;
+  notation?: "standard" | "compact";
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
+  compactDisplay?: "short" | "long";
+};
+
 export function formatCurrency(
   amount: number,
-  currency: ECurrency = ECurrency.NGN
+  options: CurrencyFormatOptions = {}
 ) {
+  const {
+    currency = "NGN",
+    notation = "compact",
+    minimumFractionDigits = 0,
+    maximumFractionDigits = 2,
+    compactDisplay = "short",
+  } = options;
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
+    notation,
+    minimumFractionDigits,
+    maximumFractionDigits,
+    compactDisplay,
   }).format(amount);
 }
 
@@ -176,21 +196,6 @@ export function getBadgeStyle(tag: string): BadgeVariant | null {
       return null;
   }
 }
-
-// export function getPackageSenderDetails(package) {
-//   return {
-//     firstName: package.firstName,
-//     lastName: package.lastName,
-//     street: package.street,
-//     aptUnit: package.aptUnit,
-//     country: package.country,
-//     state: package.state,
-//     city: package.city,
-//     postCode: package.postCode,
-//     email: package.email,
-//     phoneNumber: package.phoneNumber
-//   }
-// }
 export function getPackageSenderReceiver(
   packageData: any,
   prefix: string = ""

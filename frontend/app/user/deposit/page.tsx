@@ -70,7 +70,9 @@ export default function DepositPage() {
       // check if user is international
       try {
         setLoading(true);
-        const response = await fetch("localhost:3000/api/location");
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/location`
+        );
 
         console.log(response);
 

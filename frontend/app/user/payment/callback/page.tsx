@@ -2,7 +2,7 @@
 
 import {
   verifyPayment as verifyPaymentAction,
-  updateUserBalance,
+  createTransaction,
 } from "@/app/_lib/actions";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -13,32 +13,45 @@ export default function PaymentCallback() {
   const router = useRouter();
   const reference = searchParams.get("reference");
 
+  const totalAmount = localStorage.getItem("totalAmount");
+
+  console.log(totalAmount);
+
   console.log(reference);
 
   useEffect(() => {
     if (reference) {
-      verifyPayment(reference);
+      verifyPayment(reference, totalAmount);
     }
   }, [reference]);
 
-  const verifyPayment = async (reference: string) => {
-    const response = await verifyPaymentAction(reference);
+  const verifyPayment = async (
+    reference: string,
+    totalAmount: string | null
+  ) => {
+    const verificationResponse = await verifyPaymentAction(reference);
 
-    console.log(response);
+    console.log(verificationResponse);
 
-    if (response?.status === "success") {
+    if (verificationResponse.status === "success") {
       // redirect to dashboard with toast success or fail message
       // update user balance
-      const updateBalance = await updateUserBalance(response.data.amount);
-      // if (updateBalance?.status === "success") {
-      router.push("/user/dashboard");
-      toast.success("Payment successful");
-      // } else {
-      //   toast.error("Payment failed");
-      // }
+      const depositResponse = await createTransaction({
+        amount: Number(totalAmount),
+        type: "deposit",
+      });
+      console.log(depositResponse);
+
+      if (depositResponse.status === "success") {
+        toast.success("Payment successful");
+        router.push("/user/dashboard");
+      } else {
+        toast.error("Payment failed");
+        router.push("/user/dashboard");
+      }
     } else {
-      router.push("/user/dashboard");
       toast.error("Payment failed");
+      router.push("/user/dashboard");
     }
   };
 
