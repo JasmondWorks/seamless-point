@@ -13,6 +13,8 @@ export default function PaymentCallback() {
   const router = useRouter();
   const reference = searchParams.get("reference");
 
+  console.log(reference);
+
   const totalAmount = localStorage.getItem("totalAmount");
 
   console.log(totalAmount);

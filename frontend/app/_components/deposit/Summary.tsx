@@ -7,6 +7,7 @@ import { initiatePayment } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { PaystackButton } from "react-paystack";
 
 function Summary({
   amount,
@@ -21,8 +22,6 @@ function Summary({
 
   console.log(user);
 
-  const [selectedDialogContent, setSelectedDialogContent] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -61,10 +60,11 @@ function Summary({
   };
 
   const onSuccess = (reference: string) => {
-    console.log("Payment successful", reference);
-    toast.success("Payment successful");
+    console.log(reference);
 
-    setTimeout(() => router.push("/user/dashboard"), 2000);
+    localStorage.setItem("totalAmount", totalAmount.toString());
+
+    router.push(reference.redirecturl);
   };
 
   const onClose = () => {
@@ -79,35 +79,6 @@ function Summary({
     });
     console.log("Payment popup closed");
   };
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsDialogOpen(true);
-  }
-
-  //   function handleOpenCardDetailsDialog() {
-  //     setIsDialogOpen(false);
-  //     setSelectedDialogContent(EDialogContent.cardDetails);
-  //   }
-  //   function handleOpenAccountDetailsDialog() {
-  //     setIsDialogOpen(true);
-  //     setSelectedDialogContent(EDialogContent.accountDetails);
-  //   }
-  //   function handleOpenBankValidationDialog() {
-  //     setSelectedDialogContent(EDialogContent.bankValidation);
-  //   }
-  //   function handleOpenVerifyDialog() {
-  //     setSelectedDialogContent(EDialogContent.verify);
-  //   }
-  //   function handleOpenSuccessDialog() {
-  //     setSelectedDialogContent(EDialogContent.success);
-
-  //     setTimeout(() => router.push("/user/dashboard"), 2000);
-  //   }
-  //   function handleCloseDialog() {
-  //     setIsDialogOpen(false);
-  //     setSelectedDialogContent("");
-  //   }
 
   return (
     <>
@@ -140,18 +111,18 @@ function Summary({
         </div>
         <PrivacyPolicyBlock />
         {selectedPaymentMethod === "debit-card" && (
-          //   <PaystackButton
-          //     {...config}
-          //     text="I UNDERSTAND"
-          //     onSuccess={onSuccess}
-          //     onClose={onClose}
-          //     className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
-          //   />
-          <ButtonFormSubmit
-            disabled={loading}
-            onClick={handlePayment}
-            text={loading ? "Processing..." : "Pay Now"}
+          <PaystackButton
+            {...config}
+            text="I UNDERSTAND"
+            onSuccess={onSuccess}
+            onClose={onClose}
+            className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
           />
+          // <ButtonFormSubmit
+          //   disabled={loading}
+          //   onClick={handlePayment}
+          //   text={loading ? "Processing..." : "Pay Now"}
+          // />
         )}
         {selectedPaymentMethod === "bank-transfer" && (
           <ButtonFormSubmit
@@ -160,36 +131,6 @@ function Summary({
           />
         )}
       </div>
-      {/* <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className={`${styles.dialogContainer}`}>
-          {selectedDialogContent === EDialogContent.cardDetails && (
-            <CardDetailsDialogContent
-              amount={amount}
-              onOpenBankValidationDialog={handleOpenBankValidationDialog}
-            />
-          )}
-          {selectedDialogContent === EDialogContent.bankValidation && (
-            <BankValidationContent
-              onOpenSuccessDialog={handleOpenSuccessDialog}
-            />
-          )}
-          {selectedDialogContent === EDialogContent.accountDetails && (
-            <AccountDetailsContent
-              totalAmount={totalAmount}
-              onOpenVerifyDialog={handleOpenVerifyDialog}
-            />
-          )}
-          {selectedDialogContent === EDialogContent.verify && (
-            <VerifyContent onOpenSuccessDialog={handleOpenSuccessDialog} />
-          )}
-          {selectedDialogContent === EDialogContent.success && (
-            <SuccessDialogContent
-              title="Deposit successful"
-              onConfirmSuccess={handleCloseDialog}
-            />
-          )}
-        </DialogContent>
-      </Dialog> */}
     </>
   );
 }
