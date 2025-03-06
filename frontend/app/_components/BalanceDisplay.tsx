@@ -4,8 +4,8 @@ import clsx from "clsx";
 import React from "react";
 
 export default async function BalanceDisplay({ className = "" }) {
-  const user = await getUser();
-  console.log(user);
+  const res = await getUser();
+  console.log("BalanceDisplay", res.user.balance);
 
   return (
     <div
@@ -20,7 +20,7 @@ export default async function BalanceDisplay({ className = "" }) {
     >
       <h3 className="text-lg font-bold leading-none">BALANCE</h3>
       <p className="text-5xl lg:text-6xl font-bold lg:font-medium leading-none py-[0.5em] whitespace-normal">
-        {formatCurrency(user?.user?.balance)}
+        {formatCurrency(res.user.balance)}
       </p>
     </div>
   );
