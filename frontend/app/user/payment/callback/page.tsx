@@ -1,12 +1,19 @@
 "use client";
 
+import {
+  verifyPayment as verifyPaymentAction,
+  updateUserBalance,
+} from "@/app/_lib/actions";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 export default function PaymentCallback() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const reference = searchParams.get("reference");
+
+  console.log(reference);
 
   useEffect(() => {
     if (reference) {
@@ -15,13 +22,23 @@ export default function PaymentCallback() {
   }, [reference]);
 
   const verifyPayment = async (reference: string) => {
-    const response = await fetch(`/api/paystack/verify?reference=${reference}`);
-    const data = await response.json();
+    const response = await verifyPaymentAction(reference);
 
-    if (data.status) {
-      router.push("/payment/success"); // Redirect to success page
+    console.log(response);
+
+    if (response?.status === "success") {
+      // redirect to dashboard with toast success or fail message
+      // update user balance
+      const updateBalance = await updateUserBalance(response.data.amount);
+      if (updateBalance?.status === "success") {
+        router.push("/user/dashboard");
+        toast.success("Payment successful");
+      } else {
+        toast.error("Payment failed");
+      }
     } else {
-      router.push("/payment/failure"); // Redirect to failure page
+      router.push("/user/dashboard");
+      toast.error("Payment failed");
     }
   };
 
