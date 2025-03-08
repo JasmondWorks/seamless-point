@@ -1,61 +1,64 @@
 "use client";
 
+import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import {
   verifyPayment as verifyPaymentAction,
   createTransaction,
+  getUser,
 } from "@/app/_lib/actions";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 export default function PaymentCallback() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const reference = searchParams.get("reference");
+  const { setUser } = useUserAuth();
 
-  console.log(reference);
+  console.log("reference", reference);
 
-  const totalAmount = localStorage.getItem("totalAmount");
-
-  console.log(totalAmount);
-
-  console.log(reference);
+  const isProcessing = useRef(false); // Track if the function has already run
 
   useEffect(() => {
-    if (reference) {
-      verifyPayment(reference, totalAmount);
+    if (reference && !isProcessing.current) {
+      isProcessing.current = true; // Prevent multiple calls
+      verifyPayment(reference);
     }
   }, [reference]);
 
-  const verifyPayment = async (
-    reference: string,
-    totalAmount: string | null
-  ) => {
-    const verificationResponse = await verifyPaymentAction(reference);
+  const verifyPayment = async (reference: string) => {
+    try {
+      const verificationResponse = await verifyPaymentAction(reference);
 
-    console.log(verificationResponse);
+      console.log("verificationResponse", verificationResponse);
 
-    if (verificationResponse.status === "success") {
-      // redirect to dashboard with toast success or fail message
-      // update user balance
-      const depositResponse = await createTransaction({
-        amount: Number(totalAmount),
-        type: "deposit",
-      });
-      console.log(depositResponse);
+      if (verificationResponse.status === "success") {
+        // Create transaction only after verification is successful
+        const depositResponse = await createTransaction({
+          amount: verificationResponse.data.data.amount,
+          type: "deposit",
+          reference,
+        });
 
-      localStorage.removeItem("totalAmount");
+        if (depositResponse.status === "error") {
+          toast.error("Payment processing failed");
+          return router.push("/user/dashboard");
+        }
 
-      if (depositResponse.status === "success") {
+        const updatedUser = await getUser();
+        setUser(updatedUser.user);
         toast.success("Payment successful");
         router.push("/user/dashboard");
       } else {
-        toast.error("Payment failed");
+        toast.error("Payment verification failed");
         router.push("/user/dashboard");
       }
-    } else {
-      toast.error("Payment failed");
+    } catch (error) {
+      toast.error("Payment processing failed");
       router.push("/user/dashboard");
+    } finally {
+      localStorage.removeItem("totalAmount");
     }
   };
 

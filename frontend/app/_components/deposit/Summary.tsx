@@ -4,8 +4,8 @@ import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import { initiatePayment } from "@/app/_lib/actions";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useState, Suspense, useEffect } from "react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 
@@ -14,6 +14,11 @@ const PaystackButton = dynamic(
   () => import("react-paystack").then((mod) => mod.PaystackButton),
   {
     ssr: false,
+    loading: () => (
+      <div className="w-full bg-brandSec/50 text-white py-4 rounded-lg font-medium text-center animate-pulse">
+        Loading payment gateway...
+      </div>
+    ),
   }
 );
 
@@ -27,65 +32,68 @@ function Summary({
   selectedPaymentMethod: string;
 }) {
   const { user } = useUserAuth();
-
-  console.log(user);
-
   const router = useRouter();
-
+  const pathname = usePathname();
   const [loading, setLoading] = useState(false);
+  const [paystackOpen, setPaystackOpen] = useState(false);
 
   const totalAmount = Number(amount) + transactionFee;
+
+  // Close Paystack popup when route changes
+  useEffect(() => {
+    return () => {
+      if (paystackOpen) {
+        // Close the popup if it's open when component unmounts
+        const closePopup = document.querySelector(".paystack-trigger-close");
+        if (closePopup instanceof HTMLElement) {
+          closePopup.click();
+        }
+        setPaystackOpen(false);
+      }
+    };
+  }, [pathname, paystackOpen]);
 
   const handlePayment = async () => {
     try {
       setLoading(true);
 
+      // Store amount in localStorage for verification later
       localStorage.setItem("totalAmount", totalAmount.toString());
 
-      const url = await initiatePayment({
+      // Initialize payment with Paystack
+      const response = await initiatePayment({
         email: user.email,
-        amount: (Number(amount) + transactionFee) * 100,
+        amount: totalAmount * 100, // Convert to kobo
       });
 
-      if (url?.status === "success") {
-        router.push(url.data); // Redirect to Paystack payment page
+      if (response?.status === "success" && response.data) {
+        // Redirect to Paystack checkout page
+        router.push(response.data);
+      } else {
+        toast.error("Failed to initialize payment. Please try again.");
       }
-    } catch (error: any) {
-      console.error("Payment error:", error);
-      alert("Failed to initialize payment.");
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      toast.error("Payment initialization failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  //   Paystack config
   const config = {
     reference: new Date().getTime().toString(),
-    email: user?.email,
-    amount: Number(amount) * 100,
+    email: user.email,
+    amount: totalAmount * 100,
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
-    payment_channels: ["card"], // Only show card payment option
-  };
-
-  const onSuccess = (reference: string) => {
-    console.log(reference);
-
-    localStorage.setItem("totalAmount", totalAmount.toString());
-
-    router.push(reference.redirecturl);
-  };
-
-  const onClose = () => {
-    toast("Payment popup closed", {
-      duration: 4000,
-      position: "top-center",
-      style: {
-        background: "#007bff", // Info blue background
-        color: "#ffffff", // White text
-        fontWeight: "bold", // Bold font
-      },
-    });
-    console.log("Payment popup closed");
+    channels: ["card"],
+    currency: "NGN",
+    onSuccess: (reference: string) => {
+      console.log(reference);
+      router.push(reference.redirecturl);
+    },
+    onClose: () => {
+      console.log("Payment cancelled");
+    },
   };
 
   return (
@@ -119,24 +127,20 @@ function Summary({
         </div>
         <PrivacyPolicyBlock />
         {selectedPaymentMethod === "debit-card" && (
-          <PaystackButton
-            {...config}
-            text="Pay Now"
-            onSuccess={onSuccess}
-            onClose={onClose}
-            className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
+          <ButtonFormSubmit
+            onClick={handlePayment}
+            text={loading ? "Processing..." : "Pay with Card"}
+            disabled={loading}
           />
-          // <ButtonFormSubmit
-          //   disabled={loading}
-          //   onClick={handlePayment}
-          //   text={loading ? "Processing..." : "Pay Now"}
+          // <PaystackButton
+          //   {...config}
+          //   text="Pay with Card"
+          //   className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
+          //   onInit={() => setPaystackOpen(true)}
           // />
         )}
         {selectedPaymentMethod === "bank-transfer" && (
-          <ButtonFormSubmit
-            // onClick={handleOpenAccountDetailsDialog}
-            text="Show account details"
-          />
+          <ButtonFormSubmit text="Show account details" />
         )}
       </div>
     </>

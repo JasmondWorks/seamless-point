@@ -753,7 +753,7 @@ export const verifyPayment = async (reference: string) => {
     return { status: "error", message: error.message };
   }
 };
-export const createTransaction = async ({ amount, type }: any) => {
+export const createTransaction = async ({ amount, type, reference }: any) => {
   console.log("transactionDetails");
   console.log({ amount, type });
   console.log("**********");
@@ -771,6 +771,7 @@ export const createTransaction = async ({ amount, type }: any) => {
       body: JSON.stringify({
         amount,
         type,
+        reference,
       }),
     });
 
