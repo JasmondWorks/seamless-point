@@ -67,7 +67,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
 
       const user: User = JSON.parse(localStorage.getItem(userKey) || "{}");
 
-      if (res.status === "success") {
+      if (res?.status === "success") {
         login(user, token);
       } else {
         logout();
