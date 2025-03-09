@@ -549,3 +549,14 @@ h2.react-datepicker__current-month {
     height: 4px;
   }
 }
+
+.MuiFormControl-root {
+  width: 100%;
+}
+.MuiFormControl-root input {
+  height: 10px;
+}
+
+[class^="react-datepicker"] {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}

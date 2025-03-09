@@ -27,7 +27,7 @@ export async function signupUser(userDetails: any) {
 
     return {
       status: "success",
-      message: "User created successfully",
+      message: data.message || "User created successfully",
       token,
       user,
     };

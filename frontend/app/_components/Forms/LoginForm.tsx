@@ -17,7 +17,6 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
-import { useGoogleRedirectLogin } from "@/app/_hooks/useGoogleRedirectLogin";
 
 import { GoogleLoginButton } from "@/app/_components/GoogleLoginButton";
 
@@ -58,8 +57,6 @@ export default function LoginForm({
     console.log(data);
     console.log(userType);
 
-    // const loginFn = userType === "user" ? loginUser(data) : loginAdmin(data);
-
     setIsLoading(true);
     const response =
       userType === "user" ? await loginUser(data) : await loginAdmin(data);
@@ -84,6 +81,7 @@ export default function LoginForm({
           <GoogleLoginButton userType={userType} />
 
           <Button
+            disabled
             onClick={(e) => e.preventDefault()}
             className="text-sm !px-3"
             variant={ButtonVariant.neutralDark}
@@ -132,16 +130,18 @@ export default function LoginForm({
             icon={<FaChevronRight />}
             disabled={isLoading}
           />
-          <p className="mt-5 flex items-center justify-center leading-snug gap-2">
-            Don't have an account?{" "}
-            <Link href={`/auth/${userType}/signup`}>
-              <Button
-                variant={ButtonVariant.link}
-                className="underline !py-0 !h-0"
-                text="Sign up now"
-              />
-            </Link>
-          </p>
+          {userType === "user" && (
+            <p className="mt-5 flex items-center justify-center leading-snug gap-2">
+              Don't have an account?{" "}
+              <Link href={`/auth/${userType}/signup`}>
+                <Button
+                  variant={ButtonVariant.link}
+                  className="underline !py-0 !h-0"
+                  text="Sign up now"
+                />
+              </Link>
+            </p>
+          )}
         </div>
       </form>
     </Form>

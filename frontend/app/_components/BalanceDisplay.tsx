@@ -5,7 +5,7 @@ import React from "react";
 
 export default async function BalanceDisplay({ className = "" }) {
   const res = await getUser();
-  console.log("BalanceDisplay", res.user.balance);
+  console.log("BalanceDisplay", res?.user?.balance);
 
   return (
     <div
@@ -20,7 +20,7 @@ export default async function BalanceDisplay({ className = "" }) {
     >
       <h3 className="text-lg font-bold leading-none">BALANCE</h3>
       <p className="text-5xl lg:text-6xl font-bold lg:font-medium leading-none py-[0.5em] whitespace-normal">
-        {formatCurrency(res.user.balance)}
+        {formatCurrency(res?.user?.balance)}
       </p>
     </div>
   );
