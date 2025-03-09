@@ -5,28 +5,37 @@ import { FormControl } from "../ui/form";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import CustomSelect from "../CustomSelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/_components/ui/select";
 
-export default function DatePicker({ props, field }) {
-  const parseToDateObject = (value) => {
-    if (!value) return null; // Handle empty value
+export default function DatePicker({ props, field }: any) {
+  const parseToDateObject = (value: any) => {
+    if (!value) return null;
     const parsedDate = new Date(value);
-    return isNaN(parsedDate.getTime()) ? null : parsedDate; // Return null if invalid
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
   };
 
   return (
-    <div className="flex rounded-md border border-dark-500 bg-dark-400">
+    <div className="relative flex items-center rounded-lg border bg-white h-11 shadow-sm focus-within:ring-1 focus-within:ring-brandSec">
       <FormControl>
         <ReactDatePicker
           showTimeSelect={props.showTimeSelect ?? false}
           showYearDropdown
           dropdownMode="select"
-          selected={parseToDateObject(field.value)} // Convert field.value to Date
-          onChange={(date: Date | null) => field.onChange(date)} // Pass selected date back to form
+          selected={parseToDateObject(field.value)}
+          onChange={(date: Date | null) => field.onChange(date)}
           timeInputLabel="Time:"
           dateFormat={props.dateFormat ?? "MM/dd/yyyy"}
-          wrapperClassName="date-picker"
-          placeholderText={props.placeholder} // Set the placeholder text for the calendar input
+          wrapperClassName="w-full"
+          placeholderText={props.placeholder}
+          className="bg-transparent text-inherit text-white focus:outline-none text-sm"
+          popperClassName="z-50"
+          calendarClassName="bg-gray-900 text-white border rounded-lg shadow-lg !w-fit flex"
           renderCustomHeader={({
             date,
             changeYear,
@@ -40,36 +49,48 @@ export default function DatePicker({ props, field }) {
             );
 
             return (
-              <div className="flex justify-between items-center p-2">
+              <div className="flex justify-between items-center p-2  border-gray-200">
                 <button
-                  className="text-neutral-500"
+                  className="p-1 rounded-md hover:bg-gray-200"
                   onClick={(e) => {
                     e.preventDefault();
                     decreaseMonth();
                   }}
                 >
-                  <ChevronLeft />
+                  <ChevronLeft className="text-gray-400" />
                 </button>
                 <span className="flex items-center gap-2">
-                  <span className="font-semibold text-xl">
+                  <span className="font-semibold text-lg">
                     {new Date(date).toLocaleString("default", {
                       month: "long",
                     })}
                   </span>
-                  <CustomSelect
-                    value={date.getFullYear()}
-                    onChange={(year: number) => changeYear(Number(year))}
-                    options={years}
-                  />
+                  <Select
+                    onValueChange={(year) => changeYear(Number(year))}
+                    defaultValue={date.getFullYear().toString()}
+                  >
+                    <SelectTrigger className="w-[80px]  border  rounded-md">
+                      <SelectValue
+                        placeholder={date.getFullYear().toString()}
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="border">
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </span>
                 <button
-                  className="text-neutral-500"
+                  className="p-1 rounded-md hover:bg-gray-200"
                   onClick={(e) => {
                     e.preventDefault();
                     increaseMonth();
                   }}
                 >
-                  <ChevronRight />
+                  <ChevronRight className="text-gray-400" />
                 </button>
               </div>
             );

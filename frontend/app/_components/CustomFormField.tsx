@@ -129,7 +129,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.DATE_PICKER:
       return <DatePicker props={props} field={field} />;
-    // return <BasicDatePicker />;
+    // return <BasicDatePicker field={field} props={props} />;
     case FormFieldType.SELECT:
       return (
         <SelectBox

@@ -17,13 +17,15 @@ import Spinner from "@/app/_components/Spinner";
 export default function UpdateUserDetailsForm({ user }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  console.log(user);
+
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
       gender: "",
-      dob: "",
+      dob: new Date(),
       email: "",
     },
   });
@@ -84,6 +86,7 @@ export default function UpdateUserDetailsForm({ user }) {
             placeholder="dd/mm/yyyy"
           />
           <CustomFormField
+            disabled
             label="Gender"
             name="gender"
             control={form.control}
