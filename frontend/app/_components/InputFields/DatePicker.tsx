@@ -49,7 +49,10 @@ export default function DatePicker({ props, field }: any) {
             );
 
             return (
-              <div className="flex justify-between items-center p-2  border-gray-200">
+              <div
+                className="flex justify-between items-center p-2 border-gray-200"
+                onMouseDown={(e) => e.preventDefault()} // Prevent immediate closing
+              >
                 <button
                   className="p-1 rounded-md hover:bg-gray-200"
                   onClick={(e) => {
@@ -66,15 +69,18 @@ export default function DatePicker({ props, field }: any) {
                     })}
                   </span>
                   <Select
-                    onValueChange={(year) => changeYear(Number(year))}
-                    defaultValue={date.getFullYear().toString()}
+                    onValueChange={(year) => {
+                      changeYear(Number(year));
+                    }}
+                    value={date.getFullYear().toString()} // Use value instead of defaultValue
                   >
-                    <SelectTrigger className="w-[80px]  border  rounded-md">
-                      <SelectValue
-                        placeholder={date.getFullYear().toString()}
-                      />
+                    <SelectTrigger className="w-[80px] border rounded-md">
+                      <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border">
+                    <SelectContent
+                      className="border max-h-[200px] overflow-y-auto" // Add scroll for many years
+                      onMouseDown={(e) => e.stopPropagation()} // Prevent event bubbling
+                    >
                       {years.map((year) => (
                         <SelectItem key={year} value={year.toString()}>
                           {year}
