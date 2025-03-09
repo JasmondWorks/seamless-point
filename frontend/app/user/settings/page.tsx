@@ -9,7 +9,7 @@ export default function Settings() {
     <>
       <div className="flex justify-between items-center py-3 border-b border-neutral-300">
         <h1 className="headline">Settings</h1>
-        <UserSettingsActions />
+        {/* <UserSettingsActions /> */}
       </div>
 
       <Suspense fallback={<Loader />}>
