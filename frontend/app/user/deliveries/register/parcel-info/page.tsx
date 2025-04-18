@@ -187,8 +187,7 @@ export default function ParcelInfo() {
             control={form.control}
             fieldType={FormFieldType.FILE}
             selectedFile={parcelDetailsCopy?.proofOfPurchase}
-            // addToStore={addParcelFile}
-            // fieldName="proofOfPurchase"
+            accept=".pdf,.doc,.docx"
           />
           <CustomFormField
             className="col-span-2"
@@ -197,8 +196,7 @@ export default function ParcelInfo() {
             control={form.control}
             fieldType={FormFieldType.FILE}
             selectedFile={parcelDetailsCopy?.packageImage}
-            // addToStore={addParcelFile}
-            // fieldName="packageImage"
+            accept="image/jpeg, image/png"
           />
           <div className="flex flex-col gap-y-5 col-span-2">
             <PrivacyPolicyBlock />

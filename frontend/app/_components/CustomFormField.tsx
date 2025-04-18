@@ -58,6 +58,7 @@ interface CustomProps {
   selectValue?: string;
   onChange?: (value: string) => void;
   selectedFile?: StoredFile;
+  accept?: string;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
@@ -92,7 +93,6 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             placeholder={props.placeholder}
             {...field}
             className="shad-textArea"
-            disabled={props.disabled}
           />
         </FormControl>
       );
