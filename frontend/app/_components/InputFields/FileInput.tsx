@@ -55,6 +55,7 @@ const FileInput = ({ props, field }: { props: any; field: any }) => {
       <input
         disabled={props.disabled}
         type="file"
+        accept={props.accept}
         className="hidden"
         id={props.name}
         onChange={handleFileChange}

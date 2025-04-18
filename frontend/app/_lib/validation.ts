@@ -311,7 +311,10 @@ export const parcelItemSchema = z.object({
       required_error: "Please provide an item name",
     })
     .trim()
-    .min(1, "Please provide an item name"),
+    .min(1, "Please provide an item name")
+    .refine((val) => val.split(/\s+/).filter(Boolean).length >= 3, {
+      message: "Item name must contain at least three words",
+    }),
   category: z
     .string({
       required_error: "Please provide an item category",
@@ -374,7 +377,10 @@ export const parcelDocumentSchema = z.object({
       required_error: "Please provide an item name",
     })
     .trim()
-    .min(1, "Please provide an item name"),
+    .min(1, "Please provide an item name")
+    .refine((val) => val.split(/\s+/).filter(Boolean).length >= 3, {
+      message: "Item name must contain at least three words",
+    }),
   description: z
     .string({
       required_error: "Please provide an item description",
@@ -404,33 +410,6 @@ export const parcelDocumentSchema = z.object({
   ),
 });
 
-// const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>
-//   z.custom<File>(
-//     (file) => {
-//       if (!(file instanceof File)) {
-//         return "File must be a valid File object."; // Ensure it's a File object
-//       }
-
-//       if (file.size > maxFileSize) {
-//         return `File size exceeds the allowed limit. Maximum allowed size: ${(
-//           maxFileSize /
-//           (1024 * 1024)
-//         ).toFixed(1)} MB.`; // File size validation failure
-//       }
-
-//       if (!allowedMimeTypes.includes(file.type)) {
-//         return `Invalid file type. Allowed types: ${allowedMimeTypes.join(
-//           ", "
-//         )}.`; // MIME type validation failure
-//       }
-
-//       return true; // Pass validation
-//     },
-//     {
-//       message: "Invalid file.", // Fallback message (if needed)
-//     }
-//   );
-
 const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>
   z.custom<File>(
     (file) => {
@@ -444,37 +423,39 @@ const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>
       );
     },
     {
-      message: `Invalid file. Allowed types: ${allowedMimeTypes.join(
-        ", "
-      )}, and size must be less than ${(maxFileSize / (1024 * 1024)).toFixed(
-        1
-      )} MB.`,
+      message: `Invalid file. Please upload a file of type: ${allowedMimeTypes
+        .map((type) => type.split("/")[1].toUpperCase())
+        .join(", ")}. Maximum file size allowed is ${(
+        maxFileSize /
+        (1024 * 1024)
+      ).toFixed(1)} MB.`,
     }
   );
 
 export const parcelInfoSchema = z.object({
   packagingType: z
     .string({
-      required_error: "Please provide an item name",
+      required_error: "Packaging type is required.",
     })
     .trim()
-    .min(1, "Please provide an item name"),
+    .min(1, "Please enter a valid packaging type."),
   currency: z
     .string({
-      required_error: "Please provide an item name",
+      required_error: "Currency is required.",
     })
     .trim()
-    .min(1, "Please provide an item name"),
+    .min(1, "Please enter a valid currency."),
   proofOfPurchase: createFileSchema(5 * 1024 * 1024, [
     "application/pdf", // PDF
-    "image/jpeg", // JPEG
-    "image/png", // PNG
+    "application/msword", // DOC
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
   ]),
   packageImage: createFileSchema(2 * 1024 * 1024, [
     "image/jpeg", // JPEG
     "image/png", // PNG
   ]),
 });
+
 export const creditCardSchema = z
   .object({
     cardNumber: z
