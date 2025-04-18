@@ -15,7 +15,7 @@ type User = {
 };
 
 type AuthType = {
-  user: User;
+  user: User | null;
   setUser: (user: User | null) => void;
   isAuthenticating: boolean;
   // authenticated: boolean;
