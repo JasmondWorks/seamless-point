@@ -16,7 +16,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="scroll-smooth text-[85%] md:text-[90%] lg:text-[95%]"
+      // className="scroll-smooth text-[85%] md:text-[90%] lg:text-[95%]"
+      className="scroll-smooth"
       style={{ scrollBehavior: "smooth" }}
     >
       <head>

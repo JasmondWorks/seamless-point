@@ -2,7 +2,6 @@
 
 import { getUserToken } from "@/app/_utils/server-utils";
 import { revalidatePath } from "next/cache";
-import { date } from "zod";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
