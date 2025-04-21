@@ -3,8 +3,9 @@ import "./globals.css";
 
 import { Toaster } from "react-hot-toast";
 import { UserAuthProvider } from "@/app/_contexts/UserAuthContext";
-import { IsClientCtxProvider } from "@/app/is-client-ctx";
 import QueryProvider from "@/app/_lib/QueryProvider";
+import { LoaderProvider } from "@/app/_contexts/LoaderContext";
+import GlobalLoader from "@/app/_components/GlobalLoader";
 
 export default function RootLayout({
   children,
@@ -55,11 +56,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
       </head>
       <body className={`antialiased overflow-x-hidden no-scrollbar`}>
-        <QueryProvider>
-          <IsClientCtxProvider>
+        <LoaderProvider>
+          <QueryProvider>
             <UserAuthProvider>{children}</UserAuthProvider>
-          </IsClientCtxProvider>
-        </QueryProvider>
+          </QueryProvider>
+        </LoaderProvider>
         <Toaster
           toastOptions={{
             success: {

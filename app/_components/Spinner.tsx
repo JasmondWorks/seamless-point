@@ -10,11 +10,12 @@ export default function Spinner({
   color?: string;
 }) {
   const base = "loader border-b-transparent";
-  const sizes = {
-    small: "h-[22px] w-[22px] border-[2px]",
-    large: "h-16 w-16 border-[3px]",
+  const sizes: any = {
+    small: "h-6 w-6 !border-[3px]",
+    medium: "h-8 w-8 !border-[3px]",
+    large: "h-12 w-12 !border-[3px]",
   };
-  const colors = {
+  const colors: any = {
     text: "border-current",
     orange: "border-brandSec",
   };

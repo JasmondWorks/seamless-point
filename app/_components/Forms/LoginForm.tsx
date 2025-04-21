@@ -56,12 +56,13 @@ export default function LoginForm({
   async function onSubmit(data: z.infer<typeof baseUserSchema>) {
     console.log(data);
     console.log(userType);
-
     setIsLoading(true);
+    console.log("logging in...");
     const response =
       userType === "user" ? await loginUser(data) : await loginAdmin(data);
-
+    console.log(response);
     if (response.status === "success") {
+      console.log("login success");
       const { user, token } = response;
       onLogin(user, token);
       toast.success("Login successful");

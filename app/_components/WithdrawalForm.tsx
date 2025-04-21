@@ -4,18 +4,22 @@ import BalanceDisplay from "@/app/_components/BalanceDisplay";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import SelectDebitCard from "@/app/_components/SelectDebitCard";
+import Spinner from "@/app/_components/Spinner";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
+import WithdrawalAccountDetails from "@/app/_components/WithdrawalAccountDetails";
 import { useFormContext } from "@/app/_contexts/FormContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function WithdrawalForm() {
+export default function WithdrawalForm({ onEditAccount }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const [selectedDebitCard, setSelectedDebitCard] = useState(null);
   const router = useRouter();
 
@@ -39,9 +43,19 @@ export default function WithdrawalForm() {
     router.push("/user/dashboard");
   }
 
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center">
+        <Spinner color="orange" size="medium" />
+      </div>
+    );
+
   return (
     <div className="flex flex-col gap-y-10">
-      <BalanceDisplay />
+      <div className="flex flex-col sm:flex-row gap-5">
+        <BalanceDisplay />
+        <WithdrawalAccountDetails onEditAccount={onEditAccount} />
+      </div>
       <div className="flex flex-col gap-3">
         <Label htmlFor="withdrawAmount">
           Enter the amount that you wish to withdraw

@@ -38,6 +38,8 @@ export function DeliveriesTable({
   console.log(sort);
 
   const deliveries = formatDeliveries(deliveriesResponse?.data.delivery);
+
+  console.log(deliveriesResponse);
   const totalCount = deliveriesResponse?.totalCount;
 
   const [searchQuery, setSearchQuery] = React.useState("");

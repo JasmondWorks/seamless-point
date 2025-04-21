@@ -1,11 +1,32 @@
+"use client";
+
 import { getUser } from "@/app/_lib/actions";
 import { formatCurrency } from "@/app/_lib/utils";
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export default async function BalanceDisplay({ className = "" }) {
-  const res = await getUser();
-  console.log("BalanceDisplay", res?.user?.balance);
+import { useLoader } from "@/app/_contexts/LoaderContext";
+
+export default function BalanceDisplay({
+  className = "",
+}: {
+  className?: string;
+}) {
+  const [balance, setBalance] = useState<number>(0);
+  const { setIsLoading } = useLoader();
+
+  useEffect(() => {
+    async function fetchBalance() {
+      setIsLoading(true);
+      const res = await getUser();
+
+      setBalance(res?.user?.balance ?? 0);
+
+      setIsLoading(false);
+    }
+
+    fetchBalance();
+  }, []);
 
   return (
     <div
@@ -20,7 +41,7 @@ export default async function BalanceDisplay({ className = "" }) {
     >
       <h3 className="text-lg font-bold leading-none">BALANCE</h3>
       <p className="text-5xl lg:text-6xl font-bold lg:font-medium leading-none py-[0.5em] whitespace-normal">
-        {formatCurrency(res?.user?.balance)}
+        {formatCurrency(balance)}
       </p>
     </div>
   );

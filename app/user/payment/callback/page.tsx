@@ -20,6 +20,12 @@ export default function PaymentCallback() {
 
   const isProcessing = useRef(false); // Track if the function has already run
 
+  const handlePaymentError = (message: string) => {
+    toast.error(message);
+    console.error(message);
+    return router.push("/user/dashboard");
+  };
+
   useEffect(() => {
     if (reference && !isProcessing.current) {
       isProcessing.current = true; // Prevent multiple calls
@@ -28,38 +34,34 @@ export default function PaymentCallback() {
   }, [reference]);
 
   const verifyPayment = async (reference: string) => {
-    try {
-      const verificationResponse = await verifyPaymentAction(reference);
+    const verificationResponse = await verifyPaymentAction(reference);
 
-      console.log("verificationResponse", verificationResponse);
+    toast.success(verificationResponse.data.message);
 
-      if (verificationResponse.status === "success") {
-        // Create transaction only after verification is successful
-        const depositResponse = await createTransaction({
-          amount: verificationResponse.data.data.amount,
-          type: "deposit",
-          reference,
-        });
+    console.log("verificationResponse", verificationResponse);
 
-        if (depositResponse.status === "error") {
-          toast.error("Payment processing failed");
-          return router.push("/user/dashboard");
-        }
+    if (verificationResponse.status !== "success")
+      handlePaymentError(verificationResponse.data.message);
 
-        const updatedUser = await getUser();
-        setUser(updatedUser.user);
-        toast.success("Payment successful");
-        router.push("/user/dashboard");
-      } else {
-        toast.error("Payment verification failed");
-        router.push("/user/dashboard");
-      }
-    } catch (error) {
-      toast.error("Payment processing failed");
-      router.push("/user/dashboard");
-    } finally {
-      localStorage.removeItem("totalAmount");
-    }
+    // Create transaction only after verification is successful
+    const depositResponse = await createTransaction({
+      amount: verificationResponse.data.data.amount,
+      type: "deposit",
+      reference,
+    });
+
+    if (depositResponse.status !== "success")
+      handlePaymentError(depositResponse?.data?.message || "Deposit failed");
+
+    const updatedUser = await getUser();
+    setUser(updatedUser.user);
+
+    toast.success(
+      `${verificationResponse.data.data.amount} successfully deposited into your account`
+    );
+    router.push("/user/dashboard");
+
+    localStorage.removeItem("totalAmount");
   };
 
   return <p>Verifying payment...</p>;
