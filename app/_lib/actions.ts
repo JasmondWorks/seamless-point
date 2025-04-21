@@ -75,6 +75,8 @@ export async function loginUser(userDetails: {
   email: string;
   password: string;
 }) {
+  console.log("URL", `${URL}/users/login`);
+
   try {
     const res = await fetch(`${URL}/users/login`, {
       method: "POST",
@@ -85,6 +87,8 @@ export async function loginUser(userDetails: {
     });
 
     const data = await res.json();
+
+    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 
@@ -117,6 +121,8 @@ export async function signinUser(userDetails: {
   lastName: string;
   authType: string;
 }) {
+  console.log("URL", `${URL}/users/signIn`);
+
   try {
     const res = await fetch(`${URL}/users/signIn`, {
       method: "POST",
@@ -753,13 +759,8 @@ export const verifyPayment = async (reference: string) => {
   }
 };
 export const createTransaction = async ({ amount, type, reference }: any) => {
-  console.log("transactionDetails");
-  console.log({ amount, type });
-  console.log("**********");
   try {
     const token = getUserToken();
-
-    console.log(`${URL}/transactions/create`);
 
     const res = await fetch(`${URL}/transactions/create`, {
       method: "POST",
@@ -775,13 +776,96 @@ export const createTransaction = async ({ amount, type, reference }: any) => {
     });
 
     const data = await res.json();
-    console.log("data");
-    console.log(data);
-    console.log("**********");
+
     if (!res.ok) throw new Error(data.message);
 
     return { status: "success", data };
   } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
+};
+export const getBanksList = async () => {
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/transactions/paystack/listBanks`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
+};
+export const getAccountName = async ({
+  accountNumber,
+  bankCode,
+}: {
+  accountNumber: string;
+  bankCode: string;
+}) => {
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/transactions/paystack/accountDetails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        accountNumber,
+        bankCode,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data: data.data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const updateWithdrawalBank = async ({
+  accountNumber,
+  bankCode,
+}: {
+  accountNumber: string;
+  bankCode: string;
+}) => {
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/users/updateBankDetails`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        accountNumber,
+        bankCode,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
     return { status: "error", message: error.message };
   }
 };

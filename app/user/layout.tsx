@@ -3,6 +3,7 @@ import DashboardNavbar from "@/app/_components/DashboardNavbar";
 import ProtectedRoutes from "../_components/UserProtectedRoutes";
 import Navbar from "../_components/Navbar";
 import { ScrollArea } from "../_components/ui/scroll-area";
+import GlobalLoader from "@/app/_components/GlobalLoader";
 
 export default async function DashboardLayout({
   children,
@@ -11,6 +12,7 @@ export default async function DashboardLayout({
 }) {
   return (
     <ProtectedRoutes>
+      <GlobalLoader />
       <div className="h-screen flex flex-col">
         <Navbar />
         <div className="bg-neutral-50 h-full overflow-auto relative flex">
