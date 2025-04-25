@@ -784,11 +784,11 @@ export const createTransaction = async ({ amount, type, reference }: any) => {
     return { status: "error", message: error.message };
   }
 };
-export const getBanksList = async () => {
+export const getBanks = async () => {
   try {
     const token = getUserToken();
 
-    const res = await fetch(`${URL}/transactions/paystack/listBanks`, {
+    const res = await fetch(`${URL}/transactions/paystack/list-banks`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -815,7 +815,7 @@ export const getAccountName = async ({
   try {
     const token = getUserToken();
 
-    const res = await fetch(`${URL}/transactions/paystack/accountDetails`, {
+    const res = await fetch(`${URL}/transactions/paystack/account-details`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

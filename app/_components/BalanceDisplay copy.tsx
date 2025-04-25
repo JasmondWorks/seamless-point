@@ -1,14 +1,32 @@
+"use client";
+
 import { getUser } from "@/app/_lib/actions";
 import { formatCurrency } from "@/app/_lib/utils";
 import clsx from "clsx";
+import React, { useEffect, useState } from "react";
 
-export default async function BalanceDisplay({
+import { useLoader } from "@/app/_contexts/LoaderContext";
+
+export default function BalanceDisplay({
   className = "",
 }: {
   className?: string;
 }) {
-  const res = await getUser();
-  const balance = res?.user?.balance ?? 0;
+  const [balance, setBalance] = useState<number>(0);
+  const { setIsLoading } = useLoader();
+
+  useEffect(() => {
+    async function fetchBalance() {
+      setIsLoading(true);
+      const res = await getUser();
+
+      setBalance(res?.user?.balance ?? 0);
+
+      setIsLoading(false);
+    }
+
+    fetchBalance();
+  }, []);
 
   return (
     <div

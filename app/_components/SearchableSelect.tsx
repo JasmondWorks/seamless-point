@@ -12,7 +12,7 @@ import {
 } from "@/app/_components/ui/select";
 
 interface SearchableSelectProps {
-  banksList: any[];
+  banks: any[];
   selectedBankCode: string;
   setSelectedBankCode: (value: string) => void;
   onSearchQueryChange: (query: string) => void;
@@ -20,14 +20,14 @@ interface SearchableSelectProps {
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
-  banksList,
+  banks,
   selectedBankCode,
   setSelectedBankCode,
   onSearchQueryChange,
   searchQuery,
 }) => {
   // Filter banks based on search query
-  const filteredBanksList = banksList.filter((bank: any) =>
+  const filteredBanksList = banks.filter((bank: any) =>
     bank.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

@@ -56,19 +56,16 @@ export function formatCurrency(
 ) {
   const {
     currency = "NGN",
-    notation = "compact",
     minimumFractionDigits = 0,
     maximumFractionDigits = 2,
-    compactDisplay = "short",
   } = options;
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
-    notation,
     minimumFractionDigits,
     maximumFractionDigits,
-    compactDisplay,
+    // Removed compact settings to avoid rounding
   }).format(amount);
 }
 

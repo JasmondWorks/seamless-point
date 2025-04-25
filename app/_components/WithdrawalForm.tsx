@@ -3,24 +3,21 @@
 import BalanceDisplay from "@/app/_components/BalanceDisplay";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
-import SelectDebitCard from "@/app/_components/SelectDebitCard";
 import Spinner from "@/app/_components/Spinner";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import WithdrawalAccountDetails from "@/app/_components/WithdrawalAccountDetails";
-import { useFormContext } from "@/app/_contexts/FormContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function WithdrawalForm({ onEditAccount }) {
+export default function WithdrawalForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const [selectedDebitCard, setSelectedDebitCard] = useState(null);
   const router = useRouter();
 
   function handleSetAmount(e: any) {
@@ -54,7 +51,7 @@ export default function WithdrawalForm({ onEditAccount }) {
     <div className="flex flex-col gap-y-10">
       <div className="flex flex-col sm:flex-row gap-5">
         <BalanceDisplay />
-        <WithdrawalAccountDetails onEditAccount={onEditAccount} />
+        <WithdrawalAccountDetails />
       </div>
       <div className="flex flex-col gap-3">
         <Label htmlFor="withdrawAmount">
