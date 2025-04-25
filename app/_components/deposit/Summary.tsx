@@ -80,21 +80,21 @@ function Summary({
     }
   };
 
-  const config = {
-    reference: new Date().getTime().toString(),
-    email: user.email,
-    amount: totalAmount * 100,
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
-    channels: ["card"],
-    currency: "NGN",
-    onSuccess: (reference: string) => {
-      console.log(reference);
-      router.push(reference.redirecturl);
-    },
-    onClose: () => {
-      console.log("Payment cancelled");
-    },
-  };
+  // const config = {
+  //   reference: new Date().getTime().toString(),
+  //   email: user.email,
+  //   amount: totalAmount * 100,
+  //   publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+  //   channels: ["card"],
+  //   currency: "NGN",
+  //   onSuccess: (reference: string) => {
+  //     console.log(reference);
+  //     router.push(reference.redirecturl);
+  //   },
+  //   onClose: () => {
+  //     console.log("Payment cancelled");
+  //   },
+  // };
 
   return (
     <>

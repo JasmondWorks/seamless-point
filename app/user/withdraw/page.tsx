@@ -1,64 +1,24 @@
-"use client";
-
 import AddWithdrawalAccount from "@/app/_components/AddWithdrawalAccount";
-import SpinnerFull from "@/app/_components/SpinnerFull";
 import WithdrawalForm from "@/app/_components/WithdrawalForm";
 import { getUser } from "@/app/_lib/actions";
-import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 
-export default function Withdraw() {
-  const [bankDetails, setBankDetails] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEditingAcc, setIsEditingAcc] = useState(false);
+export default async function Withdraw({ params, searchParams }: any) {
+  const res = await getUser();
+  const bankDetails = res?.user?.bankDetails ?? {};
+  const showAddAccount = (searchParams["add-account"] = "true");
 
-  console.log("Editing: ", isEditingAcc);
-
-  useEffect(() => {
-    async function fetchBalance() {
-      try {
-        setIsLoading(true);
-        const res = await getUser();
-        setBankDetails(res?.user?.bankDetails ?? {});
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchBalance();
-  }, []);
-
-  function handleEditAcc() {
-    setIsEditingAcc(true);
-  }
-  function handleEndEditAcc() {
-    setIsEditingAcc(false);
+  if (Object.keys(bankDetails).length === 0) {
+    redirect("?add-account=true");
   }
 
-  if (isLoading) return <SpinnerFull />;
-
-  if (Object.keys(bankDetails).length === 0 || isEditingAcc) {
-    return (
-      <AddWithdrawalAccount
-        bankDetails={bankDetails}
-        onEndEditAcc={handleEndEditAcc}
-        onAccountAdded={(newDetails) => {
-          setIsLoading(true); // Show spinner briefly
-          setTimeout(() => {
-            setBankDetails(newDetails);
-            setIsLoading(false);
-          }, 500); // Adjust this delay to taste
-        }}
-      />
-    );
-  }
+  if (showAddAccount) return <AddWithdrawalAccount bankDetails={bankDetails} />;
 
   return (
     <div className="max-w-3xl">
       <div className="flex flex-col gap-10">
         <h1 className="headline text-center">Withdrawal of Funds</h1>
-        <WithdrawalForm onEditAccount={handleEditAcc} />
+        <WithdrawalForm />
       </div>
     </div>
   );

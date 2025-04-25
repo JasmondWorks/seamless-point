@@ -5,17 +5,8 @@ import { Label } from "@/app/_components/ui/label";
 import React, { useEffect, useState } from "react";
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/_components/ui/select";
-import {
   getAccountName,
-  getBanksList,
+  getBanks,
   updateWithdrawalBank,
 } from "@/app/_lib/actions";
 import SearchableSelect from "@/app/_components/SearchableSelect";
@@ -23,29 +14,37 @@ import toast from "react-hot-toast";
 import SpinnerFull from "@/app/_components/SpinnerFull";
 import Spinner from "@/app/_components/Spinner";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const AddWithdrawalAccount = ({
   bankDetails,
-  onAccountAdded,
-  onEndEditAcc,
 }: {
-  onAccountAdded: ({}) => void;
-  bankDetails: {};
-  onEndEditAcc: () => void;
+  bankDetails: {
+    bankName: "";
+    accountNumber: "";
+    accountName: "";
+  };
 }) => {
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
   const [isLoadingAccountName, setIsLoadingAccountName] = useState(false);
   const [accountNumber, setAccountNumber] = useState<string>(
-    bankDetails.accountNumber
+    bankDetails?.accountNumber
   );
-  const [banksList, setBanksList] = useState([]);
+  const [banks, setBanks] = useState([]);
   const [selectedBankCode, setSelectedBankCode] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // New state for search query
-  const [accountName, setAccountName] = useState("");
-  const [accountNameErrorMessage, setAccountNameErrorMessage] = useState("");
+  const [account, setAccount] = useState({
+    name: "",
+    error: "",
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useUserAuth();
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedBank = banks.find((bank) => bank.code === selectedBankCode);
+
   const isEditing = Object.keys(bankDetails).length !== 0;
 
   const handleInputAccountNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,20 +52,20 @@ const AddWithdrawalAccount = ({
   };
 
   useEffect(() => {
-    async function fetchBanksList() {
+    async function fetchBanks() {
       let res;
 
       setIsLoadingBanks(true);
 
-      res = await getBanksList();
+      res = await getBanks();
 
-      if (res.status === "success") setBanksList(res.data.data);
+      if (res.status === "success") setBanks(res.data.data);
       if (res.status === "error") toast.error(res.message);
 
       setIsLoadingBanks(false);
     }
     async function fetchAccountDetails() {}
-    fetchBanksList();
+    fetchBanks();
     fetchAccountDetails();
   }, []);
 
@@ -82,13 +81,14 @@ const AddWithdrawalAccount = ({
       console.log(res);
 
       if (res.status === "success") {
-        setAccountName(res.data.account_name);
-        setAccountNameErrorMessage("");
+        setAccount({
+          name: res.data.account_name,
+          error: "",
+        });
       }
 
       if (res.status === "error") {
-        setAccountNameErrorMessage(res.message);
-        setAccountName("");
+        setAccount({ name: "", error: res.message });
       }
 
       setIsLoadingAccountName(false);
@@ -109,9 +109,11 @@ const AddWithdrawalAccount = ({
     console.log(newDetails);
 
     if (res.status === "success") {
-      onAccountAdded(newDetails);
       toast.success(`Account ${isEditing ? "updated" : "added"} succesfully`);
-      onEndEditAcc();
+
+      const params = new URLSearchParams(searchParams);
+      params.set("add-account", "false");
+      router.replace(`?${params.toString()}`);
     }
 
     setIsSubmitting(false);
@@ -141,7 +143,7 @@ const AddWithdrawalAccount = ({
           <div className="space-y-1">
             <Label htmlFor="bankName">Bank Name</Label>
             <SearchableSelect
-              banksList={banksList}
+              banks={banks}
               selectedBankCode={selectedBankCode}
               setSelectedBankCode={setSelectedBankCode}
               searchQuery={searchQuery}
@@ -154,21 +156,21 @@ const AddWithdrawalAccount = ({
               <Spinner color="orange" size="medium" />
             </div>
           )}
-          {!isLoadingAccountName && accountNameErrorMessage && (
+          {!isLoadingAccountName && account.error && (
             <p className="font-bold text-red-600">
-              <small>{accountNameErrorMessage}</small>
+              <small>{account.error}</small>
             </p>
           )}
-          {!isLoadingAccountName && accountName && (
+          {!isLoadingAccountName && account.name && (
             <p className="font-bold text-green-600">
-              <small>{accountName}</small>
+              <small>{account.name}</small>
             </p>
           )}
 
           <ButtonFormSubmit
             className={
               isLoadingAccountName ||
-              accountNameErrorMessage ||
+              account.error ||
               !accountNumber ||
               !selectedBankCode
                 ? "pointer-events-none cursor-not-allowed opacity-50"

@@ -4,9 +4,10 @@ import Card from "@/app/_components/Card";
 import { useLoader } from "@/app/_contexts/LoaderContext";
 import { getUser } from "@/app/_lib/actions";
 import { Edit } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const WithdrawalAccountDetails = ({ onEditAccount }) => {
+const WithdrawalAccountDetails = () => {
   const [bankDetails, setBankDetails] = useState<{
     accountName: string;
     accountNumber: string;
@@ -17,6 +18,8 @@ const WithdrawalAccountDetails = ({ onEditAccount }) => {
     bankName: "",
   });
   const { setIsLoading } = useLoader();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     async function fetchAccDetails() {
@@ -31,6 +34,12 @@ const WithdrawalAccountDetails = ({ onEditAccount }) => {
     fetchAccDetails();
   }, []);
 
+  function handleEditAccount() {
+    const params = new URLSearchParams(searchParams);
+    params.set("add-account", "true");
+    router.replace(`?${params.toString()}`);
+  }
+
   return (
     <Card className="font-medium text-sm">
       <h3 className="pb-1 mb-5 border-b font-bold">Bank details</h3>
@@ -40,7 +49,7 @@ const WithdrawalAccountDetails = ({ onEditAccount }) => {
           <p className="text-2xl font-bold">{bankDetails?.accountNumber}</p>
           <p>{bankDetails?.bankName}</p>
         </div>
-        <button onClick={onEditAccount}>
+        <button onClick={handleEditAccount}>
           <Edit size={16} />
         </button>
       </div>
