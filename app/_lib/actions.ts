@@ -847,7 +847,7 @@ export const updateWithdrawalBank = async ({
   try {
     const token = getUserToken();
 
-    const res = await fetch(`${URL}/users/updateBankDetails`, {
+    const res = await fetch(`${URL}/users/update-bank-details`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

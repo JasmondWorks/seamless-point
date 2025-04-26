@@ -34,8 +34,6 @@ export default function Navbar({ className = "" }) {
 
   const pathname = usePathname();
 
-  console.log(pathname);
-
   useEffect(() => {
     const handleScroll = () => {
       setHasScrolled(window.scrollY > 10);

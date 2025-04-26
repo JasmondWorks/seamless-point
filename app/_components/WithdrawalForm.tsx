@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function WithdrawalForm() {
+export default function WithdrawalForm({ onShowAddAccount }: any) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,7 @@ export default function WithdrawalForm() {
     <div className="flex flex-col gap-y-10">
       <div className="flex flex-col sm:flex-row gap-5">
         <BalanceDisplay />
-        <WithdrawalAccountDetails />
+        <WithdrawalAccountDetails onShowAddAccount={onShowAddAccount} />
       </div>
       <div className="flex flex-col gap-3">
         <Label htmlFor="withdrawAmount">

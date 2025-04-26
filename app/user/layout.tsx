@@ -13,7 +13,7 @@ export default async function DashboardLayout({
   return (
     <ProtectedRoutes>
       <GlobalLoader />
-      <div className="h-screen flex flex-col">
+      <div className="h-screen w-screen flex flex-col">
         <Navbar />
         <div className="bg-neutral-50 h-full overflow-auto relative flex">
           <DashboardNavbar />
