@@ -7,7 +7,7 @@ import { Edit } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const WithdrawalAccountDetails = () => {
+const WithdrawalAccountDetails = ({ onShowAddAccount }: any) => {
   const [bankDetails, setBankDetails] = useState<{
     accountName: string;
     accountNumber: string;
@@ -34,12 +34,6 @@ const WithdrawalAccountDetails = () => {
     fetchAccDetails();
   }, []);
 
-  function handleEditAccount() {
-    const params = new URLSearchParams(searchParams);
-    params.set("add-account", "true");
-    router.replace(`?${params.toString()}`);
-  }
-
   return (
     <Card className="font-medium text-sm">
       <h3 className="pb-1 mb-5 border-b font-bold">Bank details</h3>
@@ -49,7 +43,7 @@ const WithdrawalAccountDetails = () => {
           <p className="text-2xl font-bold">{bankDetails?.accountNumber}</p>
           <p>{bankDetails?.bankName}</p>
         </div>
-        <button onClick={handleEditAccount}>
+        <button onClick={onShowAddAccount}>
           <Edit size={16} />
         </button>
       </div>

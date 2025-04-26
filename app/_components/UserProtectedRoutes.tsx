@@ -10,8 +10,6 @@ export default function ProtectedRoutes({ children }: { children: any }) {
   const router = useRouter();
   const { user, isAuthenticating, logout } = useUserAuth();
 
-  console.log(user);
-
   useEffect(() => {
     if (isAuthenticating) return; // Wait until authentication is complete
 

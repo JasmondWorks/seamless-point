@@ -14,36 +14,33 @@ import toast from "react-hot-toast";
 import SpinnerFull from "@/app/_components/SpinnerFull";
 import Spinner from "@/app/_components/Spinner";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { useRouter, useSearchParams } from "next/navigation";
 
 const AddWithdrawalAccount = ({
   bankDetails,
-}: {
-  bankDetails: {
-    bankName: "";
-    accountNumber: "";
-    accountName: "";
-  };
-}) => {
+  onHideAddAccount,
+  setBankDetails,
+}: any) => {
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
   const [isLoadingAccountName, setIsLoadingAccountName] = useState(false);
   const [accountNumber, setAccountNumber] = useState<string>(
     bankDetails?.accountNumber
   );
   const [banks, setBanks] = useState([]);
+  console.log(banks);
+
   const [selectedBankCode, setSelectedBankCode] = useState("");
+  console.log(selectedBankCode);
+  let formattedSelectedBankCode = selectedBankCode.split("-")[0];
+
   const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const [account, setAccount] = useState({
     name: "",
     error: "",
   });
 
+  console.log(selectedBankCode);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const selectedBank = banks.find((bank) => bank.code === selectedBankCode);
 
   const isEditing = Object.keys(bankDetails).length !== 0;
 
@@ -59,26 +56,39 @@ const AddWithdrawalAccount = ({
 
       res = await getBanks();
 
-      if (res.status === "success") setBanks(res.data.data);
+      if (res.status === "success") {
+        const uniqueBanks = res.data.data.map((bank: any, idx: number) => ({
+          ...bank,
+          code: `${bank.code}-${idx}`,
+        }));
+        setBanks(uniqueBanks);
+        const bankCodeIndex: number = uniqueBanks.findIndex(
+          (bank: any) => bank.code.split("-")[0] === bankDetails.bankCode
+        );
+
+        setSelectedBankCode(
+          Object.keys(bankDetails).length
+            ? `${bankDetails.bankCode}-${bankCodeIndex}`
+            : ""
+        );
+      }
       if (res.status === "error") toast.error(res.message);
 
       setIsLoadingBanks(false);
     }
-    async function fetchAccountDetails() {}
     fetchBanks();
-    fetchAccountDetails();
   }, []);
 
   useEffect(() => {
     async function fetchAccountName() {
+      setAccount({ name: "", error: "" });
+
       setIsLoadingAccountName(true);
 
       const res = await getAccountName({
         accountNumber,
-        bankCode: selectedBankCode,
+        bankCode: formattedSelectedBankCode,
       });
-
-      console.log(res);
 
       if (res.status === "success") {
         setAccount({
@@ -93,7 +103,9 @@ const AddWithdrawalAccount = ({
 
       setIsLoadingAccountName(false);
     }
-    if (accountNumber && selectedBankCode) fetchAccountName();
+
+    if (accountNumber && selectedBankCode && accountNumber.length >= 6)
+      fetchAccountName();
   }, [accountNumber, selectedBankCode]);
 
   async function handleAddAccount(e: any) {
@@ -103,18 +115,18 @@ const AddWithdrawalAccount = ({
 
     const res = await updateWithdrawalBank({
       accountNumber,
-      bankCode: selectedBankCode,
+      bankCode: formattedSelectedBankCode,
     }); // your actual logic here
     const newDetails = res.data?.data?.user?.bankDetails;
     console.log(newDetails);
+    setBankDetails(res.data?.data?.user?.bankDetails);
 
     if (res.status === "success") {
       toast.success(`Account ${isEditing ? "updated" : "added"} succesfully`);
 
-      const params = new URLSearchParams(searchParams);
-      params.set("add-account", "false");
-      router.replace(`?${params.toString()}`);
-    }
+      onHideAddAccount();
+    } else if (res.status === "error")
+      toast.error(`Account could not ${isEditing ? "updated" : "added"}`);
 
     setIsSubmitting(false);
   }
@@ -144,13 +156,14 @@ const AddWithdrawalAccount = ({
             <Label htmlFor="bankName">Bank Name</Label>
             <SearchableSelect
               banks={banks}
-              selectedBankCode={selectedBankCode}
-              setSelectedBankCode={setSelectedBankCode}
+              selectedItem={selectedBankCode}
+              setSelectedItem={setSelectedBankCode}
               searchQuery={searchQuery}
               onSearchQueryChange={setSearchQuery}
             />
           </div>
 
+          {/* {<p>{JSON.stringify(account)}</p>} */}
           {isLoadingAccountName && (
             <div className="flex flex-col">
               <Spinner color="orange" size="medium" />
