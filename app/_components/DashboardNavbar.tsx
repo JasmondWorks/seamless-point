@@ -5,33 +5,35 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/app/_components/ui/tooltip";
 
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 import SignOutButton from "./SignOutButton";
 import { IoClose, IoWalletOutline } from "react-icons/io5";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { cn } from "@/app/_lib/utils";
+
+const iconStyles =
+  "w-7 h-7 lg:w-6 lg:h-6 flex items-center justify-center flex-shrink-0";
+
+const svgStyles = "w-full h-full";
 
 const navLinks = [
   {
     path: "/user/dashboard",
     icon: (
       <svg
-        // className={styles.icon}
-        className="w-full h-full"
-        width={20}
-        height={20}
+        className={svgStyles}
         viewBox="0 0 20 20"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M1 10L3 8M3 8L10 1L17 8M3 8V18C3 18.5523 3.44772 19 4 19H7M17 8L19 10M17 8V18C17 18.5523 16.5523 19 16 19H13M7 19C7.55228 19 8 18.5523 8 18V14C8 13.4477 8.44772 13 9 13H11C11.5523 13 12 13.4477 12 14V18C12 18.5523 12.4477 19 13 19M7 svg13"
-          // stroke="#40100A"
+          d="M1 10L3 8M3 8L10 1L17 8M3 8V18C3 18.5523 3.44772 19 4 19H7M17 8L19 10M17 8V18C17 18.5523 16.5523 19 16 19H13M7 19C7.55228 19 8 18.5523 8 18V14C8 13.4477 8.44772 13 9 13H11C11.5523 13 12 13.4477 12 14V18C12 18.5523 12.4477 19 13 19M7 19H13"
           stroke="currentColor"
           strokeWidth="1.2"
           strokeLinecap="round"
@@ -45,8 +47,7 @@ const navLinks = [
     path: "/user/deliveries",
     icon: (
       <svg
-        // className={styles.icon}
-        className="w-full h-full"
+        className={svgStyles}
         width={22}
         height={18}
         viewBox="0 0 22 18"
@@ -73,8 +74,7 @@ const navLinks = [
     path: "/user/payments",
     icon: (
       <svg
-        // className={styles.icon}
-        className="w-full h-full"
+        className={svgStyles}
         width={22}
         height={20}
         viewBox="0 0 22 20"
@@ -105,9 +105,7 @@ const adminNavLinks = [
     path: "/admin/dashboard",
     icon: (
       <svg
-        className="w-full h-full"
-        width={20}
-        height={20}
+        className={svgStyles}
         viewBox="0 0 20 20"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +125,7 @@ const adminNavLinks = [
     path: "/admin/shipments",
     icon: (
       <svg
-        className="w-full h-full"
+        className={svgStyles}
         width={22}
         height={18}
         viewBox="0 0 22 18"
@@ -154,7 +152,7 @@ const adminNavLinks = [
     path: "/admin/transactions",
     icon: (
       <svg
-        className="h-full w-full"
+        className={svgStyles}
         width={22}
         height={20}
         viewBox="0 0 22 20"
@@ -193,6 +191,7 @@ const adminNavLinks = [
     path: "/admin/riders",
     icon: (
       <svg
+        className={svgStyles}
         width={24}
         height={24}
         viewBox="0 0 24 24"
@@ -219,7 +218,7 @@ export default function Navbar() {
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
 
   const { user } = useUserAuth();
-  const { role } = user;
+  const role = user?.role;
 
   const getLinkStyles = (path?: string | null, paths?: string[]) => {
     return `font-medium lg:px-10 px-3 py-4 lg:py-3  flex items-center gap-3 w-full transition-all duration-300 ease-in-out ${
@@ -231,8 +230,6 @@ export default function Navbar() {
     // If an array of pathname if passed in e.g /user/settings or /admin/settings
     ${paths?.includes(pathname ? "text-brandSec pointer-events-none" : "")}`;
   };
-  const iconStyles =
-    "w-8 lg:w-6 aspect-square flex items-center justify-center flex-shrink-0";
 
   function handleToggleNav() {
     setIsNavShowing((cur) => !cur);
@@ -316,7 +313,7 @@ export default function Navbar() {
               fill="#D9D9D9"
             />
             <path
-              d="M35.5262 42.3446L253.678 183.447L22.4035 301.821L35.5262 42.3446Z"
+              d="M35.5262 42.3446L253.678 183.447L222.4035 301.821L35.5262 42.3446Z"
               fill="#EE5E21"
             />
           </svg>
@@ -345,7 +342,12 @@ export default function Navbar() {
                       <li>
                         <Link
                           href={link.path}
-                          className={getLinkStyles(link.path)}
+                          className={cn(
+                            getLinkStyles(link.path),
+                            isNavShowing
+                              ? "justify-start"
+                              : "justify-center lg:justify-start"
+                          )}
                         >
                           <div className={iconStyles}>{link.icon}</div>
                           <span

@@ -68,7 +68,7 @@ body {
   @apply text-neutral-400;
 }
 .headline {
-  @apply text-3xl md:text-4xl !leading-tight font-bold text-center;
+  @apply !text-[2.2rem] md:!text-[2.8rem] !leading-tight font-bold text-center;
 }
 
 .section-heading {

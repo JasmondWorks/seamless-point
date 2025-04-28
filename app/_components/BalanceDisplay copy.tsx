@@ -5,7 +5,7 @@ import { formatCurrency } from "@/app/_lib/utils";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 
-import { useLoader } from "@/app/_contexts/LoaderContext";
+import Spinner from "@/app/_components/Spinner";
 
 export default function BalanceDisplay({
   className = "",
@@ -13,7 +13,7 @@ export default function BalanceDisplay({
   className?: string;
 }) {
   const [balance, setBalance] = useState<number>(0);
-  const { setIsLoading } = useLoader();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchBalance() {
@@ -27,6 +27,14 @@ export default function BalanceDisplay({
 
     fetchBalance();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[300px] flex items-center justify-center absolute top-0 left-0 right-0 bottom-0">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div

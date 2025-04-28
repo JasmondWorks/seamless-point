@@ -48,7 +48,7 @@ export default function ChangePasswordForm() {
 
     if (res.status === "success") {
       toast.success(res.message);
-      login(null, res.token);
+      login(undefined, res.token);
     } else {
       toast.error(res.message);
     }

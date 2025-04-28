@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Spinner from "./Spinner";
 
 interface Props {
-  text?: string;
+  text?: string | React.ReactNode;
   className?: string;
   icon?: React.ReactNode;
   onClick?: any;
@@ -27,8 +27,12 @@ export default function ButtonFormSubmit({
       type="submit"
       disabled={disabled}
       onClick={onClick}
-      text={disabled ? <Spinner /> : text}
-      className={clsx("py-10 !h-14 items-center font-normal w-full", className)}
+      text={text}
+      className={clsx(
+        "py-10 !h-14 items-center font-normal w-full",
+        disabled && "opacity-50 cursor-not-allowed",
+        className
+      )}
       isRoundedLarge
       variant={ButtonVariant.fill}
       isReversed={isReversed}

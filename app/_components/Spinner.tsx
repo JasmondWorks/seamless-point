@@ -2,8 +2,8 @@ import React from "react";
 
 export default function Spinner({
   className = "",
-  size = "small",
-  color = "text",
+  size = "medium",
+  color = "orange",
 }: {
   className?: string;
   size?: string;

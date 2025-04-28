@@ -1,132 +1,106 @@
-import { useRef, useEffect, useState } from "react";
-import { Input } from "@/app/_components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/_components/ui/select";
+"use client";
 
-interface SearchableSelectProps {
-  banks: any[];
-  selectedItem: string;
-  setSelectedItem: (value: string) => void;
-  onSearchQueryChange: (query: string) => void;
-  searchQuery: string;
+import * as React from "react";
+import { useState } from "react";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandItem,
+  CommandGroup,
+} from "cmdk";
+import * as Popover from "@radix-ui/react-popover";
+import { CheckIcon, ChevronDownIcon } from "lucide-react";
+
+interface Bank {
+  name: string;
+  code: string;
 }
 
-const SearchableSelect: React.FC<SearchableSelectProps> = ({
+interface SearchableSelectProps {
+  banks: Bank[];
+  selectedItem: string;
+  setSelectedItem: (value: string) => void;
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
+}
+
+export default function SearchableSelect({
   banks,
   selectedItem,
   setSelectedItem,
-  onSearchQueryChange,
   searchQuery,
-}) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const selectContentRef = useRef<HTMLDivElement>(null);
-  const [isInputFocused, setIsInputFocused] = useState(true);
+  onSearchQueryChange,
+}: SearchableSelectProps) {
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState(searchQuery || "");
 
-  // Focus the input when the SelectContent opens
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-      setIsInputFocused(true);
-    }
-  }, []);
-
-  // Filter banks based on search query
-  const filteredBanksList = banks.filter((bank: any) =>
-    bank.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBanks = banks.filter((bank) =>
+    bank.name.toLowerCase().includes(searchValue.toLowerCase())
   );
-
-  const codeSet = new Set();
-  filteredBanksList.forEach((bank) => {
-    if (codeSet.has(bank.code)) {
-      console.warn("Duplicate code found:", bank.code);
-    } else {
-      codeSet.add(bank.code);
-    }
-  });
-
-  // Handle keydown events in the input
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Prevent Radix UI typeahead behavior while typing in the input
-    e.stopPropagation();
-
-    // Allow specific keys to interact with the Select component
-    if (e.key === "Tab" || e.key === "Escape") {
-      // Move focus to the Select options for navigation
-      setIsInputFocused(false);
-      if (selectContentRef.current) {
-        const firstOption = selectContentRef.current.querySelector(
-          "[data-radix-select-item]"
-        ) as HTMLElement;
-        if (firstOption) {
-          firstOption.focus();
-        }
-      }
-    } else if (["ArrowUp", "ArrowDown"].includes(e.key)) {
-      // Optionally prevent arrow keys from navigating while typing
-      e.preventDefault();
-    } else if (e.key === "Enter") {
-      // Prevent Enter from selecting an option while typing
-      e.preventDefault();
-    }
-  };
-
-  // Handle focus on the input
-  const handleInputFocus = () => {
-    setIsInputFocused(true);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
-  // Prevent clicks on the input from closing the dropdown
-  const handleInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    handleInputFocus();
-  };
 
   return (
-    <Select onValueChange={setSelectedItem} value={selectedItem}>
-      <SelectTrigger className="bg-white h-11 relative">
-        <SelectValue placeholder="Bank Name" id="bankName" />
-      </SelectTrigger>
-      <SelectContent
-        className="max-h-80 overflow-hidden"
-        ref={selectContentRef}
-      >
-        <div className="grid grid-rows-[auto_1fr] max-h-60">
-          {/* Search Input (Fixed Height: auto) */}
-          <div className="p-2 bg-white">
-            <Input
-              ref={inputRef}
-              placeholder="Search for a bank..."
-              value={searchQuery}
-              onChange={(e) => onSearchQueryChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onClick={handleInputClick}
-              onFocus={handleInputFocus}
-              className="bg-white"
-            />
-          </div>
-          {/* Scrollable Options (Takes Remaining Height) */}
-          <div className="overflow-y-auto">
-            <SelectGroup>
-              {filteredBanksList?.map((bank: any, idx: number) => (
-                <SelectItem key={idx} value={bank.code}>
-                  {bank.name}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </div>
-        </div>
-      </SelectContent>
-    </Select>
-  );
-};
+    <div className="relative w-full">
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <button
+            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-expanded={open}
+          >
+            <span className="truncate">
+              {selectedItem
+                ? banks.find((bank) => bank.code === selectedItem)?.name
+                : "Select a bank..."}
+            </span>
+            <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </button>
+        </Popover.Trigger>
 
-export default SearchableSelect;
+        <Popover.Content
+          sideOffset={4}
+          align="start"
+          className="z-50 w-[var(--radix-popper-anchor-width)] max-w-[400px] rounded-md border border-gray-200 bg-white p-0 shadow-lg"
+          side="bottom"
+        >
+          <Command>
+            <CommandInput
+              placeholder="Search banks..."
+              value={searchValue}
+              onValueChange={(value) => {
+                setSearchValue(value);
+                onSearchQueryChange?.(value);
+              }}
+              className="h-9 w-full border-b px-3 py-2 text-sm outline-none"
+            />
+            <CommandList className="max-h-[300px] overflow-y-auto">
+              <CommandGroup className="p-1">
+                {filteredBanks.length > 0 ? (
+                  filteredBanks.map((bank) => (
+                    <CommandItem
+                      key={bank.code}
+                      value={bank.name}
+                      onSelect={() => {
+                        setSelectedItem(bank.code);
+                        setOpen(false);
+                      }}
+                      className="flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-gray-100"
+                    >
+                      <span className="truncate">{bank.name}</span>
+                      {selectedItem === bank.code && (
+                        <CheckIcon className="ml-2 h-4 w-4 shrink-0 opacity-100" />
+                      )}
+                    </CommandItem>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    No banks found.
+                  </div>
+                )}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </Popover.Content>
+      </Popover.Root>
+    </div>
+  );
+}

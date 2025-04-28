@@ -17,8 +17,7 @@ type User = {
 type AuthType = {
   user: User | null;
   setUser: (user: User | null) => void;
-  isAuthenticating: boolean;
-  // authenticated: boolean;
+  authState: "loading" | "authenticated" | "unauthenticated";
   login: (user: User | undefined, token: string) => void;
   logout: () => void;
 };
@@ -36,20 +35,22 @@ const userKey = getLocalStorageKey("user");
 
 export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
-  // const [authenticated, setAuthenticated] = useState(false);
+  const [authState, setAuthState] = useState<
+    "loading" | "authenticated" | "unauthenticated"
+  >("loading");
 
   function logout() {
     localStorage.removeItem("user");
     setUser(null);
     Cookies.remove("token");
-    // setAuthenticated(false);
+    setAuthState("unauthenticated");
   }
+
   function login(user: User | undefined = undefined, token: string) {
     user && localStorage.setItem(userKey, JSON.stringify(user));
     user && setUser(user);
     Cookies.set("token", token);
-    // setAuthenticated(true);
+    setAuthState("authenticated");
   }
 
   // Fetch stored token on mount
@@ -58,21 +59,23 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       token: string,
       userType: string = "user"
     ) {
-      const res: AuthResponse =
-        userType === "user"
-          ? await authenticateUser(token)
-          : await authenticateAdmin(token);
+      try {
+        const res: AuthResponse =
+          userType === "user"
+            ? await authenticateUser(token)
+            : await authenticateAdmin(token);
 
-      console.log(res);
+        const user: User = JSON.parse(localStorage.getItem(userKey) || "{}");
 
-      const user: User = JSON.parse(localStorage.getItem(userKey) || "{}");
-
-      if (res?.status === "success") {
-        login(user, token);
-      } else {
+        if (res?.status === "success") {
+          login(user, token);
+        } else {
+          logout();
+        }
+      } catch (error) {
+        console.error("Authentication error:", error);
         logout();
       }
-      setIsAuthenticating(false);
     }
 
     const storedUser = localStorage.getItem(userKey);
@@ -82,12 +85,10 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       const token: string = Cookies.get("token") || "";
 
       const userType = user.role === "user" ? "user" : "admin";
-
       authenticationInit(token, userType);
-
       setUser({ ...user, role: userType });
     } else {
-      setIsAuthenticating(false);
+      setAuthState("unauthenticated");
     }
   }, []);
 
@@ -96,8 +97,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         setUser,
-        isAuthenticating,
-        // authenticated,
+        authState,
         logout,
         login,
       }}

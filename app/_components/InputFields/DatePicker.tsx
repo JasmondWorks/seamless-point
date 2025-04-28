@@ -30,7 +30,7 @@ export default function DatePicker({ props, field }: any) {
           selected={parseToDateObject(field.value)}
           onChange={(date: Date | null) => field.onChange(date)}
           timeInputLabel="Time:"
-          dateFormat={props.dateFormat ?? "MM/dd/yyyy"}
+          dateFormat={props.dateFormat ?? "dd/MM/yyyy"}
           wrapperClassName="w-full"
           placeholderText={props.placeholder}
           className="bg-transparent text-inherit text-white focus:outline-none text-sm"

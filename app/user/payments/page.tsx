@@ -1,4 +1,5 @@
 import ActionButton from "@/app/_components/ActionButton";
+import BalanceDisplay from "@/app/_components/BalanceDisplay";
 import { PaymentsTable } from "@/app/_components/PaymentsTable";
 import clsx from "clsx";
 import Link from "next/link";
@@ -14,13 +15,15 @@ export default function Payments() {
               "white url('/assets/images/naira-illustration.png') no-repeat right center/ contain",
           }}
           className={clsx(
-            "text-neutral-700 relative px-4 lg:px-6 py-2 pt-10 card w-full max-w-xl lg:max-w-none flex items-center"
+            "text-neutral-700 relative p-4 card w-full max-w-xl lg:max-w-none"
           )}
         >
-          <h3 className="absolute font-bold top-2 left-7">BALANCE</h3>
+          <h3 className="font-bold">BALANCE</h3>
           <p className="text-6xl lg:text-7xl">0.00</p>
         </div>
-        <div className="flex gap-10 flex-wrap">
+
+        {/* <BalanceDisplay className="flex flex-col justify-center" /> */}
+        <div className="flex gap-5 flex-wrap">
           <Link href="/user/withdraw" className="flex-1">
             <ActionButton
               text="Withdraw"
@@ -40,7 +43,7 @@ export default function Payments() {
               }
             />
           </Link>
-          <Link href="/user/deposit/funding" className="flex-1">
+          <Link href="/user/deposit" className="flex-1">
             <ActionButton
               text="Deposit"
               size="sm"

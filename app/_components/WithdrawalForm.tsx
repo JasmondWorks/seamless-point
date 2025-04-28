@@ -13,10 +13,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function WithdrawalForm({ onShowAddAccount }: any) {
+export default function WithdrawalForm({ onShowAddAccount, bankDetails }: any) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [amount, setAmount] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -25,9 +24,7 @@ export default function WithdrawalForm({ onShowAddAccount }: any) {
   }
 
   function onSubmit() {
-    // if (!selectedDebitCard || !amount) {
     if (!amount) {
-      // if (!selectedDebitCard) toast.error("Select a debit card to proceed");
       if (!amount) toast.error("Enter an amount to proceed");
 
       return;
@@ -40,18 +37,14 @@ export default function WithdrawalForm({ onShowAddAccount }: any) {
     router.push("/user/dashboard");
   }
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center">
-        <Spinner color="orange" size="medium" />
-      </div>
-    );
-
   return (
     <div className="flex flex-col gap-y-10">
-      <div className="flex flex-col sm:flex-row gap-5">
-        <BalanceDisplay />
-        <WithdrawalAccountDetails onShowAddAccount={onShowAddAccount} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <BalanceDisplay className="!min-w-0 !w-full" />
+        <WithdrawalAccountDetails
+          onShowAddAccount={onShowAddAccount}
+          bankDetails={bankDetails}
+        />
       </div>
       <div className="flex flex-col gap-3">
         <Label htmlFor="withdrawAmount">
@@ -70,7 +63,6 @@ export default function WithdrawalForm({ onShowAddAccount }: any) {
           this account
         </p>
       </div>
-      {/* <SelectDebitCard /> */}
       <PrivacyPolicyBlock />
       <ButtonFormSubmit onClick={onSubmit} text="I UNDERSTAND" />
 

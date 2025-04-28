@@ -6,8 +6,6 @@ import { getUser } from "@/app/_lib/actions";
 export default async function UserDetails() {
   const res = await getUser();
 
-  console.log(res.user);
-
   return (
     <>
       <ProfileImageUploader user={res.user} />
