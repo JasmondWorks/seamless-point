@@ -19,41 +19,36 @@ type Props = {
   onChange: (value: string) => void;
 };
 export default function SelectBox({ field, props, onChange }: Props) {
-  const [selectedValue, setSelectedValue] = useState<string | undefined>();
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(
+    field.value
+  );
+
+  console.log(field.value);
 
   function handleValueChange(value: string) {
     field.onChange(value);
     onChange(value);
-    // setSelectedValue(value);
-    console.log(value);
+    setSelectedValue(value);
   }
 
   return (
     <Select
       disabled={props.disabled}
-      value={props.selectValue || field.value}
-      onValueChange={(value) => {
-        // field.onChange(value); // update field value
-        handleValueChange(value);
-      }}
-      defaultValue={field.value}
+      value={field.value || props.selectValue}
+      onValueChange={handleValueChange}
     >
       <FormControl>
         <SelectTrigger
           onMouseDown={(event) => {
-            event.stopPropagation(); // Prevent parent handlers from interfering
+            event.stopPropagation();
 
             if (!props.selectOptions?.length) {
-              console.log("selectOptions", props.selectOptions);
               event.preventDefault();
               toast.error(props.selectMessage || "Select an option");
             }
           }}
           className={`shad-select-trigger`}
         >
-          {/* ${
-              !props.selectOptions?.length && "opacity-30 cursor-not-allowed"
-            } */}
           {!props.selectOptions?.length ? (
             <p className="text-muted">
               {props.selectMessage || "No options available"}

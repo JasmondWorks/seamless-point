@@ -6,6 +6,7 @@ import { UserAuthProvider } from "@/app/_contexts/UserAuthContext";
 import QueryProvider from "@/app/_lib/QueryProvider";
 import { LoaderProvider } from "@/app/_contexts/LoaderContext";
 import GlobalLoader from "@/app/_components/GlobalLoader";
+import { showToast } from "@/app/_lib/toast";
 
 export default function RootLayout({
   children,
@@ -68,12 +69,16 @@ export default function RootLayout({
               style: { background: "#4CAF50", color: "#fff" },
             },
             error: {
-              duration: 5000,
+              duration: 3000,
               style: { background: "#F44336", color: "#fff" },
             },
             loading: {
               duration: 3000,
               style: { background: "#FF9800", color: "#fff" },
+            },
+            custom: {
+              duration: 3000,
+              style: { background: "#2196F3", color: "#fff" },
             },
           }}
         />

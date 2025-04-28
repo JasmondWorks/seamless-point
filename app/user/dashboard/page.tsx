@@ -15,7 +15,9 @@ export default function Dashboard() {
         Let's get you started for today
       </h1>
 
-      <BalanceDisplay />
+      <div className="w-full sm:w-fit sm:min-w-[350px] md:min-w-[550px]">
+        <BalanceDisplay />
+      </div>
 
       <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 [background-color: red]">
         <Link href="/user/deposit">

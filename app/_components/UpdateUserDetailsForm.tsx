@@ -14,45 +14,60 @@ import { updateUser } from "@/app/_lib/actions";
 import { updateUserSchema } from "@/app/_lib/validation";
 import Spinner from "@/app/_components/Spinner";
 
-export default function UpdateUserDetailsForm({ user }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type User = {
+  email: string;
+  dob: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
+};
 
-  console.log(user);
+type UpdateUserDetailsFormProps = {
+  user: User;
+};
+
+export default function UpdateUserDetailsForm({
+  user,
+}: UpdateUserDetailsFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      gender: "",
-      dob: new Date(),
-      email: "",
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      gender: user.gender || "",
+      dob: user.dob ? new Date(user.dob) : new Date(),
+      email: user.email,
     },
   });
 
   const { reset } = form;
 
   useEffect(() => {
-    reset(user);
-  }, [user]);
+    if (user) {
+      reset({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        gender: user.gender || "",
+        dob: user.dob ? new Date(user.dob) : new Date(),
+        email: user.email,
+      });
+    }
+  }, [user, reset]);
 
   async function onSubmit(data: z.infer<typeof updateUserSchema>) {
-    const updatedUserInfo = { ...data, dob: data.dob.toDateString() };
+    const { email, ...updatedUserInfo } = { ...data }; // data.dob is already a Date object
 
+    console.log(updatedUserInfo);
     // Submit user data
     setIsSubmitting(true);
     const res = await updateUser(updatedUserInfo);
+    console.log(res);
     setIsSubmitting(false);
     // Update form data when user is updated
 
     if (res.status === "success") {
-      reset({
-        firstName: res.user.firstName || "",
-        lastName: res.user.lastName || "",
-        email: res.user.email || "",
-        gender: res.user.gender || "",
-        dob: res.user.dob || "",
-      });
       toast.success(res.message);
     } else {
       toast.error(res.message);
@@ -86,7 +101,6 @@ export default function UpdateUserDetailsForm({ user }) {
             placeholder="dd/mm/yyyy"
           />
           <CustomFormField
-            disabled
             label="Gender"
             name="gender"
             control={form.control}
@@ -111,8 +125,7 @@ export default function UpdateUserDetailsForm({ user }) {
           text={
             isSubmitting ? (
               <span className="flex items-center gap-2">
-                Saving{" "}
-                <Spinner color="text" size="small" className="!w-5 !h-5" />
+                Saving <Spinner color="text" size="small" />
               </span>
             ) : (
               "Save"

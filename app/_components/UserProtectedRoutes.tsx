@@ -8,28 +8,35 @@ import toast from "react-hot-toast";
 
 export default function ProtectedRoutes({ children }: { children: any }) {
   const router = useRouter();
-  const { user, isAuthenticating, logout } = useUserAuth();
+  const { user, authState, logout } = useUserAuth();
 
   useEffect(() => {
-    if (isAuthenticating) return; // Wait until authentication is complete
+    // Only handle redirects when authentication is complete
+    if (authState === "loading") return;
 
-    if (!user) {
-      // If no user is logged in, redirect to the login page
+    if (authState === "unauthenticated") {
       router.push("/auth/user/login");
-    } else if (user && user.role !== "user") {
-      // If the logged-in user is not a 'user', restrict access
-      console.log("*******");
-      console.log("is admin");
-      console.log("*******");
+      return;
+    }
+
+    if (user && user.role !== "user") {
       toast.error(
         "You do not have permission to access this page as you're not a user"
       );
-      logout(); // Log the user out
-      router.push("/auth/user/login"); // Redirect to the login page
+      logout();
+      router.push("/auth/user/login");
     }
-  }, [user, isAuthenticating, logout, router]);
+  }, [user, authState, logout, router]);
 
-  if (isAuthenticating || !user) return <SpinnerFull />;
+  // Show loading spinner while authenticating
+  if (authState === "loading") {
+    return <SpinnerFull />;
+  }
+
+  // Show loading spinner while waiting for user data
+  if (authState === "authenticated" && !user) {
+    return <SpinnerFull />;
+  }
 
   return children;
 }

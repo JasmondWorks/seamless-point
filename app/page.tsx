@@ -17,7 +17,7 @@ export default function Home() {
     <div className="flex flex-col h-screen">
       <Navbar />
       <ScrollArea className="flex-1 h-full">
-        <section id="home" className="py-32 lg:py-16">
+        <section id="home" className="py-16">
           <div className="container-custom">
             <div className="grid gap-10 gap-y-5 lg:grid-cols-2 items-center">
               <div className="space-y-8">

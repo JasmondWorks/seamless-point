@@ -21,6 +21,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isPrimary?: boolean;
   isPrimaryDark?: boolean;
   isBig?: boolean;
+  disabled?: boolean;
 }
 
 export default function Button({

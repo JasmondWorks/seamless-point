@@ -1,10 +1,13 @@
 "use client";
 
 import AddWithdrawalAccount from "@/app/_components/AddWithdrawalAccount";
+import Spinner from "@/app/_components/Spinner";
 import SpinnerFull from "@/app/_components/SpinnerFull";
 import WithdrawalForm from "@/app/_components/WithdrawalForm";
 import { getUser } from "@/app/_lib/actions";
+import { showToast } from "@/app/_lib/toast";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Withdraw() {
   const [bankDetails, setBankDetails] = useState({
@@ -39,7 +42,7 @@ export default function Withdraw() {
 
   if (isLoading) return <SpinnerFull />;
 
-  if (showAddAccount)
+  if (showAddAccount) {
     return (
       <AddWithdrawalAccount
         onHideAddAccount={handleHideAddAccount}
@@ -47,12 +50,16 @@ export default function Withdraw() {
         setBankDetails={setBankDetails}
       />
     );
+  }
 
   return (
     <div className="max-w-3xl">
       <div className="flex flex-col gap-10">
         <h1 className="headline text-center">Withdrawal of Funds</h1>
-        <WithdrawalForm onShowAddAccount={handleShowAddAccount} />
+        <WithdrawalForm
+          bankDetails={bankDetails}
+          onShowAddAccount={handleShowAddAccount}
+        />
       </div>
     </div>
   );
