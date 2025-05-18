@@ -1,10 +1,12 @@
 import ChangePasswordForm from "@/app/_components/ChangePasswordForm";
 import ProfileImageUploader from "@/app/_components/ProfileImageUploader";
 import UpdateUserDetailsForm from "@/app/_components/UpdateUserDetailsForm";
-import { getUser } from "@/app/_lib/actions";
+import { getAdmin, getUser } from "@/app/_lib/actions";
 
-export default async function UserDetails() {
-  const res = await getUser();
+export default async function UserDetails({ userType = "user" }) {
+  const res = userType === "user" ? await getUser() : await getAdmin();
+
+  console.log(res);
 
   return (
     <>

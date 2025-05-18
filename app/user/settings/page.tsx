@@ -1,5 +1,3 @@
-import ChangePasswordForm from "@/app/_components/ChangePasswordForm";
-import UserSettingsActions from "@/app/_components/UserSettingsActions";
 import UserDetails from "@/app/_components/UserDetails";
 import { Suspense } from "react";
 import Loader from "@/app/loading";

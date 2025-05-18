@@ -31,7 +31,7 @@ type AuthResponse = {
   token?: string;
 };
 
-const userKey = getLocalStorageKey("user");
+// const userKey = getLocalStorageKey("user");
 
 export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -47,7 +47,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   function login(user: User | undefined = undefined, token: string) {
-    user && localStorage.setItem(userKey, JSON.stringify(user));
+    user && localStorage.setItem("user", JSON.stringify(user));
     user && setUser(user);
     Cookies.set("token", token);
     setAuthState("authenticated");
@@ -65,7 +65,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
             ? await authenticateUser(token)
             : await authenticateAdmin(token);
 
-        const user: User = JSON.parse(localStorage.getItem(userKey) || "{}");
+        const user: User = JSON.parse(localStorage.getItem("user") || "{}");
 
         if (res?.status === "success") {
           login(user, token);
@@ -78,7 +78,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const storedUser = localStorage.getItem(userKey);
+    const storedUser = localStorage.getItem("user");
 
     if (storedUser) {
       const user: User = JSON.parse(storedUser);

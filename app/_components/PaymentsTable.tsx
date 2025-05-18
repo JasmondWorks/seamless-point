@@ -102,7 +102,13 @@ export const initialPaymentsData: Payment[] = [
   },
 ];
 
-export function PaymentsTable() {
+export function PaymentsTable({
+  header,
+  searchQueryExternal,
+}: {
+  header?: React.ReactNode;
+  searchQueryExternal?: string;
+}) {
   // Data variables
   const [payments, setPayments] =
     React.useState<Payment[]>(initialPaymentsData);
@@ -117,16 +123,21 @@ export function PaymentsTable() {
 
   return (
     <div className="w-full space-y-5">
-      <Searchbox
-        className="md:min-w-[500px]"
-        placeholder="Search for payments"
-        onChange={handleSearch}
-        value={searchQuery}
-      />
+      {header ? (
+        header
+      ) : (
+        <Searchbox
+          className="md:min-w-[500px]"
+          placeholder="Search for payments"
+          onChange={handleSearch}
+          value={searchQuery}
+        />
+      )}
+
       <DataTable
         columns={paymentsColumns}
         data={payments}
-        searchQuery={searchQuery}
+        searchQuery={searchQueryExternal ? searchQueryExternal : searchQuery}
       />
     </div>
   );

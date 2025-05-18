@@ -158,7 +158,10 @@ export default function ParcelInfo() {
             name="packagingType"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={packagingType}
+            selectOptions={packagingType.map((type) => ({
+              name: type,
+              value: type,
+            }))}
             placeholder="Select Packaging"
           />
           <CustomFormField
@@ -167,7 +170,10 @@ export default function ParcelInfo() {
             name="currency"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={currencies.map((currency) => currency.value)}
+            selectOptions={currencies.map((currency) => ({
+              name: currency.value,
+              value: currency.value,
+            }))}
             // selectValue={
             //   currencies.find(
             //     (currency) => currency.name === parcelDetails?.currency

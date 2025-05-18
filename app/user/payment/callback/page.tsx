@@ -40,6 +40,11 @@ export default function PaymentCallback() {
 
     console.log("verificationResponse", verificationResponse);
 
+    const redirectAfterPayment =
+      verificationResponse?.data?.metadata?.redirectAfterPayment;
+
+    console.log("Redirect", redirectAfterPayment);
+
     if (verificationResponse.status !== "success")
       handlePaymentError(verificationResponse.data.message);
 
@@ -59,7 +64,10 @@ export default function PaymentCallback() {
     toast.success(
       `${verificationResponse.data.data.amount} successfully deposited into your account`
     );
-    router.push("/user/dashboard");
+
+    router.push(
+      redirectAfterPayment ? redirectAfterPayment : "/user/dashboard"
+    );
 
     localStorage.removeItem("totalAmount");
   };

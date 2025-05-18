@@ -60,7 +60,7 @@ export const currencies = [
   },
 ];
 
-export const packagingType = ["box", "bag", "envelope", "other"];
+export const packagingType = ["box", "envelope", "soft-packaging"];
 
 export const itemCategory = ["electronics", "clothing", "furniture", "other"];
 export const itemSubCategory = [
@@ -74,4 +74,4 @@ export const paginationSearchParams = {
   page: "1",
   limit: "10",
   sortBy: "-createdAt",
-}
+};

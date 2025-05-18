@@ -1,4 +1,3 @@
-import { dispatches } from "@/app/_lib/constants";
 import {
   formatCurrency,
   getParcelTotalAmount,
@@ -10,17 +9,9 @@ export default function PackageDetails({
   sender,
   receiver,
   parcel,
-  delivery,
+  courierDetails,
 }: any) {
   console.log(parcel);
-
-  const dispatch = dispatches.find(
-    (d) => d.name.toLowerCase() === delivery?.courier
-  )?.name;
-
-  console.log(dispatch);
-  console.log("Delivery:", delivery);
-
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between gap-8">
@@ -109,7 +100,8 @@ export default function PackageDetails({
           <div className="space-y-1">
             <p className="font-bold">Amount</p>
             <p className="text-muted">
-              {formatCurrency(getParcelTotalAmount(parcel))}
+              {/* {formatCurrency(getParcelTotalAmount(parcel))} */}
+              {formatCurrency(courierDetails.amount)}
             </p>
           </div>
           <div className="space-y-1">
@@ -136,9 +128,9 @@ export default function PackageDetails({
           </div>
           <div className="space-y-1">
             <p className="font-bold">Item value</p>
-            {parcel?.parcelItems.map((item: any) => (
-              <p key={item?.id} className="text-muted">
-                {item?.value}
+            {parcel?.parcelItems.map((item: any, index: number) => (
+              <p key={index} className="text-muted">
+                {item?.value || "N/A"}
               </p>
             ))}
           </div>
@@ -148,21 +140,15 @@ export default function PackageDetails({
           </div>
           <div className="space-y-1">
             <p className="font-bold">Courier</p>
-            {/* <p className="text-muted">{store.courier?.name || "Courier"}</p> */}
-            <p className="text-muted">
-              {
-                dispatches.find(
-                  (d) => d.name.toLowerCase() === delivery?.courier
-                )?.name
-              }
-            </p>
+            <p className="text-muted">{courierDetails.courierName}</p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Approved by</p>
             <p className="text-muted">
-              {delivery?.deliveryStatus === "pending"
+              {/* {delivery?.deliveryStatus === "pending"
                 ? "Not approved yet"
-                : delivery?.approvedBy}
+                : delivery?.approvedBy} */}
+              Not approved yet
             </p>
           </div>
           <div className="space-y-1">

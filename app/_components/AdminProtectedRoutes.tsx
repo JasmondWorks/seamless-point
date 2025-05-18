@@ -8,28 +8,35 @@ import toast from "react-hot-toast";
 
 export default function ProtectedRoutes({ children }: { children: any }) {
   const router = useRouter();
-  const { user, isAuthenticating, logout } = useUserAuth();
+  const { user, authState, logout } = useUserAuth();
 
   useEffect(() => {
-    if (isAuthenticating) return; // Wait until authentication is complete
+    // Only handle redirects when authentication is complete
+    if (authState === "loading") return;
 
-    if (!user) {
-      // If no user is logged in, redirect to admin login
-      toast.error("You need to log in to access this page.");
+    if (authState === "unauthenticated") {
       router.push("/auth/admin/login");
-    } else if (user && user.role !== "admin") {
-      // If the user is not an admin, restrict access
-      toast.error(
-        "You do not have permission to handle this page as you're a regular user"
-      );
-      logout(); // Log the user out
-      router.push("/auth/admin/login"); // Redirect to admin login
+      return;
     }
-  }, [user, isAuthenticating, logout, router]);
 
-  // Show loading spinner if authentication is still in progress
-  if (isAuthenticating || !user) return <SpinnerFull />;
+    if (user && user.role !== "admin") {
+      toast.error(
+        "You do not have permission to access this page as you're not an admin"
+      );
+      logout();
+      router.push("/auth/user/login");
+    }
+  }, [user, authState, logout, router]);
 
-  // Render the children if the user is authenticated and has admin role
+  // Show loading spinner while authenticating
+  if (authState === "loading") {
+    return <SpinnerFull />;
+  }
+
+  // Show loading spinner while waiting for user data
+  if (authState === "authenticated" && !user) {
+    return <SpinnerFull />;
+  }
+
   return children;
 }

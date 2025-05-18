@@ -106,7 +106,10 @@ export default function UpdateUserDetailsForm({
             control={form.control}
             fieldType={FormFieldType.SELECT}
             placeholder="Male or Female"
-            selectOptions={["Male", "Female"]}
+            selectOptions={[
+              { name: "Male", value: "Male" },
+              { name: "Female", value: "Female" },
+            ]}
           />
           <CustomFormField
             className="col-span-2"

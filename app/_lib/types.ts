@@ -41,16 +41,16 @@ export enum DispatchEnum {
 }
 
 export interface Sender {
-  firstName: string;
-  lastName: string;
-  street: string;
-  aptUnit: string;
+  firstName?: string;
+  lastName?: string;
+  street?: string;
+  aptUnit?: string;
   country: string;
   state: string;
   city: string;
-  postCode: string;
-  email: string;
-  phoneNumber: string;
+  postCode?: string;
+  email?: string;
+  phoneNumber?: string;
   // deliveryTitle: string;
   // summary: string;
   // amountOfItems?: number;
@@ -80,7 +80,7 @@ export interface Parcel {
   id?: string;
 }
 export type StoredFile = {
-  base64file: string;
+  base64File: string;
   name: string;
 };
 export interface ParcelDetails {
@@ -96,18 +96,16 @@ export interface newDelivery {
   sender: Sender | null;
   receiver: Receiver | null;
   parcelDetails: ParcelDetails | null;
-  courier: Dispatch | null;
+  courier: any;
+  courierDetails: any;
   userId: string;
   step: number; // Keep track of the current form step
   onSelectDeliveryType: (type: DeliveryType) => void;
   onSelectCourier: (courier: Dispatch | null) => void;
+  onSetCourierDetails: (courier: any) => void;
   updateSender: (sender: Sender) => void;
   updateReceiver: (receiver: Receiver) => void;
   addParcelDetails: (parcelDetails: ParcelDetails) => void;
-  // addParcelFile: (
-  //   file: File,
-  //   fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
-  // ) => void;
   resetDeliveryData: () => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;

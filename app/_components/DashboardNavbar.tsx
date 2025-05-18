@@ -297,7 +297,7 @@ export default function Navbar() {
         </div>
         {/* Triangle shapes */}
         <div
-          className={`absolute ${
+          className={`absolute  ${
             !isNavShowing ? "hidden" : "block"
           } lg:block bottom-0 right-0 -z-10`}
         >
@@ -309,11 +309,11 @@ export default function Navbar() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M13.5262 0.344604L231.678 141.447L0.403466 259.821L13.5262 0.344604Z"
+              d="M13.5262 0.342651L231.678 141.445L0.403466 259.819L13.5262 0.342651Z"
               fill="#D9D9D9"
             />
             <path
-              d="M35.5262 42.3446L253.678 183.447L222.4035 301.821L35.5262 42.3446Z"
+              d="M35.5262 42.3427L253.678 183.445L22.4035 301.819L35.5262 42.3427Z"
               fill="#EE5E21"
             />
           </svg>
@@ -374,10 +374,11 @@ export default function Navbar() {
         <div className="lg:mx-0 w-full flex flex-col items-center">
           <Link
             href={role === "user" ? "/user/settings" : "/admin/settings"}
-            className={getLinkStyles(null, [
-              "/user/settings",
-              "/admin/settings",
-            ])}
+            className={cn(
+              "flex w-full",
+              getLinkStyles(null, ["/user/settings", "/admin/settings"]),
+              isNavShowing ? "justify-start" : "justify-center lg:justify-start"
+            )}
           >
             <div className={iconStyles}>
               <svg

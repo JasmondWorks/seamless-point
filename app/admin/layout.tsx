@@ -12,29 +12,29 @@ export default async function DashboardLayout({
 }) {
   return (
     <AdminProtectedRoutes>
-      <div className="h-screen flex flex-col">
+      <div
+        style={{ display: "grid", gridTemplateRows: "auto 1fr" }}
+        className="h-screen w-screen"
+      >
         <Navbar />
-        <div className="bg-neutral-50 flex-1 overflow-auto flex">
+        <div className="bg-neutral-50 flex-1 overflow-hidden flex relative">
           <DashboardNavbar />
-          <ScrollArea
-            // style={{ height: "calc(100% - 80px)" }}
-            className="ml-16 mt-20 md:mt-0 lg:ml-0 flex-1"
-          >
-            <main className="p-5 w-full md:p-6 lg:p-8 overflow-hidden h-full">
-              <div className="relative z-10 space-y-10 h-full">{children}</div>
-              <Image
-                style={{
-                  height: "82vh",
-                  bottom: "50%",
-                }}
-                className="hidden translate-y-[56%] md:block w-auto object-contain right-8 fixed"
-                src="/assets/images/seamlesspoint-watermark.png"
-                alt="seamless point"
-                width={500}
-                height={500}
-              />
-            </main>
-          </ScrollArea>
+          <main className="flex-1 ml-14 lg:ml-[0] overflow-auto">
+            <div className="overflow-auto relative z-10 space-y-10 min-h-full p-3 sm:p-5 md:p-6 lg:p-8 !py-10">
+              {children}
+            </div>
+            <Image
+              style={{
+                height: "82vh",
+                bottom: "50%",
+              }}
+              className="hidden translate-y-[56%] md:block w-auto object-contain right-8 fixed"
+              src="/assets/images/seamlesspoint-watermark.png"
+              alt="seamless point"
+              width={500}
+              height={500}
+            />
+          </main>
         </div>
       </div>
     </AdminProtectedRoutes>

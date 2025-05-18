@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useUserAuth } from "../_contexts/UserAuthContext";
+import { cn } from "@/app/_lib/utils";
 
 export default function SignOutButton({
   isNavShowing,
@@ -16,7 +17,13 @@ export default function SignOutButton({
   const { logout } = useUserAuth();
 
   return (
-    <button onClick={logout} className={styles.linkStyles}>
+    <button
+      onClick={logout}
+      className={cn(
+        styles.linkStyles,
+        isNavShowing ? "justify-start" : "justify-center lg:justify-start"
+      )}
+    >
       <span className={styles.iconStyles}>
         <svg
           className="w-full h-full"

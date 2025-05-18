@@ -1,13 +1,12 @@
-"use client";
-
 import { DeliveryType } from "@/app/_lib/types";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
-import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-export default function SelectDeliveryType() {
-  const router = useRouter();
-
+export default function SelectDeliveryType({
+  onSetActivePage,
+}: {
+  onSetActivePage: (page: string) => void;
+}) {
   const onSelectDeliveryType = useCreateDeliveryStore(
     (state) => state.onSelectDeliveryType
   );
@@ -21,7 +20,7 @@ export default function SelectDeliveryType() {
   function handleSetDeliveryType(type: DeliveryType) {
     onSelectDeliveryType(type);
     goToNextStep();
-    router.push("/user/deliveries/register/sender");
+    onSetActivePage("sender");
   }
 
   return (

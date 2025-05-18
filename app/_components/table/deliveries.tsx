@@ -112,7 +112,10 @@ export const getDeliveriesColumns = (deliveryActions: {
         return (
           <div className="flex items-center gap-5">
             <span className="font-medium min-w-32">{formattedAmount}</span>
-            <Badge className="capitalize font-medium" variant={getBadgeStyle(status)}>
+            <Badge
+              className="capitalize font-medium"
+              variant={getBadgeStyle(status)}
+            >
               {status}
             </Badge>
           </div>

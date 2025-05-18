@@ -4,6 +4,8 @@ import BalanceDisplay from "../../_components/BalanceDisplay";
 import ActionButton from "../../_components/ActionButton";
 import Username from "@/app/_components/Username";
 import DashboardLayout from "@/app/_components/DashboardLayout";
+import { Suspense } from "react";
+import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 
 export default function Dashboard() {
   return (
@@ -16,7 +18,9 @@ export default function Dashboard() {
       </h1>
 
       <div className="w-full sm:w-fit sm:min-w-[350px] md:min-w-[550px]">
-        <BalanceDisplay />
+        <Suspense fallback={<DataFetchSpinner />}>
+          <BalanceDisplay />
+        </Suspense>
       </div>
 
       <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 [background-color: red]">

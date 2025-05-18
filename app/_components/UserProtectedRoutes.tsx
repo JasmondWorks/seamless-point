@@ -29,7 +29,7 @@ export default function ProtectedRoutes({ children }: { children: any }) {
   }, [user, authState, logout, router]);
 
   // Show loading spinner while authenticating
-  if (authState === "loading") {
+  if (authState === "loading" || authState === "unauthenticated") {
     return <SpinnerFull />;
   }
 

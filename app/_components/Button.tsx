@@ -1,5 +1,6 @@
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
+import Link from "next/link";
 
 export enum ButtonVariant {
   link = "LINK",
@@ -22,6 +23,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isPrimaryDark?: boolean;
   isBig?: boolean;
   disabled?: boolean;
+  href?: string;
 }
 
 export default function Button({
@@ -38,38 +40,46 @@ export default function Button({
   isBig = false,
   className = "",
   disabled,
+  href,
   ...props
 }: ButtonProps) {
+  const classes = clsx(
+    "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11 text-base disabled:cursor-not-allowed", // Common classes
+    {
+      "py-10": isBig,
+      "pointer-events-none": disabled,
+      "bg-white text-brandSec":
+        variant === ButtonVariant.fillWhite && !isPrimary,
+      "bg-white text-brandPry":
+        variant === ButtonVariant.fillWhite && isPrimary,
+      "flex-row-reverse": isReversed,
+      "rounded-lg": isRoundedLarge,
+      "rounded-sm": !isRoundedLarge,
+      "border-2 border-brandPry text-brandPry":
+        variant === ButtonVariant.outline,
+      "bg-brandSec text-white": variant === ButtonVariant.fill && !isPrimary,
+      "!bg-brandPryDark text-white":
+        variant === ButtonVariant.fill && isPrimaryDark,
+      "bg-brandPry text-white": variant === ButtonVariant.fill && isPrimary,
+      "text-brandSec": variant === ButtonVariant.link,
+      "bg-neutral-200": variant === ButtonVariant.neutralLight,
+      "bg-neutral-900 text-white": variant === ButtonVariant.neutralDark,
+    },
+    className // Additional external classes
+  );
+
+  if (href)
+    return (
+      <Link href={href} className={classes}>
+        {text || children}
+      </Link>
+    );
   return (
     <button
       disabled={disabled}
       type={type}
       onClick={onClick}
-      className={clsx(
-        "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11 text-base disabled:cursor-not-allowed", // Common classes
-        {
-          "py-10": isBig,
-          "pointer-events-none": disabled,
-          "bg-white text-brandSec":
-            variant === ButtonVariant.fillWhite && !isPrimary,
-          "bg-white text-brandPry":
-            variant === ButtonVariant.fillWhite && isPrimary,
-          "flex-row-reverse": isReversed,
-          "rounded-lg": isRoundedLarge,
-          "rounded-sm": !isRoundedLarge,
-          "border-2 border-brandPry text-brandPry":
-            variant === ButtonVariant.outline,
-          "bg-brandSec text-white":
-            variant === ButtonVariant.fill && !isPrimary,
-          "!bg-brandPryDark text-white":
-            variant === ButtonVariant.fill && isPrimaryDark,
-          "bg-brandPry text-white": variant === ButtonVariant.fill && isPrimary,
-          "text-brandSec": variant === ButtonVariant.link,
-          "bg-neutral-200": variant === ButtonVariant.neutralLight,
-          "bg-neutral-900 text-white": variant === ButtonVariant.neutralDark,
-        },
-        className // Additional external classes
-      )}
+      className={classes}
       {...props}
     >
       {icon && <span>{icon}</span>}

@@ -4,7 +4,7 @@ import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import { initiatePayment } from "@/app/_lib/actions";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -33,25 +33,22 @@ function Summary({
 }) {
   const { user } = useUserAuth();
   const router = useRouter();
-  const pathname = usePathname();
+
   const [loading, setLoading] = useState(false);
-  const [paystackOpen, setPaystackOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const [redirect, setRedirect] = useState("");
+
+  useEffect(() => {
+    // Get the raw redirect string from the URL
+    const rawRedirect = searchParams.get("redirect");
+
+    if (rawRedirect) {
+      const decoded = decodeURIComponent(rawRedirect);
+      setRedirect(decoded);
+    }
+  }, [searchParams]);
 
   const totalAmount = Number(amount) + transactionFee;
-
-  // Close Paystack popup when route changes
-  useEffect(() => {
-    return () => {
-      if (paystackOpen) {
-        // Close the popup if it's open when component unmounts
-        const closePopup = document.querySelector(".paystack-trigger-close");
-        if (closePopup instanceof HTMLElement) {
-          closePopup.click();
-        }
-        setPaystackOpen(false);
-      }
-    };
-  }, [pathname, paystackOpen]);
 
   const handlePayment = async () => {
     try {
@@ -62,13 +59,16 @@ function Summary({
 
       // Initialize payment with Paystack
       const response = await initiatePayment({
-        email: user.email,
+        email: user!.email,
         amount: totalAmount * 100, // Convert to kobo
+        metadata: {
+          redirectAfterPayment: redirect,
+        },
       });
 
       if (response?.status === "success" && response.data) {
         // Redirect to Paystack checkout page
-        router.push(response.data);
+        router.push(`${response.data}`);
       } else {
         toast.error("Failed to initialize payment. Please try again.");
       }
@@ -79,22 +79,6 @@ function Summary({
       setLoading(false);
     }
   };
-
-  // const config = {
-  //   reference: new Date().getTime().toString(),
-  //   email: user.email,
-  //   amount: totalAmount * 100,
-  //   publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
-  //   channels: ["card"],
-  //   currency: "NGN",
-  //   onSuccess: (reference: string) => {
-  //     console.log(reference);
-  //     router.push(reference.redirecturl);
-  //   },
-  //   onClose: () => {
-  //     console.log("Payment cancelled");
-  //   },
-  // };
 
   return (
     <>
@@ -132,12 +116,6 @@ function Summary({
             text={loading ? "Processing..." : "Pay with Card"}
             disabled={loading}
           />
-          // <PaystackButton
-          //   {...config}
-          //   text="Pay with Card"
-          //   className="w-full bg-brandSec text-white py-4 rounded-lg font-medium"
-          //   onInit={() => setPaystackOpen(true)}
-          // />
         )}
         {selectedPaymentMethod === "bank-transfer" && (
           <ButtonFormSubmit text="Show account details" />
