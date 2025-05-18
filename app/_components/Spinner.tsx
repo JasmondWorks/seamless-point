@@ -20,5 +20,9 @@ export default function Spinner({
     orange: "border-brandSec",
   };
 
-  return <div className={`${base} ${colors[color]} ${sizes[size]}`}></div>;
+  return (
+    <div
+      className={`${base} ${colors[color]} ${sizes[size]} ${className}`}
+    ></div>
+  );
 }

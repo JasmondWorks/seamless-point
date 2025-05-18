@@ -426,11 +426,86 @@ export async function getUser() {
     };
   }
 }
+export async function getAdmin() {
+  const token = getUserToken();
+
+  console.log(token);
+
+  try {
+    const res = await fetch(`${URL}/admins/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    const {
+      data: { user },
+    } = data;
+
+    return {
+      status: "success",
+      message: "Admin fetched successfully",
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
+}
 export async function updateUser(updatedUserInfo: any) {
   const token = getUserToken();
 
   try {
     const res = await fetch(`${URL}/users/me`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedUserInfo),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    revalidatePath("/user/settings");
+    revalidatePath("/admin/settings");
+
+    const {
+      data: { user },
+    } = data;
+
+    return {
+      status: "success",
+      message: "User updated successfully",
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
+}
+export async function updateAdmin(updatedUserInfo: any) {
+  const token = getUserToken();
+
+  try {
+    const res = await fetch(`${URL}/admins/me`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -605,9 +680,9 @@ export async function fetchAllCustomers({
   limit,
   sort,
 }: {
-  page: number;
-  limit: number;
-  sort: string;
+  page?: number;
+  limit?: number;
+  sort?: string;
 }) {
   try {
     const token = getUserToken();
@@ -641,7 +716,21 @@ export async function fetchLatestCustomers() {
     return { status: "error", message: err.message };
   }
 }
+export async function fetchCustomer(id: string) {
+  try {
+    const token = getUserToken();
+    const res = await fetch(`${URL}/users/${id}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
 
+    return data;
+  } catch (err: any) {
+    return { status: "error", message: err.message };
+  }
+}
 export async function fetchNotifications() {
   try {
     const token = getUserToken();
@@ -711,9 +800,11 @@ export async function markNotificationsAsRead(notificationIds: string[]) {
 export const initiatePayment = async ({
   email,
   amount,
+  metadata,
 }: {
   email: string;
   amount: number;
+  metadata?: { redirectAfterPayment?: string };
 }) => {
   const token = getUserToken();
 
@@ -724,7 +815,7 @@ export const initiatePayment = async ({
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ email, amount }), // Amount in kobo
+      body: JSON.stringify({ email, amount, metadata }), // Amount in kobo
     });
 
     const data = await response.json();
@@ -776,6 +867,8 @@ export const createTransaction = async ({ amount, type, reference }: any) => {
     });
 
     const data = await res.json();
+
+    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 
@@ -869,7 +962,120 @@ export const updateWithdrawalBank = async ({
     return { status: "error", message: error.message };
   }
 };
+export const getCountries = async () => {
+  const token = getUserToken();
 
+  try {
+    const res = await fetch(`${URL}/terminal/countries`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data: data?.data?.countries };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const getStates = async (countryCode: string) => {
+  const token = getUserToken();
+
+  console.log(countryCode);
+
+  try {
+    const res = await fetch(
+      `${URL}/terminal/states?countryCode=${countryCode}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data: data?.data?.states };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const getCities = async (countryCode: string, stateCode: string) => {
+  const token = getUserToken();
+
+  console.log(countryCode, stateCode);
+
+  try {
+    const res = await fetch(
+      `${URL}/terminal/cities?countryCode=${countryCode}&stateCode=${stateCode}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await res.json();
+
+    console.log(data);
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data: data?.data?.cities.data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const getRates = async ({
+  pickupAddress,
+  deliveryAddress,
+  packagingDetails,
+  parcel: parcelDetails,
+  currency,
+}: any) => {
+  const token = getUserToken();
+
+  const payload = {
+    pickupAddress,
+    deliveryAddress,
+    packagingDetails,
+    parcelDetails,
+    currency,
+  };
+
+  console.log(payload);
+
+  try {
+    const res = await fetch(`${URL}/terminal/rates`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    console.log("Data", data);
+
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data: data?.data?.rates?.data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
 function formatDataDescending(data: any, resourceName: string) {
   const unformattedData = data.data[resourceName];
   const formattedList = unformattedData.sort(

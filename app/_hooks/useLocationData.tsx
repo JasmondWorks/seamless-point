@@ -1,85 +1,96 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import {
-  fetchCitiesForState,
-  fetchCountries,
-  fetchStatesForCountry,
-} from "@/app/_utils/utils";
+import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 
 export function useLocationData(isSender: boolean = true) {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const getCountries = async () => {
-      try {
-        const response: any = await fetchCountries();
-        setCountries(response);
-      } catch (error) {
-        toast.error("Failed to fetch countries.");
+    const fetchCountries = async () => {
+      setIsLoading(true);
+      const response: any = await getCountries();
+      setIsLoading(false);
+
+      if (response.status === "success") setCountries(response.data);
+      else {
+        // toast.error("Failed to fetch countries");
       }
     };
-    getCountries();
+    fetchCountries();
   }, []);
 
-  async function loadCities(
-    selectedCountryName: string,
+  async function fetchStates(selectedCountryCode: string) {
+    console.log(selectedCountryCode);
+    const country: any = countries.find(
+      (c: any) => c.isoCode === selectedCountryCode
+    );
+
+    if (country) {
+      setIsLoading(true);
+      const response: any = await getStates(country.isoCode);
+      setIsLoading(false);
+
+      if (response.status === "success") setStates(response.data);
+      // else toast.error(response.message);
+
+      if (response.data.length === 0) {
+        toast.error(`No states available for ${country.name}.`);
+        setStates([]);
+      }
+    }
+  }
+
+  async function fetchCities(
+    selectedCountryCode: string,
     selectedStateName: string
   ) {
     const country: any = countries.find(
-      (c: any) => c.name === selectedCountryName
+      (c: any) => c.isoCode === selectedCountryCode
     );
     const state: any = states.find((s: any) => s.name === selectedStateName);
 
     if (country && state) {
-      const response: any = await fetchCitiesForState(
-        country.isoCode,
-        state.isoCode
-      );
-      setCities(response);
+      console.log("here");
+      setIsLoading(true);
+      const response: any = await getCities(country.isoCode, state.isoCode);
+      setIsLoading(false);
+      console.log("Cities", response.data.data);
 
-      if (response.length === 0) toast.error("No cities available.");
-    }
-  }
-  async function loadStates(selectedCountryName: string) {
-    const country: any = countries.find(
-      (c: any) => c.name === selectedCountryName
-    );
+      if (response.status === "success") setCities(response.data.data);
+      // else toast.error(response.message);
 
-    if (country) {
-      const response: any = await fetchStatesForCountry(country.isoCode);
-      setStates(response);
-
-      if (response.length === 0) toast.error("No states available.");
+      if (response?.data?.data?.length === 0) {
+        // toast.error(`No cities available for ${state.name}.`);
+        setCities([]);
+      }
     }
   }
 
   function onCountryChange(selectedCountry: string, setValue: any) {
-    console.log(selectedCountry);
-
     setValue(isSender ? "state" : "toState", ""); // Clear state
     setValue(isSender ? "city" : "toCity", ""); // Clear city
-    loadStates(selectedCountry); // Fetch states
+    fetchStates(selectedCountry); // Fetch states
   }
   function onStateChange(
-    selectedCountryName: string,
+    selectedCountryCode: string,
     selectedState: string,
     setValue: any
   ) {
-    console.log(selectedState);
-
     setValue(isSender ? "city" : "toCity", ""); // Clear city
-    loadCities(selectedCountryName, selectedState); // Fetch states
+    fetchCities(selectedCountryCode, selectedState); // Fetch states
   }
 
   return {
     countries,
     states,
     cities,
-    loadCities,
-    loadStates,
+    fetchCities,
+    fetchStates,
     onCountryChange,
     onStateChange,
+    isLoading,
   };
 }

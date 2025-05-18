@@ -1,10 +1,20 @@
 "use client";
+import Button, { ButtonVariant } from "@/app/_components/Button";
+import Spinner from "@/app/_components/Spinner";
+import { useUserAuth } from "@/app/_contexts/UserAuthContext";
+import { updateAdmin, updateUser } from "@/app/_lib/actions";
+import { uploadFile } from "@/app/_lib/utils";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ProfileImageUploader({ user }: any) {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const defaultImage = user?.profileImg || "/assets/images/avatar.png"; // Replace with your default image URL
+  const defaultImage = user?.profileImage || "/assets/images/avatar.png"; // Replace with your default image URL
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useUserAuth();
+
+  console.log(user);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -14,13 +24,35 @@ export default function ProfileImageUploader({ user }: any) {
     }
   };
 
-  const handleImageUpload = () => {
-    if (image) {
-      // Upload the image logic here
-      console.log("Uploading image:", image);
-    } else {
-      console.error("No image selected");
+  const handleImageUpload = async () => {
+    if (!image) return console.error("No image selected");
+
+    // Upload the image logic here
+
+    setIsLoading(true);
+    const profileImageUrl = await uploadFile(
+      image,
+      "profile-image",
+      "profile-image",
+      true
+    );
+    console.log(profileImageUrl);
+
+    if (!profileImageUrl) return;
+
+    const updatedUser =
+      user.role === "user"
+        ? await updateUser({ profileImage: profileImageUrl })
+        : await updateAdmin({ profileImage: profileImageUrl });
+
+    if (updatedUser.status === "success") {
+      toast.success("Profile image updated successfully");
+      setUser(updatedUser.user);
+      setImage(null);
     }
+    console.log(updatedUser);
+
+    setIsLoading(false);
   };
 
   return (
@@ -42,12 +74,21 @@ export default function ProfileImageUploader({ user }: any) {
       </div>
       <div className="mt-4">
         {image && (
-          <button
+          <Button
+            variant={ButtonVariant.fill}
+            disabled={isLoading}
             onClick={handleImageUpload}
             className="px-4 py-2 bg-blue-500 text-white rounded-full"
           >
-            Upload
-          </button>
+            {isLoading ? (
+              <div className="flex gap-2 items-center">
+                <Spinner color="text" size="small" />
+                <span>Uploading</span>
+              </div>
+            ) : (
+              "Upload"
+            )}
+          </Button>
         )}
       </div>
     </div>

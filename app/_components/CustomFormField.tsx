@@ -24,6 +24,7 @@ import FileInput from "./InputFields/FileInput";
 import SelectBox from "@/app/_components/SelectBox";
 import { StoredFile } from "@/app/_lib/types";
 import BasicDatePicker from "@/app/_components/DatePicker2";
+import Spinner from "@/app/_components/Spinner";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -52,13 +53,14 @@ interface CustomProps {
   renderSkeleton?: (field: any) => React.ReactNode;
   fieldType: FormFieldType;
   className?: string;
-  selectOptions?: string[];
+  selectOptions?: { name: string; value: string }[];
   selectGroupOptions?: { title: string; items: string[] }[];
   selectMessage?: string;
   selectValue?: string;
   onChange?: (value: string) => void;
   selectedFile?: StoredFile;
   accept?: string;
+  isLoading?: boolean;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
@@ -68,6 +70,8 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       props.onChange(value); // Call custom onChange handler
     }
   };
+
+  const { isLoading } = props;
 
   switch (props.fieldType) {
     case FormFieldType.INPUT:
@@ -148,7 +152,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
 };
 
 const CustomFormField = (props: CustomProps) => {
-  const { control, name, label, className } = props;
+  const { control, name, label, className, isLoading } = props;
 
   return (
     <FormField
@@ -159,7 +163,14 @@ const CustomFormField = (props: CustomProps) => {
           {props.fieldType !== FormFieldType.CHECKBOX && label && (
             <FormLabel className="shad-input-label">{label}</FormLabel>
           )}
-          <RenderInput field={field} props={props} />
+          <div className="relative">
+            {isLoading && (
+              <div className="absolute top-[50%] right-[30px] z-[99] translate-y-[-50%] flex items-center">
+                <Spinner size="small" />
+              </div>
+            )}
+            <RenderInput field={field} props={props} />
+          </div>
 
           <FormMessage className="shad-error" />
         </FormItem>

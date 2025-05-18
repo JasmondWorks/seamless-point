@@ -6,6 +6,18 @@ import { type ClassValue, clsx } from "clsx";
 import { toast } from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 
+export const copyToClipboard = (text: string) => {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      console.log("Copied to clipboard:", text);
+      toast.success(`${text} copied to clipboard`);
+    })
+    .catch((err) => {
+      console.error("Failed to copy to clipboard:", err);
+    });
+};
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -83,9 +95,7 @@ export function getUserId() {
   }
 
   try {
-    const user = JSON.parse(
-      localStorage.getItem(getLocalStorageKey("user")) || "{}"
-    );
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
     return user?._id || null; // Return null if no user ID is found
   } catch (error) {
     console.error("Error accessing user:", error);
@@ -276,25 +286,26 @@ export function getNewDeliveryData() {
 export async function uploadFile(
   file: File,
   bucket: string,
-  fileClassification?: string
+  fileClassification: string = "profile_image", // default fallback
+  uniqueName: boolean = false // force same name for overwrite
 ): Promise<string | null> {
   try {
-    // Generate a unique path for the file within the bucket
-    const folder = getUserId(); // Example folder name
-    const uniqueFileName = `${Date.now()}-${file.name}`; // Ensure a unique file name
-    const path = `${folder}/${uniqueFileName}`; // Full path in the bucket
+    const folder = getUserId();
 
-    console.log("File details:", {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    });
-    // Upload the file to the specified bucket and path
+    console.log(folder);
+
+    const extension = file.name.split(".").pop(); // preserve extension
+    const fileName = uniqueName
+      ? `${Date.now()}-${file.name}`
+      : `${fileClassification}.${extension}`;
+
+    const path = `${folder}/${fileName}`;
+
     const { data, error } = await supabase.storage
       .from(bucket)
       .upload(path, file, {
-        cacheControl: "3600", // Cache for 1 hour
-        upsert: true, // Replace file if it already exists
+        cacheControl: "3600",
+        upsert: true,
       });
 
     if (error) {
@@ -303,7 +314,6 @@ export async function uploadFile(
       return null;
     }
 
-    // Get the public URL of the uploaded file
     const { data: publicUrlData } = supabase.storage
       .from(bucket)
       .getPublicUrl(data.path);
@@ -314,20 +324,18 @@ export async function uploadFile(
       return null;
     }
 
-    return publicUrlData?.publicUrl || null;
+    return publicUrlData.publicUrl;
   } catch (err) {
     console.error("Error uploading file:", err);
     toast.error(
-      fileClassification
-        ? `Error uploading ${fileClassification} ${
-            file.type.startsWith("image") ? "image" : "file"
-            // file.type.split("/")[0]
-          }`
-        : "Error uploading file"
+      `Error uploading ${fileClassification || "file"} (${
+        file.type.split("/")[0]
+      })`
     );
     return null;
   }
 }
+
 // export async function getSuperbaseMedia(bucketName) {
 //   const {data, error} = await supabase.storage.from(bucketName).list(getUserId + '/', {
 //     limit: 10,

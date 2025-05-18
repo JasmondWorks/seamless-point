@@ -12,13 +12,17 @@
 // }
 
 import Spinner from "@/app/_components/Spinner";
+import { cn } from "@/app/_lib/utils";
 import React from "react";
 
-export default function SpinnerFull() {
-  console.log("spinning...");
-
+export default function SpinnerFull({ className = "" }) {
   return (
-    <div className="absolute inset-0 grid place-items-center z-50 h-full w-full">
+    <div
+      className={cn(
+        "absolute inset-0 grid place-items-center z-50 h-full w-full",
+        className
+      )}
+    >
       <Spinner size="medium" color="orange" />
     </div>
   );

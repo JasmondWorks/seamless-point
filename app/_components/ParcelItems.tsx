@@ -273,7 +273,10 @@ function ItemParcelForm({
             name="category"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={itemCategory}
+            selectOptions={itemCategory.map((item) => ({
+              name: item,
+              value: item,
+            }))}
             placeholder="Select a category"
           />
           <CustomFormField

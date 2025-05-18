@@ -35,6 +35,7 @@ export const useCreateDeliveryStore = create(
       receiver: null,
       parcelDetails: null,
       courier: null,
+      courierDetails: null,
       step: 1, // Initial step (sender form)
       userId: getUserId(),
 
@@ -46,13 +47,14 @@ export const useCreateDeliveryStore = create(
           receiver: null,
           parcelDetails: null, // Reset to an empty collection
           courier: null,
+          courierDetails: null,
           step: 1, // Reset to step 1
         });
       },
 
       onSelectDeliveryType: (type: DeliveryType) => set({ deliveryType: type }),
-      onSelectCourier: (courier: any) =>
-        set({ courier: courier.name.toLowerCase() }),
+      onSelectCourier: (courier: any) => set({ courier }),
+      onSetCourierDetails: (courierDetails: any) => set({ courierDetails }),
       updateSender: (sender: Sender) =>
         set((state: newDelivery) => ({
           sender: { ...state.sender, ...sender },
@@ -65,23 +67,6 @@ export const useCreateDeliveryStore = create(
         set((state: newDelivery) => ({
           parcelDetails: { ...state.parcelDetails, ...parcelDetails },
         })),
-      // addParcelFile: (
-      //   file: File,
-      //   fieldName: keyof Pick<newDelivery, "packageImage" | "proofOfPurchase">
-      // ) => {
-      //   set({ [fieldName]: file });
-      // },
-      // addParcelFile: (
-      //   file: File,
-      //   fieldName: keyof ParcelDetails // Change this line to reference ParcelDetails
-      // ) => {
-      //   set((state: newDelivery) => ({
-      //     parcelDetails: {
-      //       ...state.parcelDetails,
-      //       [fieldName]: file,
-      //     } as ParcelDetails,
-      //   }));
-      // },
 
       // Step navigation
       goToNextStep: () =>
@@ -107,6 +92,7 @@ export const useCreateDeliveryStore = create(
         parcelDetails: state.parcelDetails,
         courier: state.courier,
         step: state.step,
+        courierDetails: state.courierDetails,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

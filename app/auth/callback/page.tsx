@@ -16,8 +16,6 @@ const GoogleCallback = () => {
   const code = searchParams.get("code");
   const state = searchParams.get("state");
 
-  console.log("OAuth code:", code);
-
   useEffect(() => {
     if (state && code) {
       // Step 1: Extract userType from state (encoded JSON object)
@@ -70,8 +68,6 @@ const GoogleCallback = () => {
                   ? await signinUser(userDetails)
                   : await signinAdmin(userDetails);
               const { user, token } = response;
-
-              console.log(response);
 
               if (response?.status === "success") {
                 login(user, token);

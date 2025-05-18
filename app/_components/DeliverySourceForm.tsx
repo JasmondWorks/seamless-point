@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CustomFormField, {
@@ -10,26 +10,61 @@ import { deliverySourceSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { useEffect, useState } from "react";
-import {
-  fetchCitiesForState,
-  fetchCountries,
-  fetchStatesForCountry,
-} from "@/app/_utils/utils";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useEffect, useReducer } from "react";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
-import { useLocationData } from "@/app/_hooks/useLocationData";
-import SpinnerFull from "@/app/_components/SpinnerFull";
+import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 
-export default function DeliverySourceForm() {
-  // const [countries, setCountries] = useState([]);
-  // const [states, setStates] = useState([]);
-  // const [cities, setCities] = useState([]);
+interface State {
+  countries: any;
+  states: any;
+  cities: any;
+  isLoading: { countries: boolean; states: boolean; cities: boolean };
+}
 
+const initialState = {
+  countries: [],
+  states: [],
+  cities: [],
+  isLoading: { countries: false, states: false, cities: false },
+};
+function reducer(state: State, action: any) {
+  switch (action.type) {
+    case "countries/loading":
+      return { ...state, isLoading: { ...state.isLoading, countries: true } };
+    case "states/loading":
+      return { ...state, isLoading: { ...state.isLoading, states: true } };
+    case "cities/loading":
+      return { ...state, isLoading: { ...state.isLoading, cities: true } };
+    case "countries/fetched":
+      return {
+        ...state,
+        countries: action.payload,
+        isLoading: { ...state.isLoading, countries: false },
+      };
+    case "states/fetched":
+      return {
+        ...state,
+        states: action.payload,
+        isLoading: { ...state.isLoading, states: false },
+      };
+    case "cities/fetched":
+      return {
+        ...state,
+        cities: action.payload,
+        isLoading: { ...state.isLoading, cities: false },
+      };
+    default:
+      return state;
+  }
+}
+
+export default function DeliverySourceForm({
+  onSetActivePage,
+}: {
+  onSetActivePage: (page: string) => void;
+}) {
   const sender = useCreateDeliveryStore((store) => store.sender);
-  const deliveryType = useCreateDeliveryStore((store) => store.deliveryType);
-  const step = useCreateDeliveryStore((store) => store.step);
+  const updateSender = useCreateDeliveryStore((state) => state.updateSender);
 
   const form = useForm<z.infer<typeof deliverySourceSchema>>({
     resolver: zodResolver(deliverySourceSchema),
@@ -44,59 +79,103 @@ export default function DeliverySourceForm() {
       postCode: "",
       email: "",
       phoneNumber: "",
-      // deliveryTitle: "",
-      // summary: "",
-      ...sender, // Override with Zustand state
+      ...sender,
     },
   });
 
-  const router = useRouter();
-  const updateSender = useCreateDeliveryStore((state) => state.updateSender);
+  const [{ countries, states, cities, isLoading }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
-  const {
-    countries,
-    states,
-    cities,
-    loadCities,
-    loadStates,
-    onCountryChange,
-    onStateChange,
-  } = useLocationData(false);
+  const { setValue } = form;
 
-  const { watch, setValue } = form;
-  const selectedCountryName = watch("country");
-  const selectedStateName = watch("state");
+  const selectedCountry = useWatch({ control: form.control, name: "country" });
+  const selectedState = useWatch({ control: form.control, name: "state" });
+  const selectedCity = useWatch({ control: form.control, name: "city" });
 
-  // // Clear selected state and cities when country changes
-  // useEffect(() => {
-  //   setValue("state", ""); // Clear state
-  //   setValue("city", ""); // Clear city
-  // }, [selectedCountryName, setValue]);
-
-  // // Clear selected city when state changes
-  // useEffect(() => {
-  //   setValue("city", ""); // Clear city
-  // }, [selectedStateName, setValue]);
-
-  // Fetch states for selected country
   useEffect(() => {
-    loadStates(selectedCountryName);
-  }, [selectedCountryName, countries]);
+    async function fetchCountries() {
+      dispatch({ type: "countries/loading" });
+      const res = await getCountries();
 
-  // Fetch cities for selected state
+      if (res.status === "success")
+        dispatch({ type: "countries/fetched", payload: res.data });
+    }
+
+    fetchCountries();
+  }, []);
+
   useEffect(() => {
-    loadCities(selectedCountryName, selectedStateName);
-  }, [selectedStateName, states]);
+    if (sender?.country) fetchStates(sender.country);
+    if (selectedCountry) fetchStates(selectedCountry);
+  }, [selectedCountry, countries]);
+
+  useEffect(() => {
+    if (sender?.country && sender?.state)
+      fetchCities(sender.country, sender.state);
+
+    if (selectedCountry && selectedState)
+      fetchCities(selectedCountry, selectedState);
+  }, [selectedState, states]);
+
+  async function fetchStates(countryCode: any) {
+    const country = countries?.find(
+      (country: any) => country.isoCode === countryCode
+    );
+
+    if (!country) return;
+
+    dispatch({ type: "states/loading" });
+    const res = await getStates(countryCode);
+
+    if (res.status === "success") {
+      dispatch({ type: "states/fetched", payload: res.data });
+
+      const selectedStateDetails = res.data.find(
+        (state: any) => state.name === selectedState
+      );
+
+      const stateIsInCountry = res.data.find(
+        (state: any) => state.state_id === selectedStateDetails?.state_id
+      );
+
+      if (stateIsInCountry) setValue("state", selectedState);
+      else setValue("state", "");
+    }
+  }
+  async function fetchCities(countryCode: string, stateName: string) {
+    const state = states?.find((state: any) => state.name === stateName);
+
+    if (!state) return;
+
+    dispatch({ type: "cities/loading" });
+    console.log("Fetch start");
+    const res = await getCities(countryCode, state.isoCode);
+
+    console.log("Cities", res.data);
+    if (res.status === "success") {
+      dispatch({ type: "cities/fetched", payload: res.data });
+
+      const selectedCityDetails = res.data.find(
+        (city: any) => city.name === selectedCity
+      );
+
+      const cityIsInState = res.data.find(
+        (city: any) => city.city_id === selectedCityDetails?.city_id
+      );
+
+      if (cityIsInState) setValue("city", selectedCity);
+      else setValue("city", "");
+    }
+  }
 
   // Form submission
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
     if (data) updateSender(data);
-    console.log(data);
 
-    router.push("/user/deliveries/register/receiver");
+    onSetActivePage("receiver");
   }
-
-  // if (isLocationDataLoading) return <SpinnerFull />;
 
   return (
     <Form {...form}>
@@ -131,35 +210,44 @@ export default function DeliverySourceForm() {
             placeholder="Apt/unit"
           />
           <CustomFormField
+            disabled={isLoading.countries}
+            isLoading={isLoading.countries}
             label="Country"
             name="country"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            placeholder="Country"
-            selectOptions={countries?.map((country: any) => country.name)}
-            onChange={(selectedCountryName) =>
-              onCountryChange(selectedCountryName, setValue)
-            }
+            placeholder="Select a country"
+            selectOptions={countries?.map((country: any) => ({
+              name: country.name,
+              value: country.isoCode,
+            }))}
           />
           <CustomFormField
+            disabled={isLoading.states}
+            isLoading={isLoading.states}
             label="State"
             name="state"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            placeholder="State"
-            selectOptions={states?.map((state: any) => state.name)}
+            placeholder="Select a state"
+            selectOptions={states?.map((state: any) => ({
+              name: state.name,
+              value: state.name,
+            }))}
             selectMessage="Select a country first"
-            onChange={(selectedStateName) =>
-              onStateChange(selectedCountryName, selectedStateName, setValue)
-            }
           />
           <CustomFormField
+            disabled={isLoading.cities}
+            isLoading={isLoading.cities}
             label="City"
             name="city"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            placeholder="City"
-            selectOptions={cities.map((city: any) => city.name)}
+            placeholder="Select a city"
+            selectOptions={cities?.map((city: any) => ({
+              name: city.name,
+              value: city.name,
+            }))}
             selectMessage="Select a state first"
           />
           <CustomFormField
@@ -184,6 +272,7 @@ export default function DeliverySourceForm() {
             placeholder="+234"
           />
         </div>
+
         <PrivacyPolicyBlock />
         <ButtonFormSubmit text="Continue" />
       </form>

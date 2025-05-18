@@ -103,7 +103,12 @@ export default function Navbar({ className = "" }) {
           )}
           {user && (
             <div className="flex items-center gap-8">
-              <Link href="/user/notifications" className="relative">
+              <Link
+                href={`/${
+                  user.role === "user" ? "user" : "admin"
+                }/notifications`}
+                className="relative"
+              >
                 <Bell className="text-neutral-600" />
 
                 {numUnreadNotifications > 0 && (
@@ -112,7 +117,9 @@ export default function Navbar({ className = "" }) {
                   </span>
                 )}
               </Link>
-              <Link href="/user/dashboard">
+              <Link
+                href={`/${user.role === "user" ? "user" : "admin"}/dashboard`}
+              >
                 <Image
                   width={50}
                   height={50}

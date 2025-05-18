@@ -1,6 +1,6 @@
 "use client";
 
-import { copyToClipboard } from "@/app/_utils/utils";
+import { copyToClipboard } from "@/app/_lib/utils";
 import React from "react";
 import { IoCopyOutline } from "react-icons/io5";
 

@@ -16,8 +16,6 @@ let initialStats = [
 export default function StatsCards({
   data: { customersResponse: customers },
 }: any) {
-  console.log(customers);
-
   initialStats = initialStats.map((stat) =>
     stat.name === "total customers"
       ? { ...stat, amount: customers.data.totalCount }
@@ -26,7 +24,7 @@ export default function StatsCards({
 
   return (
     <div className="grid lg:grid-cols-4 gap-5">
-      {initialStats.map((stat, idx) => (
+      {initialStats?.map((stat, idx) => (
         <Card key={stat.name} className="bg-white">
           <div className="space-y-3 font-bold">
             <span className="uppercase text-xs tracking-wider font-medium text-muted">

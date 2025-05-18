@@ -23,8 +23,6 @@ export default function SelectBox({ field, props, onChange }: Props) {
     field.value
   );
 
-  console.log(field.value);
-
   function handleValueChange(value: string) {
     field.onChange(value);
     onChange(value);
@@ -54,7 +52,9 @@ export default function SelectBox({ field, props, onChange }: Props) {
               {props.selectMessage || "No options available"}
             </p>
           ) : (
-            <SelectValue placeholder={props.placeholder} />
+            <SelectValue
+              placeholder={props.placeholder || "--Select an option--"}
+            />
           )}
         </SelectTrigger>
       </FormControl>
@@ -62,9 +62,9 @@ export default function SelectBox({ field, props, onChange }: Props) {
         {props.selectOptions && props.selectOptions.length > 0
           ? props.selectOptions
               // .map((val) => val[0].toUpperCase() + val.slice(1))
-              .map((option: string) => (
-                <SelectItem key={option} value={option}>
-                  {option[0].toUpperCase() + option.slice(1)}
+              .map(({ name, value }: { name: string; value: string }) => (
+                <SelectItem key={value} value={value}>
+                  {name[0].toUpperCase() + name.slice(1)}
                 </SelectItem>
               ))
           : props.selectGroupOptions &&
@@ -74,11 +74,13 @@ export default function SelectBox({ field, props, onChange }: Props) {
                 <SelectLabel className="text-2xl mt-6">
                   {group.title}
                 </SelectLabel>
-                {group.items.map((item: any) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
+                <>
+                  {group.items.map((item: any) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </>
               </SelectGroup>
             ))}
       </SelectContent>

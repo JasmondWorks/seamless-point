@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/app/_components/ui/table";
 import useCustomers from "@/app/_hooks/useCustomers";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FaSearch } from "react-icons/fa";
 
@@ -29,6 +30,8 @@ export default function Customers({
   const { customers, isLoading, isError } = useCustomers(page, limit, sort);
   const totalCount = customers?.totalCount;
   const numTotalPages = Math.ceil(totalCount / limit);
+
+  const router = useRouter();
 
   console.log(customers);
 
@@ -72,10 +75,14 @@ export default function Customers({
             </TableHeader>
             <TableBody>
               {customers.data.users.map((user: any) => (
-                <TableRow key={user._id}>
+                <TableRow
+                  key={user._id}
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/admin/customers/${user._id}`)}
+                >
                   <TableCell className="h-12">
                     {user.firstName} {user.lastName}
-                    {(!user.firstName && !user.lastName) && "N/A"}
+                    {!user.firstName && !user.lastName && "N/A"}
                   </TableCell>
                   <TableCell className="h-12">{user.email}</TableCell>
                   <TableCell className="h-12">{user.phone || "N/A"}</TableCell>

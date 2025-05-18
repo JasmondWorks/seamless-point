@@ -186,24 +186,18 @@ export const deliverySourceSchema = z.object({
     })
     .trim()
     .min(1, "Please provide an apartment/unit"),
-  country: z
-    .string({
-      required_error: "Please provide a country",
-    })
-    .trim()
-    .min(1, "Please provide a country"),
-  state: z
-    .string({
-      required_error: "Please provide a state",
-    })
-    .trim()
-    .min(1, "Please provide a country"),
-  city: z
-    .string({
-      required_error: "Please provide a city",
-    })
-    .trim()
-    .min(1, "Please provide a city"),
+  state: z.string().trim().min(1, "Please provide a state"),
+  // .optional()
+  // .or(z.literal("")),
+
+  country: z.string().trim().min(1, "Please provide a country"),
+  // .optional()
+  // .or(z.literal("")),
+
+  city: z.string().trim().min(1, "Please provide a city"),
+  // .optional()
+  // .or(z.literal("")),
+
   postCode: z
     .string({
       required_error: "Please provide a postcode",
@@ -263,24 +257,17 @@ export const deliveryDestinationSchema = z.object({
     })
     .trim()
     .min(1, "Please provide an apt/unit"),
-  toCountry: z
-    .string({
-      required_error: "Please provide a country",
-    })
-    .trim()
-    .min(1, "Please provide a country"),
-  toState: z
-    .string({
-      required_error: "Please provide a state",
-    })
-    .trim()
-    .min(1, "Please provide a country"),
-  toCity: z
-    .string({
-      required_error: "Please provide a city",
-    })
-    .trim()
-    .min(1, "Please provide a city"),
+  toState: z.string().trim().min(1, "Please provide a state"),
+  // .optional()
+  // .or(z.literal("")),
+
+  toCountry: z.string().trim().min(1, "Please provide a country"),
+  // .optional()
+  // .or(z.literal("")),
+
+  toCity: z.string().trim().min(1, "Please provide a city"),
+  // .optional()
+  // .or(z.literal("")),
 
   toPostCode: z
     .string({

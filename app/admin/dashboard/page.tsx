@@ -1,13 +1,14 @@
 import AdminDashboardData from "@/app/_components/AdminDashboardData";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import Card from "@/app/_components/Card";
+import DashboardLayout from "@/app/_components/DashboardLayout";
 
 import Username from "@/app/_components/Username";
 import React from "react";
 
 export default function Dashboard() {
   return (
-    <div className="flex flex-col ">
+    <>
       <h1 className="mb-5">
         <strong>
           Hey <Username userType="admin" /> -{" "}
@@ -63,6 +64,6 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
-    </div>
+    </>
   );
 }
