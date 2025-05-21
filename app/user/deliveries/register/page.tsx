@@ -41,7 +41,7 @@ export default function Register() {
   const searchParams = useSearchParams();
 
   const [activePage, setActivePage] = useState(
-    searchParams.get("activePage") || "parcel-info"
+    searchParams.get("activePage") || "delivery-type"
   );
 
   function handleSetActivePage(page: string) {
