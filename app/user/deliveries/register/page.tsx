@@ -265,6 +265,7 @@ function Payment({
 
       setIsLoading(false);
       router.push("/user/dashboard");
+      return;
     }
 
     const { courier, dispatch, ...deliveryPayload } = {
