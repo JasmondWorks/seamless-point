@@ -177,8 +177,6 @@ function Payment({
   onSetActivePage: (page: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  // const { createDelivery, isCreating, isError } = useCreateDelivery();
-  const [isCreating, setIsCreating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [balance, setBalance] = useState<any>({});
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
@@ -260,7 +258,14 @@ function Payment({
 
     const pickupRes = await arrangeShipmentPickup({ rateId, shipmentId });
 
-    console.log(pickupRes.data);
+    console.log(pickupRes);
+
+    if (pickupRes.status === "error") {
+      toast.error(pickupRes.message);
+
+      setIsLoading(false);
+      router.push("/user/dashboard");
+    }
 
     const { courier, dispatch, ...deliveryPayload } = {
       ...state,
@@ -363,8 +368,6 @@ function Payment({
 
     console.log("Created delivery", createdDelivery);
 
-    setIsCreating(false);
-
     onSetActivePage("success");
     // if (!isError) {
     //   resetDeliveryData();
@@ -416,7 +419,7 @@ function Payment({
 
         <PrivacyPolicyBlock />
         <ButtonFormSubmit
-          disabled={isLoading || isCreating}
+          disabled={isLoading}
           text={isLoading ? <Spinner color="text" /> : "I UNDERSTAND"}
         />
       </form>

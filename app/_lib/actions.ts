@@ -1128,6 +1128,8 @@ export const arrangeShipmentPickup = async ({ rateId, shipmentId }: any) => {
 
     if (!res.ok) throw new Error(data.message);
 
+    if (data.status === "fail") throw new Error(data.message);
+
     const returnedData = {
       trackingUrl: data.data.shipmentStatus.data.extras.tracking_url,
       trackingNumber: data.data.shipmentStatus.data.extras.tracking_number,

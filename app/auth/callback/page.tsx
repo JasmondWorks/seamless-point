@@ -42,7 +42,7 @@ const GoogleCallback = () => {
 
         const tokenData = await tokenResponse.json();
 
-        if (tokenData.error) toast.error(tokenData.error);
+        // if (tokenData.error) toast.error(tokenData.error);
 
         console.log("token data", tokenData);
 
