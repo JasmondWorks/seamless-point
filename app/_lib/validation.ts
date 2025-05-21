@@ -357,6 +357,9 @@ export const parcelItemSchema = z.object({
       .int("Value must be an integer")
       .min(1, "Value must be at least 1")
   ),
+  length: z.coerce.number().positive("Length must be at least 1cm"),
+  width: z.coerce.number().positive("Width must be at least 1cm"),
+  height: z.coerce.number().positive("Height must be at least 1cm"),
 });
 export const parcelDocumentSchema = z.object({
   name: z
@@ -395,6 +398,9 @@ export const parcelDocumentSchema = z.object({
       .int("Quantity must be an integer")
       .min(1, "Quantity must be at least 1")
   ),
+  length: z.coerce.number().positive("Length must be at least 1cm"),
+  width: z.coerce.number().positive("Width must be at least 1cm"),
+  height: z.coerce.number().positive("Height must be at least 1cm"),
 });
 
 const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>

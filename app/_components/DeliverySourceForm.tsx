@@ -14,6 +14,9 @@ import { useEffect, useReducer } from "react";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 
+import styles from "./DeliverySourceForm.module.css";
+import { cn } from "@/app/_lib/utils";
+
 interface State {
   countries: any;
   states: any;
@@ -179,7 +182,10 @@ export default function DeliverySourceForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("space-y-5", styles.container)}
+      >
         <div className="grid lg:grid-cols-2 gap-5">
           <CustomFormField
             label="First name"
@@ -270,6 +276,7 @@ export default function DeliverySourceForm({
             control={form.control}
             fieldType={FormFieldType.PHONE_INPUT}
             placeholder="+234"
+            country={selectedCountry}
           />
         </div>
 

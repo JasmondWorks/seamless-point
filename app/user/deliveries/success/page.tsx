@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
-import CopyToClipboard from "@/app/_components/CopyToClipboard";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 
 export default function Success({ searchParams }: { searchParams: any }) {

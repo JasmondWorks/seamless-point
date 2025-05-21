@@ -27,7 +27,7 @@ const validateAndResetUser = (resetDeliveryData: () => void) => {
 // Create the delivery store
 export const useCreateDeliveryStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       // State
       deliveryType: "",
       dispatch: "",
@@ -38,6 +38,8 @@ export const useCreateDeliveryStore = create(
       courierDetails: null,
       step: 1, // Initial step (sender form)
       userId: getUserId(),
+
+      replaceState: (newState: any) => set(() => ({ ...newState })),
 
       // Actions
       resetDeliveryData: () => {

@@ -17,7 +17,6 @@ import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { currencies, packagingType } from "@/app/_lib/constants";
-import { set } from "mongoose";
 import { base64ToFile, fileToBase64 } from "@/app/_lib/utils";
 import toast from "react-hot-toast";
 
@@ -59,7 +58,6 @@ export default function ParcelInfo() {
   const parcelDetailsCopy = { ...parcelDetails };
   delete parcelDetailsCopy.parcelItems;
 
-  // const addParcelFile = useCreateDeliveryStore((store) => store.addParcelFile);
   const addParcelDetails = useCreateDeliveryStore(
     (store) => store.addParcelDetails
   );
@@ -92,7 +90,7 @@ export default function ParcelInfo() {
     setSelectedParcelItem(item);
   }
 
-  console.log(base64ToFile(parcelDetailsCopy.packageImage?.base64File));
+  console.log(base64ToFile(parcelDetailsCopy.packageImage!.base64File));
 
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
