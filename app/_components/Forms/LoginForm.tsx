@@ -30,8 +30,6 @@ export default function LoginForm({
 
   const router = useRouter();
 
-  console.log(isLoading);
-
   const form = useForm<z.infer<typeof baseUserSchema>>({
     resolver: zodResolver(baseUserSchema),
     defaultValues: { email: "", password: "" },

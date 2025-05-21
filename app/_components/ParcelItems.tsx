@@ -203,6 +203,29 @@ function DocumentParcelForm({
             fieldType={FormFieldType.INPUT}
             placeholder="1"
           />
+          <div className="grid sm:grid-cols-3 gap-5 col-span-2">
+            <CustomFormField
+              label="Length (cm)"
+              name="length"
+              control={form.control}
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
+            />
+            <CustomFormField
+              label="Width (cm)"
+              name="width"
+              control={form.control}
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
+            />
+            <CustomFormField
+              label="Height (cm)"
+              name="height"
+              control={form.control}
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
+            />
+          </div>
         </div>
         <ButtonFormSubmit text="Continue" />
       </form>
@@ -300,22 +323,45 @@ function ItemParcelForm({
               label="Weight (kg)"
               name="weight"
               control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="5"
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5kg"
             />
             <CustomFormField
               label="Quantity"
               name="quantity"
               control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="10"
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
             />
             <CustomFormField
               label="Item Value"
               name="value"
               control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="N2, 000"
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g N5"
+            />
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5 col-span-2">
+            <CustomFormField
+              label="Length (cm)"
+              name="length"
+              control={form.control}
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
+            />
+            <CustomFormField
+              label="Width (cm)"
+              name="width"
+              control={form.control}
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
+            />
+            <CustomFormField
+              label="Height (cm)"
+              name="height"
+              control={form.control}
+              fieldType={FormFieldType.NUMBER}
+              placeholder="E.g 5cm"
             />
           </div>
         </div>

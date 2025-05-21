@@ -23,7 +23,6 @@ import DatePicker from "./InputFields/DatePicker";
 import FileInput from "./InputFields/FileInput";
 import SelectBox from "@/app/_components/SelectBox";
 import { StoredFile } from "@/app/_lib/types";
-import BasicDatePicker from "@/app/_components/DatePicker2";
 import Spinner from "@/app/_components/Spinner";
 
 export enum FormFieldType {
@@ -36,6 +35,7 @@ export enum FormFieldType {
   SKELETON = "skeleton",
   PASSWORD = "password",
   FILE = "file",
+  NUMBER = "number",
 }
 
 interface CustomProps {
@@ -61,6 +61,7 @@ interface CustomProps {
   selectedFile?: StoredFile;
   accept?: string;
   isLoading?: boolean;
+  country?: string;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
@@ -71,14 +72,27 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     }
   };
 
-  const { isLoading } = props;
-
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
         <div className="flex rounded-md border border-dark-500 bg-dark-400">
           <FormControl>
             <Input
+              disabled={props.disabled}
+              placeholder={props.placeholder}
+              {...field}
+              className="shad-input border-0"
+            />
+          </FormControl>
+        </div>
+      );
+    case FormFieldType.NUMBER:
+      return (
+        <div className="flex rounded-md border border-dark-500 bg-dark-400">
+          <FormControl>
+            <Input
+              min={1}
+              type={props.fieldType}
               disabled={props.disabled}
               placeholder={props.placeholder}
               {...field}
@@ -105,7 +119,8 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         <FormControl>
           <PhoneInput
             disabled={props.disabled}
-            defaultCountry="NG"
+            country={props.country || "NG"}
+            coun
             placeholder={props.placeholder}
             international
             withCountryCallingCode
@@ -153,6 +168,8 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
 
 const CustomFormField = (props: CustomProps) => {
   const { control, name, label, className, isLoading } = props;
+
+  if (name === "phoneNumber") console.log(props.country);
 
   return (
     <FormField

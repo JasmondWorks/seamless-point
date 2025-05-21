@@ -62,13 +62,7 @@ const RatesList = ({
     clearTimeout(timeout);
   }, [isDialogOpen]);
 
-  console.log("Selected courier", selectedCourier);
-  console.log("Courier details", courierDetails);
-
   async function fetchRates() {
-    console.log(sender?.country, sender?.state, sender?.city);
-    console.log(receiver?.toCountry, receiver?.toState, receiver?.toCity);
-
     const pickupAddress = {
       country: sender!.country,
       state: sender!.state,
@@ -91,15 +85,31 @@ const RatesList = ({
       first_name: receiver!.toFirstName,
       last_name: receiver!.toLastName,
     };
-    console.log("Type", parcelDetails?.packagingType);
+
+    const biggestLength = parcelDetails!.parcelItems.reduce(
+      (biggest, item) =>
+        item.length > biggest ? (biggest = item.length) : biggest,
+      parcelDetails!.parcelItems[0].length
+    );
+    const biggestWidth = parcelDetails!.parcelItems.reduce(
+      (biggest, item) =>
+        item.width > biggest ? (biggest = item.width) : biggest,
+      parcelDetails!.parcelItems[0].width
+    );
+    const biggestHeight = parcelDetails!.parcelItems.reduce(
+      (biggest, item) =>
+        item.height > biggest ? (biggest = item.height) : biggest,
+      parcelDetails!.parcelItems[0].height
+    );
+
     const packagingDetails = {
-      height: 50,
-      length: 70,
+      length: biggestLength,
+      width: biggestWidth,
+      height: biggestHeight,
       name: parcelDetails?.packagingType,
-      size_unit: "cm",
       type: parcelDetails?.packagingType.toLowerCase(),
-      width: 50,
       weight: 0.25,
+      size_unit: "cm",
       weight_unit: "kg",
     };
     const parcel = {
@@ -133,7 +143,6 @@ const RatesList = ({
       setError(res.message);
       toast.error(res.message);
     }
-    console.log(res.data, res.message);
     setCouriers(res.data);
   }
 

@@ -121,8 +121,6 @@ export async function signinUser(userDetails: {
   lastName: string;
   authType: string;
 }) {
-  console.log("URL", `${URL}/users/signIn`);
-
   try {
     const res = await fetch(`${URL}/users/signIn`, {
       method: "POST",
@@ -133,6 +131,8 @@ export async function signinUser(userDetails: {
     });
 
     const data = await res.json();
+
+    console.log("data", data);
 
     if (!res.ok) throw new Error(data.message);
 
@@ -542,6 +542,8 @@ export async function updateAdmin(updatedUserInfo: any) {
 export async function createDelivery(deliveryDetails: any) {
   const token = getUserToken();
 
+  // console.log("delivery details", deliveryDetails);
+
   try {
     const res = await fetch(`${URL}/deliveries`, {
       method: "POST",
@@ -554,24 +556,26 @@ export async function createDelivery(deliveryDetails: any) {
 
     const data = await res.json();
 
-    const {
-      data: { delivery },
-    } = data;
+    // console.log("Data", data);
+
+    // const {
+    //   data: { delivery },
+    // } = data;
 
     if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "error") throw new Error(data.message);
 
     return {
       status: "success",
       message: "Delivery created successfully",
-      delivery,
+      data: data.data.delivery,
     };
   } catch (error: any) {
+    console.error(error.message);
     return {
       status: "error",
-      message:
-        error.message.includes("fetch") || error.message.includes("failed")
-          ? "Check your internet connection"
-          : error.message,
+      message: error.message,
     };
   }
 }
@@ -1076,6 +1080,67 @@ export const getRates = async ({
     return { status: "error", message: error.message };
   }
 };
+export const createShipment = async ({
+  pickupAddressId,
+  deliveryAddressId,
+  parcelId,
+}: any) => {
+  const token = getUserToken();
+
+  try {
+    // Create packaging
+    const res = await fetch(`${URL}/terminal/shipments`, {
+      method: "POST",
+      body: JSON.stringify({ pickupAddressId, deliveryAddressId, parcelId }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    console.log("Data", data);
+
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data: data?.data?.shipment?.data.shipment_id };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const arrangeShipmentPickup = async ({ rateId, shipmentId }: any) => {
+  const token = getUserToken();
+
+  try {
+    // Create packaging
+    const res = await fetch(`${URL}/terminal/shipments/pickup`, {
+      method: "POST",
+      body: JSON.stringify({ rateId, shipmentId }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    console.log("Data", data);
+
+    if (!res.ok) throw new Error(data.message);
+
+    const returnedData = {
+      trackingUrl: data.data.shipmentStatus.data.extras.tracking_url,
+      trackingNumber: data.data.shipmentStatus.data.extras.tracking_number,
+      reference: data.data.shipmentStatus.data.extras.reference,
+    };
+
+    return { status: "success", data: returnedData };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+
 function formatDataDescending(data: any, resourceName: string) {
   const unformattedData = data.data[resourceName];
   const formattedList = unformattedData.sort(

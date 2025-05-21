@@ -292,8 +292,6 @@ export async function uploadFile(
   try {
     const folder = getUserId();
 
-    console.log(folder);
-
     const extension = file.name.split(".").pop(); // preserve extension
     const fileName = uniqueName
       ? `${Date.now()}-${file.name}`

@@ -33,6 +33,27 @@ export default function ParcelInfoForm({
     parcelDetails?.parcelItems || []
   );
 
+  // const biggestLength = parcelItems.reduce(
+  //   (biggest, item) =>
+  //     item.length > biggest ? (biggest = item.length) : biggest,
+  //   parcelItems[0]?.length
+  // );
+  // const biggestWidth = parcelItems.reduce(
+  //   (biggest, item) =>
+  //     item.width > biggest ? (biggest = item.width) : biggest,
+  //   parcelItems[0]?.width
+  // );
+  // const biggestHeight = parcelItems.reduce(
+  //   (biggest, item) =>
+  //     item.height > biggest ? (biggest = item.height) : biggest,
+  //   parcelItems[0]?.height
+  // );
+
+  // console.log("Biggest Length", biggestLength);
+  // console.log("Biggest Width", biggestWidth);
+  // console.log("Biggest Height", biggestHeight);
+
+  console.log("Parcel items", parcelItems);
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
     defaultValues: {
@@ -142,11 +163,6 @@ export default function ParcelInfoForm({
             name: currency.value,
             value: currency.value,
           }))}
-          // selectValue={
-          //   currencies.find(
-          //     (currency) => currency.name === parcelDetails?.currency
-          //   )?.value
-          // }
           placeholder="E.g Nigerian naira"
         />
         <ParcelItems

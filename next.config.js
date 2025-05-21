@@ -10,4 +10,7 @@ module.exports = {
       "enewerspynkvmaxulbhv.supabase.co", // <-- add this line
     ],
   },
+  serverActions: {
+    bodySizeLimit: "5mb", // or '10mb' — depending on your needs
+  },
 };

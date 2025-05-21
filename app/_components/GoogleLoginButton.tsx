@@ -16,8 +16,6 @@ export const GoogleLoginButton = ({
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
   const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ?? "";
 
-  console.log(redirectUri);
-
   // Step 1: Redirect user to Google login page
   const redirectToGoogleLogin = () => {
     setIsLoading(true);

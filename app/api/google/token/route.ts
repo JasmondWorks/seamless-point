@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
     }
 
     const tokenData = await tokenResponse.json();
+
+    console.log("token data", tokenData);
+
     return NextResponse.json({
       access_token: tokenData.access_token,
       id_token: tokenData.id_token,

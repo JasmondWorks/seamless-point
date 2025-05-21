@@ -70,14 +70,17 @@ export interface Receiver {
 }
 export interface Parcel {
   name: string;
-  category?: string;
-  subCategory?: string;
-  description?: string;
-  hsCode?: string;
+  category: string;
+  subCategory: string;
+  description: string;
+  hsCode: string;
   weight: number;
   quantity: number;
-  value?: number;
+  value: number;
   id?: string;
+  length: number;
+  width: number;
+  height: number;
 }
 export type StoredFile = {
   base64File: string;
@@ -107,6 +110,7 @@ export interface newDelivery {
   updateReceiver: (receiver: Receiver) => void;
   addParcelDetails: (parcelDetails: ParcelDetails) => void;
   resetDeliveryData: () => void;
+  replaceState: (newState: any) => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
   setStep: (step: number) => void;

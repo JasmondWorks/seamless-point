@@ -11,7 +11,21 @@ export default function PackageDetails({
   parcel,
   courierDetails,
 }: any) {
-  console.log(parcel);
+  const biggestLength = parcel!.parcelItems.reduce(
+    (biggest: number, item: any) =>
+      item.length > biggest ? (biggest = item.length) : biggest,
+    parcel!.parcelItems[0].length
+  );
+  const biggestWidth = parcel!.parcelItems.reduce(
+    (biggest: number, item: any) =>
+      item.width > biggest ? (biggest = item.width) : biggest,
+    parcel!.parcelItems[0].width
+  );
+  const biggestHeight = parcel!.parcelItems.reduce(
+    (biggest: number, item: any) =>
+      item.height > biggest ? (biggest = item.height) : biggest,
+    parcel!.parcelItems[0].height
+  );
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between gap-8">
@@ -153,15 +167,15 @@ export default function PackageDetails({
           </div>
           <div className="space-y-1">
             <p className="font-bold">Length</p>
-            <p className="text-muted">20cm</p>
+            <p className="text-muted">{biggestLength}cm</p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Width</p>
-            <p className="text-muted">30cm</p>
+            <p className="text-muted">{biggestWidth}cm</p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Height</p>
-            <p className="text-muted">40cm</p>
+            <p className="text-muted">{biggestHeight}cm</p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Quantity</p>
