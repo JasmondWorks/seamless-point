@@ -81,7 +81,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
               disabled={props.disabled}
               placeholder={props.placeholder}
               {...field}
-              className="shad-input border-0 text-[16px] scale-[0.875] origin-left"
+              className="shad-input border-0"
             />
           </FormControl>
         </div>
