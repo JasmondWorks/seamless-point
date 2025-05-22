@@ -6,7 +6,7 @@ export default function Spinner({
   color = "orange",
 }: {
   className?: string;
-  size?: string;
+  size?: "small" | "medium" | "large";
   color?: string;
 }) {
   const base = "loader border-b-transparent";

@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
-      <ScrollArea className="flex-1 h-full">
+      <main className="h-full flex-1 overflow-auto">
         <section id="home" className="py-16">
           <div className="container-custom">
             <div className="grid gap-10 gap-y-5 lg:grid-cols-2 items-center">
@@ -1428,7 +1428,7 @@ export default function Home() {
             <h2 className="section-heading">
               Frequently Asked <span className="text-brandSec">Questions</span>
             </h2>
-            <ScrollArea className="h-96 overflow-auto max-w-3xl mx-auto">
+            <div className="max-h-[500px] overflow-auto max-w-3xl mx-auto">
               <div className="px-2 md:px-4">
                 <AccordionComponent
                   items={[
@@ -1469,7 +1469,7 @@ export default function Home() {
                   ]}
                 />
               </div>
-            </ScrollArea>
+            </div>
           </div>
           <svg
             className="absolute right-0 bottom-[50%] translate-y-[50%]"
@@ -1509,9 +1509,9 @@ export default function Home() {
               </h2>
               <form>
                 <div className="grid lg:grid-cols-2 gap-4 items-stretch">
-                  <Input
+                  <input
                     type="text"
-                    className="h-auto min-h-11 placeholder:text-white text-white bg-transparent border border-neutral-300"
+                    className="bg-white focus:outline-none focus:ring-1 focus:ring-brandSec focus:ring-offset-2 focus:ring-offset-transparent rounded px-4 py-2 transition-all duration-300 outline-none border-2 border-black focus:border-transparent"
                     placeholder="Email address"
                   />
                   <ButtonFormSubmit
@@ -1524,7 +1524,7 @@ export default function Home() {
           </div>
         </section>
         <Footer />
-      </ScrollArea>
+      </main>
     </div>
   );
 }

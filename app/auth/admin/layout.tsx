@@ -12,22 +12,20 @@ export default function AdminAuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticating, user } = useUserAuth();
+  const { authState, user } = useUserAuth();
   const router = useRouter();
-
-  // console.log(authenticated);
 
   useEffect(() => {
     if (user) router.push("/admin/dashboard");
   }, [user]);
 
-  if (isAuthenticating) return <SpinnerFull />;
+  if (authState === "loading") return <SpinnerFull />;
 
   return (
     !user && (
       <div className="flex flex-col h-screen">
         <Navbar />
-        <ScrollArea className="flex-1 h-full">{children}</ScrollArea>
+        <main className="h-full flex-1 overflow-auto">{children}</main>
       </div>
     )
   );

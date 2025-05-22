@@ -12,7 +12,7 @@ export default function UserAuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticating, user } = useUserAuth();
+  const { authState, user } = useUserAuth();
   const router = useRouter();
 
   // console.log(authenticated);
@@ -21,13 +21,13 @@ export default function UserAuthLayout({
     if (user) router.push("/user/dashboard");
   }, [user]);
 
-  if (isAuthenticating) return <SpinnerFull />;
+  if (authState === "loading") return <SpinnerFull />;
 
   return (
     !user && (
       <div className="flex flex-col h-screen">
         <Navbar />
-        <ScrollArea className="h-full flex-1">{children}</ScrollArea>
+        <main className="h-full flex-1 overflow-auto">{children}</main>
       </div>
     )
   );
