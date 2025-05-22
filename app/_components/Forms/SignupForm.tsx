@@ -22,6 +22,7 @@ import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { GoogleLoginButton } from "@/app/_components/GoogleLoginButton";
+import Spinner from "@/app/_components/Spinner";
 
 export default function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -136,7 +137,16 @@ export default function SignupForm() {
           <div>
             <ButtonFormSubmit
               disabled={isLoading}
-              text="Sign up"
+              text={
+                isLoading ? (
+                  <div className="flex gap-2 items-center">
+                    <Spinner color="text" size="small" />
+                    Signing up
+                  </div>
+                ) : (
+                  "Sign up"
+                )
+              }
               isReversed
               icon={<FaChevronRight />}
             />

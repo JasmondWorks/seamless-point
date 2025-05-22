@@ -29,8 +29,8 @@ export default function ButtonFormSubmit({
       onClick={onClick}
       text={text}
       className={clsx(
-        "py-10 !h-14 items-center font-normal w-full",
-        disabled && "opacity-50 cursor-not-allowed",
+        "py-10 !h-14 items-center font-normal w-full focus:outline-none focus:ring-1 focus:ring-brandSec focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-300",
+        disabled && "opacity-50 cursor-not-allowed ",
         className
       )}
       isRoundedLarge

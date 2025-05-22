@@ -1,8 +1,5 @@
 "use client";
 
-import styles from "./ResetPasswordForm.module.css";
-
-import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import CustomFormField, {
   FormFieldType,
 } from "@/app/_components/CustomFormField";
@@ -11,9 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { Form } from "@/app/_components/ui/form";
 import { useForm } from "react-hook-form";
-import { FaChevronRight } from "react-icons/fa";
-import Navbar from "@/app/_components/Navbar";
-import Link from "next/link";
+
 import toast from "react-hot-toast";
 import { changeUserPassword } from "@/app/_lib/actions";
 import { useUserAuth } from "../_contexts/UserAuthContext";
@@ -45,9 +40,10 @@ export default function ChangePasswordForm() {
       password,
       confirmPassword
     );
-
+    console.log(res);
     if (res.status === "success") {
       toast.success(res.message);
+      reset({});
       login(undefined, res.token);
     } else {
       toast.error(res.message);

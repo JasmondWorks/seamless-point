@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 
 import { GoogleLoginButton } from "@/app/_components/GoogleLoginButton";
+import Spinner from "@/app/_components/Spinner";
 
 export default function LoginForm({
   userType = "user",
@@ -124,7 +125,16 @@ export default function LoginForm({
         </div>
         <div>
           <ButtonFormSubmit
-            text="Sign in"
+            text={
+              isLoading ? (
+                <div className="flex gap-2 items-center">
+                  <Spinner color="text" size="small" />
+                  Signing in
+                </div>
+              ) : (
+                "Sign in"
+              )
+            }
             isReversed
             icon={<FaChevronRight />}
             disabled={isLoading}
