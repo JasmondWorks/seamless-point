@@ -1,7 +1,6 @@
 import React from "react";
 import Button, { ButtonVariant } from "./Button";
 import clsx from "clsx";
-import Spinner from "./Spinner";
 
 interface Props {
   text?: string | React.ReactNode;
@@ -11,6 +10,7 @@ interface Props {
   isReversed?: boolean;
   disabled?: boolean;
   children?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export default function ButtonFormSubmit({
@@ -20,12 +20,14 @@ export default function ButtonFormSubmit({
   icon,
   isReversed,
   disabled,
+  isLoading,
   children,
 }: Props) {
   return (
     <Button
       type="submit"
       disabled={disabled}
+      isLoading={isLoading}
       onClick={onClick}
       text={text}
       className={clsx(

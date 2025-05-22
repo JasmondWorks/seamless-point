@@ -135,21 +135,16 @@ export default function SignupForm() {
             />
           </div>
           <div>
-            <ButtonFormSubmit
-              disabled={isLoading}
-              text={
-                isLoading ? (
-                  <div className="flex gap-2 items-center">
-                    <Spinner color="text" size="small" />
-                    Signing up
-                  </div>
-                ) : (
-                  "Sign up"
-                )
-              }
-              isReversed
-              icon={<FaChevronRight />}
-            />
+            <Button
+              type="submit"
+              variant={ButtonVariant.fill}
+              className="w-full h-14"
+              isLoading={isLoading}
+              isRoundedLarge
+            >
+              {isLoading ? "Signing up" : "Sign up"}
+              <FaChevronRight />
+            </Button>
             <p className="mt-5 flex items-center justify-center leading-snug gap-2">
               Already have an account?{" "}
               <Link href="/auth/user/login">

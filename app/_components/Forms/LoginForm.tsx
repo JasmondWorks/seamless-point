@@ -124,21 +124,22 @@ export default function LoginForm({
           </Link>
         </div>
         <div>
-          <ButtonFormSubmit
-            text={
-              isLoading ? (
-                <div className="flex gap-2 items-center">
-                  <Spinner color="text" size="small" />
-                  Signing in
-                </div>
-              ) : (
-                "Sign in"
-              )
-            }
-            isReversed
+          {/* <ButtonFormSubmit
+            text={isLoading ? "Signing in" : "Sign in"}
+            // isReversed
             icon={<FaChevronRight />}
-            disabled={isLoading}
-          />
+            isLoading={isLoading}
+          /> */}
+          <Button
+            type="submit"
+            variant={ButtonVariant.fill}
+            className="w-full h-14"
+            isLoading={isLoading}
+            isRoundedLarge
+          >
+            {isLoading ? "Signing in" : "Sign in"}
+            <FaChevronRight />
+          </Button>
           {userType === "user" && (
             <p className="mt-5 flex items-center justify-center leading-snug gap-2">
               Don't have an account?{" "}

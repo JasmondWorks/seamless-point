@@ -1,6 +1,7 @@
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 import Link from "next/link";
+import Spinner from "@/app/_components/Spinner";
 
 export enum ButtonVariant {
   link = "LINK",
@@ -23,6 +24,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isPrimaryDark?: boolean;
   isBig?: boolean;
   disabled?: boolean;
+  isLoading?: boolean;
   href?: string;
 }
 
@@ -40,6 +42,7 @@ export default function Button({
   isBig = false,
   className = "",
   disabled,
+  isLoading,
   href,
   ...props
 }: ButtonProps) {
@@ -64,6 +67,7 @@ export default function Button({
       "text-brandSec": variant === ButtonVariant.link,
       "bg-neutral-200": variant === ButtonVariant.neutralLight,
       "bg-neutral-900 text-white": variant === ButtonVariant.neutralDark,
+      "opacity-40 pointer-events-none": isLoading,
     },
     className // Additional external classes
   );
@@ -71,6 +75,7 @@ export default function Button({
   if (href)
     return (
       <Link href={href} className={classes}>
+        {isLoading && <Spinner color="text" size="small" />}
         {text || children}
       </Link>
     );
@@ -82,7 +87,9 @@ export default function Button({
       className={classes}
       {...props}
     >
+      {isLoading && <Spinner color="text" size="small" />}
       {icon && <span>{icon}</span>}
+
       {text && <span className="flex items-center">{text}</span>}
       {!text && children}
     </button>
