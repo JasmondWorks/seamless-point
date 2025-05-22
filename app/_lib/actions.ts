@@ -632,6 +632,7 @@ export async function fetchDeliveries({
     );
     const data = await res.json();
 
+    console.log(data);
     // const formattedData = formatDataDescending(data, "delivery");
 
     if (!res.ok) throw new Error(data.message);

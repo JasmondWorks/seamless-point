@@ -255,6 +255,93 @@ function ItemParcelForm({
     },
   });
 
+  const hsCodes = [
+    {
+      hs_code: "010121",
+      description: "Live horses, pure-bred breeding animals",
+    },
+    {
+      hs_code: "020110",
+      description: "Meat of bovine animals, fresh or chilled",
+    },
+    {
+      hs_code: "030231",
+      description: "Tuna, skipjack and bonito, frozen",
+    },
+    {
+      hs_code: "040221",
+      description: "Milk and cream, concentrated, not containing sugar",
+    },
+    {
+      hs_code: "070200",
+      description: "Tomatoes, fresh or chilled",
+    },
+    {
+      hs_code: "090111",
+      description: "Coffee, not roasted, not decaffeinated",
+    },
+    {
+      hs_code: "120991",
+      description: "Vegetable seeds for sowing",
+    },
+    {
+      hs_code: "150910",
+      description: "Olive oil, virgin",
+    },
+    {
+      hs_code: "170199",
+      description:
+        "Cane or beet sugar, solid, not containing flavoring or coloring",
+    },
+    {
+      hs_code: "220421",
+      description: "Wine of fresh grapes, in containers <=2 liters",
+    },
+    {
+      hs_code: "270900",
+      description:
+        "Petroleum oils and oils obtained from bituminous minerals, crude",
+    },
+    {
+      hs_code: "300490",
+      description: "Medicaments consisting of mixed or unmixed products",
+    },
+    {
+      hs_code: "392690",
+      description: "Plastic articles not elsewhere specified",
+    },
+    {
+      hs_code: "481910",
+      description: "Cartons, boxes and cases of corrugated paper or paperboard",
+    },
+    {
+      hs_code: "620342",
+      description: "Men's or boys' trousers and shorts, of cotton, not knitted",
+    },
+    {
+      hs_code: "701090",
+      description: "Glass containers for the conveyance or packing of goods",
+    },
+    {
+      hs_code: "730820",
+      description: "Towers and lattice masts, of iron or steel",
+    },
+    {
+      hs_code: "841810",
+      description:
+        "Combined refrigerator-freezers, fitted with separate external doors",
+    },
+    {
+      hs_code: "850440",
+      description: "Static converters (for example, rectifiers)",
+    },
+    {
+      hs_code: "940360",
+      description:
+        "Wooden furniture (other than for offices, kitchens or bedrooms)",
+    },
+  ];
+
   function onSubmit(data: z.infer<typeof parcelItemSchema>) {
     const itemDetails = {
       ...data,
@@ -303,6 +390,14 @@ function ItemParcelForm({
             placeholder="Select a category"
           />
           <CustomFormField
+            className="col-span-2"
+            label="Description"
+            name="description"
+            control={form.control}
+            fieldType={FormFieldType.INPUT}
+            placeholder="Description"
+          />
+          <CustomFormField
             className="col-span-2 sm:col-span-1"
             label="Item sub-category"
             name="subCategory"
@@ -315,8 +410,12 @@ function ItemParcelForm({
             label="Select HS Code"
             name="hsCode"
             control={form.control}
-            fieldType={FormFieldType.PHONE_INPUT}
-            placeholder="+234"
+            fieldType={FormFieldType.SELECT}
+            selectOptions={hsCodes.map((obj) => ({
+              name: `${obj.description}: ${obj.hs_code}`,
+              value: obj.hs_code,
+            }))}
+            placeholder="HS code"
           />
           <div className="grid sm:grid-cols-3 gap-5 col-span-2">
             <CustomFormField

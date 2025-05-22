@@ -52,7 +52,9 @@ export const getDeliveriesColumns = (deliveryActions: {
             <>
               <ConfirmDialog
                 onConfirm={() =>
-                  handleCancelAndShowSuccess(row.original.trackingNumber)
+                  handleCancelAndShowSuccess(
+                    row.original.courierDetails.trackingNumber
+                  )
                 }
                 title="Cancel delivery"
                 description="Are you sure you want to cancel this delivery? This action cannot be undone."
@@ -100,7 +102,7 @@ export const getDeliveriesColumns = (deliveryActions: {
       id: "amountStatus", // Custom ID for the combined column
       header: () => <div className="text-center">AMOUNT</div>,
       cell: ({ row }) => {
-        const amount = getParcelTotalAmount(row.original.parcelDetails); // Access 'amount' directly from the row data
+        const amount = row.original?.courierDetails?.amount || "N/A"; // Access 'amount' directly from the row data
         const status = row.original.status; // Access 'status' directly from the row data
 
         // Format the amount as currency
@@ -127,7 +129,9 @@ export const getDeliveriesColumns = (deliveryActions: {
       accessorKey: "trackingId",
       header: "TRACKING NUMBER",
       cell: ({ row }) => {
-        const trackingNumber = row.original.trackingId;
+        const trackingNumber =
+          row.original.courierDetails?.trackingNumber ||
+          row.original.trackingId;
         return (
           <div className="flex gap-2 items-center">
             <span>{trackingNumber}</span>
@@ -141,16 +145,19 @@ export const getDeliveriesColumns = (deliveryActions: {
       accessorKey: "dispatch",
       header: "DISPATCH",
       cell: ({ row }) => {
-        const dispatch = dispatches.find(
-          (dispatch) => dispatch.name.toLowerCase() === row.original.courier
-        );
+        // const dispatch = dispatches.find(
+        //   (dispatch) => dispatch.name.toLowerCase() === row.original.courier
+        // );
+        console.log(row.original);
+
+        const dispatch = row.original?.courierDetails;
 
         if (!dispatch) return null;
         return (
           <Image
             className="w-7 object-contain mx-auto"
-            src={dispatch.logo}
-            alt={dispatch.name}
+            src={dispatch.courierLogo}
+            alt={dispatch.courierName}
             width={100}
             height={100}
           />

@@ -1,28 +1,25 @@
 import ActionButton from "@/app/_components/ActionButton";
 import BalanceDisplay from "@/app/_components/BalanceDisplay";
+
+import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
+
 import { PaymentsTable } from "@/app/_components/PaymentsTable";
-import clsx from "clsx";
+import Spinner from "@/app/_components/Spinner";
+
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default function Payments() {
   return (
     <>
       <h1 className="headline">Payments</h1>
       <div className="grid lg:grid-cols-2 gap-10">
-        <div
-          style={{
-            background:
-              "white url('/assets/images/naira-illustration.png') no-repeat right center/ contain",
-          }}
-          className={clsx(
-            "text-neutral-700 relative p-4 card w-full max-w-xl lg:max-w-none"
-          )}
-        >
-          <h3 className="font-bold">BALANCE</h3>
-          <p className="text-6xl lg:text-7xl">0.00</p>
-        </div>
+        <Suspense fallback={<DataFetchSpinner />}>
+          <div className="max-w-lg">
+            <BalanceDisplay />
+          </div>
+        </Suspense>
 
-        {/* <BalanceDisplay className="flex flex-col justify-center" /> */}
         <div className="flex gap-5 flex-wrap">
           <Link href="/user/withdraw" className="flex-1">
             <ActionButton

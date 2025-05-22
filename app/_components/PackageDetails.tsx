@@ -29,11 +29,11 @@ export default function PackageDetails({
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between gap-8">
-        <div className="sm:max-w-lg space-y-3 flex-1">
+        <div className="sm:max-w-lg space-y-3 flex-1 flex flex-col">
           <h3 className="text-xl font-bold leading-tight text-gray-900">
             Senders details
           </h3>
-          <div className="space-y-6 rounded-3xl p-3 bg-white border border-neutral-300">
+          <div className="space-y-6 rounded-3xl p-3 bg-white border border-neutral-300 flex-1">
             <div className="flex gap-6 flex-wrap justify-between">
               <div className="space-y-1">
                 <p className="font-bold">Name</p>
@@ -63,11 +63,11 @@ export default function PackageDetails({
             </div>
           </div>
         </div>
-        <div className="sm:max-w-lg space-y-3 flex-1">
+        <div className="sm:max-w-lg space-y-3 flex-1 flex flex-col">
           <h3 className="text-xl font-bold leading-tight text-gray-900">
             Receiver's details
           </h3>
-          <div className="space-y-6 rounded-3xl p-3 bg-white border border-neutral-300">
+          <div className="space-y-6 rounded-3xl p-3 bg-white border border-neutral-300 flex-1">
             <div className="flex gap-6 flex-wrap justify-between">
               <div className="space-y-1">
                 <p className="font-bold">Name</p>
@@ -115,7 +115,7 @@ export default function PackageDetails({
             <p className="font-bold">Amount</p>
             <p className="text-muted">
               {/* {formatCurrency(getParcelTotalAmount(parcel))} */}
-              {formatCurrency(courierDetails.amount)}
+              {formatCurrency(courierDetails?.amount)}
             </p>
           </div>
           <div className="space-y-1">
@@ -154,7 +154,7 @@ export default function PackageDetails({
           </div>
           <div className="space-y-1">
             <p className="font-bold">Courier</p>
-            <p className="text-muted">{courierDetails.courierName}</p>
+            <p className="text-muted">{courierDetails?.courierName}</p>
           </div>
           <div className="space-y-1">
             <p className="font-bold">Approved by</p>

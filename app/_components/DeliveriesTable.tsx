@@ -35,9 +35,7 @@ export function DeliveriesTable({
     isError,
   } = useDeliveries(page, limit, sort);
 
-  console.log(sort);
-
-  const deliveries = formatDeliveries(deliveriesResponse?.data.delivery);
+  // const deliveries = formatDeliveries(deliveriesResponse?.data.delivery);
 
   console.log(deliveriesResponse);
   const totalCount = deliveriesResponse?.totalCount;
@@ -53,7 +51,9 @@ export function DeliveriesTable({
 
   const deliveriesColumns = getDeliveriesColumns(deliveryActions);
 
-  const tags = deliveries && [...new Set(deliveries?.map((d) => d?.status))];
+  const tags = deliveriesResponse?.data.delivery && [
+    ...new Set(deliveriesResponse?.data.delivery?.map((d) => d?.status)),
+  ];
 
   // Handlers
   function handleCancelDelivery(trackingNumber: string) {
@@ -124,7 +124,7 @@ export function DeliveriesTable({
         </div>
         <DataTable
           columns={deliveriesColumns}
-          data={deliveries}
+          data={deliveriesResponse.data.delivery}
           searchQuery={searchQuery}
           selectedTags={selectedTags}
           isBackendPaginated

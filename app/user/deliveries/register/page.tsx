@@ -369,9 +369,9 @@ function Payment({
 
     console.log("Created delivery", createdDelivery);
 
+    if (res.status === "success") resetDeliveryData();
     onSetActivePage("success");
     // if (!isError) {
-    //   resetDeliveryData();
     //   // timeout = setTimeout(
     //   //   () => router.push("/user/deliveries/success"),
     //   //   5000
