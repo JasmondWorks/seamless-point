@@ -28,7 +28,7 @@ const stepsData = [
 export default function DeliveryStatuses({
   direction = "responsive",
 }: {
-  direction: string;
+  direction?: string;
 }) {
   return (
     <div>

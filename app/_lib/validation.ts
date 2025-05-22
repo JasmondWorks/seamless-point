@@ -302,6 +302,12 @@ export const parcelItemSchema = z.object({
     .refine((val) => val.split(/\s+/).filter(Boolean).length >= 3, {
       message: "Item name must contain at least three words",
     }),
+  description: z
+    .string({
+      required_error: "Please provide an item description",
+    })
+    .trim()
+    .min(1, "Please provide an item description"),
   category: z
     .string({
       required_error: "Please provide an item category",
@@ -315,14 +321,9 @@ export const parcelItemSchema = z.object({
     .trim()
     .min(1, "Please provide an item subcategory"),
   hsCode: z
-    .string({
-      // required_error: "HS code is required",
-    })
-    .trim()
-    .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
-    .regex(/^[+]?\d{10,14}$/, {
-      message: "Phone number must be valid and can include a country code",
-    }),
+    .string()
+    .nonempty("Select an HS code")
+    .regex(/^\d+$/, "HS code must contain digits only"),
   weight: z.preprocess(
     (val) => {
       if (typeof val === "string" && val.trim() === "") return undefined; // Default to 1 for empty string

@@ -16,10 +16,17 @@ export default async function ShipmentDetails({
   console.log(trackingId);
 
   const shipment = await fetchDelivery(trackingId);
+  // return console.log("Shipment", shipment);
 
-  const sender = getPackageSenderReceiver(shipment.data.delivery);
-  const receiver = getPackageSenderReceiver(shipment.data.delivery, "to");
-  const parcel = getParcelDetails(shipment.data.delivery);
+  const sender = shipment.data?.delivery.hasOwnProperty("sender")
+    ? shipment.data?.delivery.sender
+    : getPackageSenderReceiver(shipment.data.delivery);
+  const receiver = shipment.data?.delivery.hasOwnProperty("receiver")
+    ? shipment.data?.delivery.receiver
+    : getPackageSenderReceiver(shipment.data.delivery, "to");
+  const parcel = shipment.data.delivery.hasOwnProperty("parcelDetails")
+    ? shipment.data.delivery.parcelDetails
+    : getParcelDetails(shipment.data.delivery);
 
   return (
     <>
@@ -33,13 +40,13 @@ export default async function ShipmentDetails({
         />
         <div>
           <h3 className="text-xl mb-3 font-bold">Package Timeline</h3>
-          {shipment.data.delivery.status === "unconfirmed" && (
+          {/* {shipment.data.delivery.status === "unconfirmed" && (
             <div>
               <p className="mb-5">This shipment is not approved</p>
               <Button variant={ButtonVariant.fill}>Approve now</Button>
             </div>
-          )}
-          {shipment.data.delivery.status !== "unconfirmed" && (
+          )} */}
+          {shipment.data.delivery.status === "unconfirmed" && (
             <Card className="p-8 !rounded-3xl">
               <div className="flex gap-10 justify-between text-center  overflow-x-auto">
                 <DeliveryStatuses direction="horizontal" />
