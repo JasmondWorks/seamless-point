@@ -13,7 +13,7 @@ export default function Deliveries({
 
   return (
     <>
-      <h1 className="headline">Deliveries</h1>
+      <h1 className="text-3xl font-bold text-center">Deliveries</h1>
 
       <DeliveriesTable page={page} limit={limit} sort={sort} />
     </>

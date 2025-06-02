@@ -18,7 +18,7 @@ export default async function DashboardLayout({
         <div className="bg-neutral-50 flex-1 overflow-hidden flex relative">
           <DashboardNavbar />
           <main className="flex-1 ml-14 lg:ml-[0] overflow-auto">
-            <div className="overflow-auto relative z-10 space-y-10 min-h-full p-3 sm:p-5 md:p-6 lg:p-8 !py-10">
+            <div className="overflow-auto relative z-10 space-y-10 min-h-full p-3 sm:p-5 md:p-6">
               {children}
             </div>
             <Image

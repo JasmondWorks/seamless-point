@@ -24,7 +24,7 @@ export default function SelectDeliveryType({
   }
 
   return (
-    <div className="gap-10 grid md:grid-cols-2 justify-center">
+    <div className="gap-8 flex flex-col md:flex-row">
       <button
         onClick={() => handleSetDeliveryType(DeliveryType.REGULAR)}
         className="flex flex-col gap-3 justify-center items-center w-fit"
@@ -32,7 +32,7 @@ export default function SelectDeliveryType({
         <div className="card flex-1 bg-white flex flex-col">
           <div className="flex-1 grid place-items-center px-5 py-10">
             <svg
-              className="max-w-full h-auto"
+              className="max-w-full h-[220px]"
               width={300}
               height={300}
               viewBox="0 0 300 300"
@@ -420,9 +420,7 @@ export default function SelectDeliveryType({
             <hr />
           </div>
           <div className="p-3 border-t border-neutral-100">
-            <span className="text-lg font-bold text-neutral-600">
-              Regular items{" "}
-            </span>{" "}
+            <span className="font-bold text-neutral-600">Regular items </span>{" "}
           </div>
         </div>
         <span className="text-muted">Furniture, etc.</span>
@@ -434,7 +432,7 @@ export default function SelectDeliveryType({
         <div className="card flex-1 bg-white flex flex-col">
           <div className="flex-1 grid place-items-center px-5 py-10">
             <svg
-              className="max-w-full h-auto"
+              className="max-w-full h-[220px]"
               width={300}
               height={300}
               viewBox="0 0 300 300"
@@ -1317,9 +1315,7 @@ export default function SelectDeliveryType({
             <hr />
           </div>
           <div className="p-3 border-t border-neutral-100">
-            <span className="text-lg font-bold text-neutral-600">
-              Food items
-            </span>
+            <span className="font-bold text-neutral-600">Food items</span>
           </div>
         </div>
         <span className="text-muted">Food stuff, drinks and meat, etc.</span>

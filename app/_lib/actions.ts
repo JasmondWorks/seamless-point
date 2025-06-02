@@ -847,6 +847,8 @@ export const verifyPayment = async (reference: string) => {
     );
     const data = await response.json();
 
+    console.log("data", data);
+
     if (!response.ok) throw new Error(data.message);
 
     return { status: "success", data };
@@ -854,7 +856,15 @@ export const verifyPayment = async (reference: string) => {
     return { status: "error", message: error.message };
   }
 };
-export const createTransaction = async ({ amount, type, reference }: any) => {
+export const createTransaction = async ({
+  amount,
+  type,
+  reference,
+}: {
+  amount: Number;
+  type: "withdraw" | "deposit";
+  reference?: string;
+}) => {
   try {
     const token = getUserToken();
 
@@ -1059,7 +1069,7 @@ export const getRates = async ({
     currency,
   };
 
-  console.log(payload);
+  // console.log(payload);
 
   try {
     const res = await fetch(`${URL}/terminal/rates`, {

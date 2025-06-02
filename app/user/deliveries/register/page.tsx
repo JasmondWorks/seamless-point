@@ -8,7 +8,6 @@ import ParcelInfoForm from "@/app/_components/ParcelInfoForm";
 import { useEffect, useState } from "react";
 import RatesList from "@/app/_components/RatesList";
 
-import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PackageDetails from "@/app/_components/PackageDetails";
 
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
@@ -25,23 +24,27 @@ import {
   arrangeShipmentPickup,
   createDelivery,
   createShipment,
+  createTransaction,
   getUser,
+  verifyPayment,
 } from "@/app/_lib/actions";
-import SpinnerFull from "@/app/_components/SpinnerFull";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import Button, { ButtonVariant } from "@/app/_components/Button";
-import { useRouter, useSearchParams } from "next/navigation";
-import BalanceDisplayClient from "@/app/_components/BalanceDisplayClient";
-import Spinner from "@/app/_components/Spinner";
+import { useSearchParams } from "next/navigation";
+
 import toast from "react-hot-toast";
 import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
 import Link from "next/link";
+import BalanceDisplay from "@/app/_components/BalanceDisplay";
+import PaystackButtonWrapper from "@/components/PaystackButtonWrapper";
+import { AlertCircle } from "lucide-react";
+import SpinnerFull from "@/app/_components/SpinnerFull";
 
 export default function Register() {
   const searchParams = useSearchParams();
 
   const [activePage, setActivePage] = useState(
-    searchParams.get("activePage") || "delivery-type"
+    searchParams.get("activePage") || "payment"
   );
 
   function handleSetActivePage(page: string) {
@@ -83,7 +86,9 @@ function DeliveryType({
 }) {
   return (
     <>
-      <h1 className="headline text-center">What are you trying to deliver</h1>
+      <h1 className="text-3xl font-bold text-center">
+        What are you trying to deliver
+      </h1>
       <SelectDeliveryType onSetActivePage={onSetActivePage} />
     </>
   );
@@ -96,7 +101,8 @@ function Sender({
 }) {
   return (
     <>
-      <h1 className="headline text-center mb-10">Sender’s information</h1>
+      <h1 className="text-3xl font-bold text-center">Sender’s information</h1>
+
       <DeliverySourceForm onSetActivePage={onSetActivePage} />
     </>
   );
@@ -108,7 +114,7 @@ function Receiver({
 }) {
   return (
     <>
-      <h1 className="headline text-center mb-10">Receiver’s information</h1>
+      <h1 className="text-3xl font-bold text-center">Receiver’s information</h1>
       <DeliveryReceiverForm onSetActivePage={onSetActivePage} />
     </>
   );
@@ -121,7 +127,7 @@ function ParcelInfo({
 }) {
   return (
     <>
-      <h1 className="headline text-center mb-10">Parcel information</h1>
+      <h1 className="text-3xl font-bold text-center">Parcel information</h1>
       <ParcelInfoForm onSetActivePage={onSetActivePage} />
     </>
   );
@@ -134,7 +140,7 @@ function SelectRate({
 }) {
   return (
     <>
-      <h1 className="headline text-center mb-10">Select Courier</h1>
+      <h1 className="text-3xl font-bold text-center">Select Courier</h1>
       <RatesList onSetActivePage={onSetActivePage} />
     </>
   );
@@ -157,8 +163,8 @@ function PackageDetailsOverview({
   } = useCreateDeliveryStore((store) => store);
 
   return (
-    <div className="space-y-8">
-      <h1 className="headline text-center mb-10">Package details</h1>
+    <div className="space-y-8 ">
+      <h1 className="text-3xl font-bold text-center">Package details</h1>
 
       <PackageDetails
         courierDetails={courierDetails}
@@ -166,7 +172,23 @@ function PackageDetailsOverview({
         receiver={receiver}
         parcel={parcel}
       />
-      <ButtonFormSubmit onClick={onSubmit} text="I UNDERSTAND" />
+      <div className="flex gap-4 justify-end">
+        <Button
+          onClick={() => onSetActivePage("select-rate")}
+          variant={ButtonVariant.fill}
+          className="!bg-[#fde9d7] !text-brandSec"
+          text="Previous"
+          isRoundedLarge
+        />
+
+        <Button
+          onClick={onSubmit}
+          variant={ButtonVariant.fill}
+          className="!text-white !bg-brandSec"
+          text="Continue"
+          isRoundedLarge
+        />
+      </div>
     </div>
   );
 }
@@ -178,69 +200,77 @@ function Payment({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [balance, setBalance] = useState<any>({});
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
-  const [dialogContent, setDialogContent] = useState("submit");
-  const router = useRouter();
+  const [user, setUser] = useState<any>({});
+  const [activeDialog, setActiveDialog] = useState<"submit" | "deposit">(
+    "submit"
+  );
+  const amount = 4_000_000_000_000;
+  const { balance, email } = user;
+  const minDeposit = Number(amount) - Number(balance);
+  const [depositAmount, setDepositAmount] = useState(3000);
 
   const {
     userId,
     resetDeliveryData,
     replaceState,
-    courierDetails: { amount },
+    // courierDetails: { amount },
   } = useCreateDeliveryStore((state) => state);
 
   const state = getNewDeliveryData();
 
-  // TODO: upload packageImage and proofOfPurchase and get back urls
+  async function fetchUser() {
+    setIsLoading(true);
+    const res = await getUser();
 
-  let timeout: NodeJS.Timeout;
+    setUser(res.user);
+    // setDepositAmount(Number(amount) - Number(res.user.balance));
+
+    setIsLoading(false);
+  }
 
   useEffect(() => {
-    async function fetchBalance() {
-      setIsLoadingBalance(true);
-      const res = await getUser();
-      setIsLoadingBalance(false);
-
-      setBalance(res.user.balance);
-    }
-    fetchBalance();
+    fetchUser();
   }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (balance < amount) {
-      setIsDialogOpen(true);
-      setDialogContent("deposit");
-      return;
-    }
+    console.log("submitted!");
+
+    if (balance < amount) return;
+
+    console.log("balance", balance);
+    console.log("amount", amount);
 
     // UPLOADING OF PACKAGE IMAGE AND PROOF OF PURCHASE
     setIsLoading(true);
 
-    const packageImageUrl = await uploadFile(
-      base64ToFile(
-        state.parcelDetails.packageImage!.base64File,
-        state.parcelDetails.packageImage!.name
-      ),
-      "package_images",
-      "Package"
-    );
+    let packageImageUrl, proofOfPurchaseUrl;
 
-    const proofOfPurchaseUrl = await uploadFile(
-      base64ToFile(
-        state.parcelDetails.proofOfPurchase.base64File,
-        state.parcelDetails.proofOfPurchase.name
-      ),
-      "package_proofs",
-      "Package proof"
-    );
+    if (state.parcelDetails.packageImage)
+      packageImageUrl = await uploadFile(
+        base64ToFile(
+          state.parcelDetails.packageImage.base64File,
+          state.parcelDetails.packageImage.name
+        ),
+        "package_images",
+        "Package"
+      );
 
-    if (!packageImageUrl || !proofOfPurchaseUrl) {
-      // toast.error("Failed to upload files");
-      return;
-    }
+    if (state.parcelDetails.proofOfPurchase)
+      proofOfPurchaseUrl = await uploadFile(
+        base64ToFile(
+          state.parcelDetails.proofOfPurchase.base64File,
+          state.parcelDetails.proofOfPurchase.name
+        ),
+        "package_proofs",
+        "Package proof"
+      );
+
+    // if (!packageImageUrl || !proofOfPurchaseUrl) {
+    //   // toast.error("Failed to upload files");
+    //   // return;
+    // }
 
     const pickupAddressId = state.courier.pickup_address;
     const deliveryAddressId = state.courier.delivery_address;
@@ -264,7 +294,6 @@ function Payment({
       toast.error(pickupRes.message);
 
       setIsLoading(false);
-      router.push("/user/dashboard");
       return;
     }
 
@@ -272,8 +301,8 @@ function Payment({
       ...state,
       parcelDetails: {
         ...state.parcelDetails,
-        packageImage: packageImageUrl,
-        proofOfPurchaseImage: proofOfPurchaseUrl,
+        packageImage: packageImageUrl || "",
+        proofOfPurchaseImage: proofOfPurchaseUrl || "",
       },
       courierDetails: { ...state.courierDetails, ...pickupRes.data },
     };
@@ -371,38 +400,52 @@ function Payment({
 
     if (res.status === "success") resetDeliveryData();
     onSetActivePage("success");
-    // if (!isError) {
-    //   // timeout = setTimeout(
-    //   //   () => router.push("/user/deliveries/success"),
-    //   //   5000
-    //   // );
-    //   setIsDialogOpen(true);
-    //   setDialogContent("submit");
-    // }
 
     setIsLoading(false);
-
-    return () => clearTimeout(timeout);
   }
-  function handleDepositRedirect() {
-    const redirectPath = "/user/deliveries/register";
-    const params = new URLSearchParams({
-      activePage: "payment",
-      step: "3",
-    }).toString();
+  async function handleDepositSuccess(res: any) {
+    setIsLoading(true);
+    console.log(res.reference);
 
-    const fullRedirect = `${redirectPath}?${params}`;
-    const encoded = encodeURIComponent(fullRedirect);
+    const verifyRes = await verifyPayment(res.reference);
 
-    router.push(`/user/deposit?redirect=${encoded}`);
+    if (verifyRes.status === "error") {
+      toast.error(verifyRes.message);
+      setIsLoading(false);
+    }
+
+    console.log(verifyRes);
+    // await createTransaction({ amount: depositAmount, type: "withdraw" });
+
+    fetchUser();
   }
-  if (isLoadingBalance) return <SpinnerFull />;
+  function handleDepositDialog() {
+    setActiveDialog("deposit");
+    setIsDialogOpen(true);
+  }
+  // function handleDepositRedirect() {
+  //   const redirectPath = "/user/deliveries/register";
+  //   const params = new URLSearchParams({
+  //     activePage: "payment",
+  //     step: "3",
+  //   }).toString();
+
+  //   const fullRedirect = `${redirectPath}?${params}`;
+  //   const encoded = encodeURIComponent(fullRedirect);
+
+  //   router.push(`/user/deposit?redirect=${encoded}`);
+  // }
+  // if (isLoadingBalance) return <SpinnerFull />;
+
+  if (isLoading) return <SpinnerFull />;
 
   return (
     <>
-      <h1 className="headline text-center">Payment</h1>
+      <h1 className="text-3xl font-bold text-center">Payment</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-y-10">
-        <BalanceDisplayClient balance={Number(balance)} />
+        <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]">
+          <BalanceDisplay balance={balance} />
+        </div>{" "}
         <div className="flex flex-col gap-3">
           <Label htmlFor="withdrawAmount">Amount to be paid</Label>
           <Input
@@ -417,37 +460,80 @@ function Payment({
             This amount will be deducted from your balance
           </p>
         </div>
-
         <PrivacyPolicyBlock />
-        <ButtonFormSubmit
-          disabled={isLoading}
-          text={isLoading ? <Spinner color="text" /> : "I UNDERSTAND"}
-        />
+        <div className="flex gap-4 justify-end">
+          <Button
+            onClick={() => onSetActivePage("package-details")}
+            variant={ButtonVariant.fill}
+            className="!bg-[#fde9d7] !text-brandSec"
+            text="Previous"
+            isRoundedLarge
+          />
+
+          {amount <= balance && (
+            <Button
+              type="submit"
+              variant={ButtonVariant.fill}
+              className="!text-white !bg-brandSec"
+              isRoundedLarge
+            >
+              Finish creating shipment
+            </Button>
+          )}
+          {amount > balance && (
+            <Button
+              type="button"
+              onClick={handleDepositDialog}
+              variant={ButtonVariant.fill}
+              className="!text-white !bg-red-500 flex items-center gap-2"
+              isRoundedLarge
+            >
+              <AlertCircle />
+              <span>Insufficient balance</span>
+            </Button>
+          )}
+        </div>
       </form>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
-          {dialogContent === "submit" && (
+          {activeDialog === "submit" && (
             <SuccessDialogContent
               title="Payment successful"
               description="Your delivery has been confirmed and your delivery process has started"
               onConfirmSuccess={() => {
                 onSetActivePage("success");
-                clearTimeout(timeout);
               }}
             />
           )}
-          {dialogContent === "deposit" && (
+          {activeDialog === "deposit" && (
             <div className="space-y-8">
-              <DialogTitle className="text-2xl font-bold text-red-600">
-                You have insufficient funds
+              <DialogTitle className="text-2xl font-bold">
+                Deposit now
               </DialogTitle>
+              <div className="flex flex-col gap-3">
+                <span>Amount</span>
+                <Input
+                  value={depositAmount}
+                  onChange={(e) => setDepositAmount(Number(e.target.value))}
+                  className="h-11 bg-white"
+                  type="text"
+                  placeholder="100NGN"
+                />
+              </div>
               <Button
-                onClick={handleDepositRedirect}
-                className="w-full"
+                onClick={() => setIsDialogOpen(false)}
+                type="button"
                 variant={ButtonVariant.fill}
-                text="Go to deposit page"
-              />
+                className="!text-white flex items-center w-full"
+                isRoundedLarge
+              >
+                <PaystackButtonWrapper
+                  onSuccess={handleDepositSuccess}
+                  amount={depositAmount}
+                  email={email}
+                />
+              </Button>
             </div>
           )}
         </DialogContent>

@@ -140,8 +140,7 @@ function DocumentParcelForm({
   const form = useForm<z.infer<typeof parcelDocumentSchema>>({
     resolver: zodResolver(parcelDocumentSchema),
     defaultValues: selectedParcelItem || {
-      name: "",
-      description: "",
+      itemDescription: "",
       weight: "",
       quantity: "",
     },
@@ -175,16 +174,8 @@ function DocumentParcelForm({
         <div className="grid grid-cols-2 gap-5">
           <CustomFormField
             className="col-span-2"
-            label="Item name"
-            name="name"
-            control={form.control}
-            fieldType={FormFieldType.INPUT}
-            placeholder="Sofa"
-          />
-          <CustomFormField
-            className="col-span-2"
             label="Item description"
-            name="description"
+            name="itemDescription"
             control={form.control}
             fieldType={FormFieldType.TEXTAREA}
             placeholder="Detailed description..."
@@ -245,7 +236,7 @@ function ItemParcelForm({
   const form = useForm<z.infer<typeof parcelItemSchema>>({
     resolver: zodResolver(parcelItemSchema),
     defaultValues: selectedParcelItem || {
-      name: "",
+      itemDescription: "",
       category: "",
       subCategory: "",
       hsCode: "",
@@ -371,8 +362,8 @@ function ItemParcelForm({
         <div className="grid sm:grid-cols-2 gap-5">
           <CustomFormField
             className="col-span-2 sm:col-span-1"
-            label="Item name"
-            name="name"
+            label="Item description"
+            name="itemDescription"
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="123 main street"
@@ -388,14 +379,6 @@ function ItemParcelForm({
               value: item,
             }))}
             placeholder="Select a category"
-          />
-          <CustomFormField
-            className="col-span-2"
-            label="Description"
-            name="description"
-            control={form.control}
-            fieldType={FormFieldType.INPUT}
-            placeholder="Description"
           />
           <CustomFormField
             className="col-span-2 sm:col-span-1"

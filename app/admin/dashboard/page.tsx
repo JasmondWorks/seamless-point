@@ -11,7 +11,7 @@ export default function Dashboard() {
     <>
       <h1 className="mb-5">
         <strong>
-          Hey <Username userType="admin" /> -{" "}
+          Hey <Username /> -{" "}
         </strong>{" "}
         Let's get you started for today
       </h1>

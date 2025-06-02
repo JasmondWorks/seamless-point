@@ -112,8 +112,8 @@ export default function Navbar({ className = "" }) {
                 <Bell className="text-neutral-600" />
 
                 {numUnreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 text-white rounded-full bg-brandSec w-5 text-sm font-bold h-5 grid place-items-center">
-                    {numUnreadNotifications}
+                  <span className="absolute -top-2 -right-2 text-white rounded-full bg-brandSec w-5 text-[.65rem] font-bold h-5 grid place-items-center">
+                    {numUnreadNotifications > 5 ? "5+" : numUnreadNotifications}
                   </span>
                 )}
               </Link>

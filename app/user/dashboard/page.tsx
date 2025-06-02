@@ -4,31 +4,32 @@ import BalanceDisplay from "../../_components/BalanceDisplay";
 import ActionButton from "../../_components/ActionButton";
 import Username from "@/app/_components/Username";
 import DashboardLayout from "@/app/_components/DashboardLayout";
-import { Suspense } from "react";
-import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
+import { getUser } from "@/app/_lib/actions";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const res = await getUser();
+  const balance = res?.user.balance ?? 0;
+
   return (
-    <DashboardLayout isContained={false} isRightContained={true}>
-      <h1 className="">
+    <DashboardLayout isRightContained={true}>
+      <h1 className="text-sm font-medium">
         <strong>
           Hey <Username /> -{" "}
         </strong>{" "}
         Let's get you started for today
       </h1>
 
-      <div className="w-full sm:w-fit sm:min-w-[350px] md:min-w-[550px]">
-        <Suspense fallback={<DataFetchSpinner />}>
-          <BalanceDisplay />
-        </Suspense>
+      <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]">
+        <BalanceDisplay balance={balance} />
       </div>
 
-      <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-10 [background-color: red]">
+      <div className="grid [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] gap-5">
         <Link href="/user/deposit">
           <ActionButton
             text="Deposit"
             icon={
               <svg
+                className="h-7"
                 width={30}
                 height={38}
                 viewBox="0 0 30 38"
@@ -48,6 +49,7 @@ export default function Dashboard() {
             text="Withdraw"
             icon={
               <svg
+                className="h-7"
                 width={30}
                 height={38}
                 viewBox="0 0 30 38"
@@ -67,6 +69,7 @@ export default function Dashboard() {
             text="Tracking"
             icon={
               <svg
+                className="h-7"
                 width={30}
                 height={38}
                 viewBox="0 0 30 38"
@@ -83,15 +86,16 @@ export default function Dashboard() {
         </Link>
       </div>
       <div
-        className="grid gap-10 justify-start md:pr-20 max-w-4xl [grid-template-columns:repeat(auto-fit,minmax(230px,1fr))] 
-        sm:[grid-template-columns:repeat(auto-fit,minmax(250px,1fr))] 
-        md:[grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] 
-        lg:[grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]"
+        // className="grid gap-10 justify-start md:pr-20 max-w-4xl [grid-template-columns:repeat(auto-fit,minmax(230px,1fr))]
+        // sm:[grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]
+        // md:[grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]
+        // lg:[grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]"
+        className="grid md:grid-cols-2 gap-5 max-w-xl"
       >
-        <div className="card bg-white flex flex-col">
-          <div className="flex-1 grid place-items-center p-5 md:py-10">
+        <div className="card bg-white flex flex-col p-3">
+          <div className="flex-1 grid place-items-center md:py-10">
             <svg
-              className="w-full"
+              className="w-full h-[120px]"
               width={280}
               height={216}
               viewBox="0 0 280 216"
@@ -551,10 +555,10 @@ export default function Dashboard() {
               />
             </svg>
           </div>
-          <div className="mx-5">
+          <div className="mb-3">
             <hr />
           </div>
-          <div className="p-5 border-t border-neutral-100">
+          <div className="border-t border-neutral-100">
             <Link href="/user/deliveries/register">
               <Button
                 className="font-light"
@@ -566,10 +570,10 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
-        <div className="card bg-white flex flex-col">
-          <div className="flex-1 grid place-items-center p-5 md:py-10">
+        <div className="card bg-white flex flex-col p-3">
+          <div className="flex-1 grid place-items-center md:py-10">
             <svg
-              className="w-full"
+              className="w-full h-[120px]"
               width={226}
               height={270}
               viewBox="0 0 226 270"
@@ -1151,10 +1155,10 @@ export default function Dashboard() {
               </g>
             </svg>
           </div>
-          <div className="mx-5">
+          <div className="mb-3">
             <hr />
           </div>
-          <div className="p-5 border-t border-neutral-100">
+          <div className="border-t border-neutral-100">
             <Button
               className="font-light"
               variant={ButtonVariant.fill}

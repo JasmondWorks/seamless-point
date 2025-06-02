@@ -11,17 +11,14 @@ export default function ActionButton({
   size?: string;
 }) {
   return (
-    <div className="p-5 rounded-xl items-center flex gap-6 bg-[#fef5ee]">
+    <div className="p-2 rounded-xl items-center flex gap-3 bg-[#fef5ee] border border-orange-200">
       <span
         className={clsx(
-          "rounded-full bg-orange-200 p-4 h-full aspect-square grid place-items-center"
+          "rounded-full bg-orange-200 p-2 h-full aspect-square grid place-items-center"
         )}
       >
         <span
-          className={clsx("flex justify-center items-center aspect-square", {
-            "w-8": size === "sm",
-            "w-10 lg:w-12": size !== "sm",
-          })}
+          className={clsx("flex justify-center items-center aspect-square")}
         >
           {icon}
         </span>
