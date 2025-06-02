@@ -10,7 +10,7 @@ import {
 } from "@/app/_components/ui/dialog";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getRates } from "@/app/_lib/actions";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
@@ -39,8 +39,21 @@ const RatesList = ({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
 
-  let timeout: any;
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    setShowLeftShadow(el.scrollLeft > 0);
+    setShowRightShadow(el.scrollLeft + el.clientWidth < el.scrollWidth);
+  };
+
+  useEffect(() => {
+    handleScroll(); // run on mount
+  }, [couriers]);
 
   useEffect(() => {
     fetchRates();
@@ -57,10 +70,6 @@ const RatesList = ({
       );
     setSelectedCourier(foundCourier);
   }, [couriers]);
-
-  useEffect(() => {
-    clearTimeout(timeout);
-  }, [isDialogOpen]);
 
   async function fetchRates() {
     const pickupAddress = {
@@ -168,10 +177,12 @@ const RatesList = ({
       rateId: selectedCourier.rate_id,
     };
     onSetCourierDetails(courierDetails);
-    setIsDialogOpen(true);
 
-    timeout = setTimeout(() => onSetActivePage("package-details"), 5000);
+    onSetActivePage("package-details");
   }
+
+  if (isLoading) return <DataFetchSpinner />;
+
   return (
     <>
       {error && (
@@ -186,39 +197,53 @@ const RatesList = ({
           </Button2>
         </div>
       )}
-      <div className="overflow-x-auto space-y-5">
-        {isLoading && <DataFetchSpinner />}
-        {!isLoading &&
-          couriers?.length === 0 &&
-          "No rates available at this time"}
-        {!isLoading &&
-          couriers?.length > 0 &&
-          couriers?.map((courier: any) => (
-            <CourierDetails
-              key={courier._id}
-              courier={courier}
-              selectedCourier={selectedCourier}
-              onSelectCourier={handleSelectCourier}
-            />
-          ))}
+      <div className="relative">
+        {/* Shadows */}
+        {showLeftShadow && (
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#fafafa] to-transparent z-10" />
+        )}
+        {showRightShadow && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#fafafa] to-transparent z-10" />
+        )}
+
+        {/* Scrollable Content */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="overflow-x-auto space-y-5 px-2"
+        >
+          {!isLoading &&
+            couriers?.length === 0 &&
+            "No rates available at this time"}
+          {!isLoading &&
+            couriers?.length > 0 &&
+            couriers?.map((courier: any) => (
+              <CourierDetails
+                key={courier._id}
+                courier={courier}
+                selectedCourier={selectedCourier}
+                onSelectCourier={handleSelectCourier}
+              />
+            ))}
+        </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 justify-end">
         <Button
+          onClick={() => onSetActivePage("parcel-info")}
           variant={ButtonVariant.fill}
           className="!bg-[#fde9d7] !text-brandSec"
           text="Previous"
           isRoundedLarge
         />
-        {
-          <Button
-            disabled={Boolean(error)}
-            onClick={onSubmit}
-            variant={ButtonVariant.fill}
-            className="!text-white !bg-brandSec"
-            text="Continue"
-            isRoundedLarge
-          />
-        }
+
+        <Button
+          disabled={Boolean(error)}
+          onClick={() => setIsDialogOpen(true)}
+          variant={ButtonVariant.fill}
+          className="!text-white !bg-brandSec"
+          text="Continue"
+          isRoundedLarge
+        />
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -249,9 +274,13 @@ const RatesList = ({
               </span>
             </div>
 
-            <span className="absolute bottom-3 right-3">
-              <CountdownTimer initialSeconds={5} />
-            </span>
+            <Button
+              onClick={onSubmit}
+              variant={ButtonVariant.fill}
+              className="!text-white !bg-brandSec w-full"
+              text="Proceed"
+              isRoundedLarge
+            />
           </div>
         </DialogContent>
       </Dialog>

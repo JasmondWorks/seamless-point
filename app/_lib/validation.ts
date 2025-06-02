@@ -293,16 +293,7 @@ export const deliveryDestinationSchema = z.object({
 });
 
 export const parcelItemSchema = z.object({
-  name: z
-    .string({
-      required_error: "Please provide an item name",
-    })
-    .trim()
-    .min(1, "Please provide an item name")
-    .refine((val) => val.split(/\s+/).filter(Boolean).length >= 3, {
-      message: "Item name must contain at least three words",
-    }),
-  description: z
+  itemDescription: z
     .string({
       required_error: "Please provide an item description",
     })
@@ -363,16 +354,7 @@ export const parcelItemSchema = z.object({
   height: z.coerce.number().positive("Height must be at least 1cm"),
 });
 export const parcelDocumentSchema = z.object({
-  name: z
-    .string({
-      required_error: "Please provide an item name",
-    })
-    .trim()
-    .min(1, "Please provide an item name")
-    .refine((val) => val.split(/\s+/).filter(Boolean).length >= 3, {
-      message: "Item name must contain at least three words",
-    }),
-  description: z
+  itemDescription: z
     .string({
       required_error: "Please provide an item description",
     })
@@ -405,27 +387,28 @@ export const parcelDocumentSchema = z.object({
 });
 
 const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>
-  z.custom<File>(
-    (file) => {
-      if (!(file instanceof File)) {
-        return false; // Ensure it's a File object
+  z
+    .custom<File>(
+      (file) => {
+        if (!(file instanceof File)) {
+          return false; // Ensure it's a File object
+        }
+
+        return (
+          file.size <= maxFileSize && // Check file size
+          allowedMimeTypes.includes(file.type) // Check MIME type
+        );
+      },
+      {
+        message: `Invalid file. Please upload a file of type: ${allowedMimeTypes
+          .map((type) => type.split("/")[1].toUpperCase())
+          .join(", ")}. Maximum file size allowed is ${(
+          maxFileSize /
+          (1024 * 1024)
+        ).toFixed(1)} MB.`,
       }
-
-      return (
-        file.size <= maxFileSize && // Check file size
-        allowedMimeTypes.includes(file.type) // Check MIME type
-      );
-    },
-    {
-      message: `Invalid file. Please upload a file of type: ${allowedMimeTypes
-        .map((type) => type.split("/")[1].toUpperCase())
-        .join(", ")}. Maximum file size allowed is ${(
-        maxFileSize /
-        (1024 * 1024)
-      ).toFixed(1)} MB.`,
-    }
-  );
-
+    )
+    .optional(); // ✅ This makes it optional
 export const parcelInfoSchema = z.object({
   packagingType: z
     .string({

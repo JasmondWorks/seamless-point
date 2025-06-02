@@ -1,33 +1,31 @@
 import ActionButton from "@/app/_components/ActionButton";
 import BalanceDisplay from "@/app/_components/BalanceDisplay";
 
-import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
-
 import { PaymentsTable } from "@/app/_components/PaymentsTable";
-import Spinner from "@/app/_components/Spinner";
+import { getUser } from "@/app/_lib/actions";
 
 import Link from "next/link";
-import { Suspense } from "react";
 
-export default function Payments() {
+export default async function Payments() {
+  const res = await getUser();
+  const { user } = res;
+
   return (
     <>
-      <h1 className="headline">Payments</h1>
-      <div className="grid lg:grid-cols-2 gap-10">
-        <Suspense fallback={<DataFetchSpinner />}>
-          <div className="max-w-lg">
-            <BalanceDisplay />
-          </div>
-        </Suspense>
+      <h1 className="text-3xl font-bold text-center">Payments</h1>
+      <div className="grid lg:grid-cols-2 gap-8">
+        <div className="max-w-3xl">
+          <BalanceDisplay balance={user?.balance} />
+        </div>
 
-        <div className="flex gap-5 flex-wrap">
+        <div className="flex flex-row lg:flex-col gap-3 flex-wrap">
           <Link href="/user/withdraw" className="flex-1">
             <ActionButton
               text="Withdraw"
               size="sm"
               icon={
                 <svg
-                  className="w-full h-full"
+                  className="h-7"
                   viewBox="0 0 30 38"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +44,7 @@ export default function Payments() {
               size="sm"
               icon={
                 <svg
-                  className="w-full h-full"
+                  className="h-7"
                   viewBox="0 0 30 38"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

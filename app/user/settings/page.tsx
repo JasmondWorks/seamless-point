@@ -6,7 +6,7 @@ export default function Settings() {
   return (
     <>
       <div className="flex justify-between items-center py-3 border-b border-neutral-300">
-        <h1 className="headline">Settings</h1>
+        <h1 className="text-3xl font-bold text-center">Settings</h1>
         {/* <UserSettingsActions /> */}
       </div>
 

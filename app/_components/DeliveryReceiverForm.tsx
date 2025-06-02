@@ -18,6 +18,7 @@ import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import { newDelivery } from "@/app/_lib/types";
 import React from "react";
 import { getCities, getCountries, getStates } from "@/app/_lib/actions";
+import Button, { ButtonVariant } from "@/app/_components/Button";
 
 interface State {
   countries: any;
@@ -293,7 +294,23 @@ export default function DeliveryReceiverForm({
           />
         </div>
         <PrivacyPolicyBlock />
-        <ButtonFormSubmit text="Continue" />
+        <div className="flex gap-4 justify-end">
+          <Button
+            onClick={() => onSetActivePage("sender")}
+            variant={ButtonVariant.fill}
+            className="!bg-[#fde9d7] !text-brandSec"
+            text="Previous"
+            isRoundedLarge
+          />
+
+          <Button
+            type="submit"
+            variant={ButtonVariant.fill}
+            className="!text-white !bg-brandSec"
+            text="Continue"
+            isRoundedLarge
+          />
+        </div>
       </form>
     </Form>
   );

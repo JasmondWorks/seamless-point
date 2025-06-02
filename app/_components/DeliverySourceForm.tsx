@@ -16,6 +16,7 @@ import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 
 import styles from "./DeliverySourceForm.module.css";
 import { cn } from "@/app/_lib/utils";
+import Button, { ButtonVariant } from "@/app/_components/Button";
 
 interface State {
   countries: any;
@@ -281,7 +282,25 @@ export default function DeliverySourceForm({
         </div>
 
         <PrivacyPolicyBlock />
-        <ButtonFormSubmit text="Continue" />
+        {/* <ButtonFormSubmit text="Continue" /> */}
+
+        <div className="flex gap-4 justify-end">
+          <Button
+            onClick={() => onSetActivePage("delivery-type")}
+            variant={ButtonVariant.fill}
+            className="!bg-[#fde9d7] !text-brandSec"
+            text="Previous"
+            isRoundedLarge
+          />
+
+          <Button
+            type="submit"
+            variant={ButtonVariant.fill}
+            className="!text-white !bg-brandSec"
+            text="Continue"
+            isRoundedLarge
+          />
+        </div>
       </form>
     </Form>
   );

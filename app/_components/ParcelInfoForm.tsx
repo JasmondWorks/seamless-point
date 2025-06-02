@@ -17,6 +17,7 @@ import { parcelInfoSchema } from "@/app/_lib/validation";
 import { useForm } from "react-hook-form";
 import { base64ToFile, fileToBase64 } from "@/app/_lib/utils";
 import toast from "react-hot-toast";
+import Button, { ButtonVariant } from "@/app/_components/Button";
 
 export default function ParcelInfoForm({
   onSetActivePage,
@@ -108,31 +109,33 @@ export default function ParcelInfoForm({
     if (!parcelItems.length)
       return toast.error("Please add at least one parcel item");
 
-    try {
-      const base64packageImage = await fileToBase64(data.packageImage);
-      const base64proofOfPurchase = await fileToBase64(data.proofOfPurchase);
+    if (data.packageImage && data.proofOfPurchase) {
+      try {
+        const base64packageImage = await fileToBase64(data.packageImage);
+        const base64proofOfPurchase = await fileToBase64(data.proofOfPurchase);
 
-      if (base64packageImage && base64proofOfPurchase) {
-        const parcelDetails = {
-          ...data,
-          packageImage: {
-            base64File: base64packageImage,
-            name: data.packageImage.name,
-          },
-          proofOfPurchase: {
-            base64File: base64proofOfPurchase,
-            name: data.proofOfPurchase.name,
-          },
-          parcelItems,
-        };
+        if (base64packageImage && base64proofOfPurchase) {
+          const parcelDetails = {
+            ...data,
+            packageImage: {
+              base64File: base64packageImage,
+              name: data.packageImage.name,
+            },
+            proofOfPurchase: {
+              base64File: base64proofOfPurchase,
+              name: data.proofOfPurchase.name,
+            },
+            parcelItems,
+          };
 
-        addParcelDetails(parcelDetails);
-        // Navigate to the next page
-        onSetActivePage("select-rate");
+          addParcelDetails(parcelDetails);
+          // Navigate to the next page
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
     }
+    onSetActivePage("select-rate");
   }
 
   return (
@@ -190,7 +193,24 @@ export default function ParcelInfoForm({
         />
         <div className="flex flex-col gap-y-5 col-span-2">
           <PrivacyPolicyBlock />
-          <ButtonFormSubmit text="Continue" />
+          {/* <ButtonFormSubmit text="Continue" /> */}
+          <div className="flex gap-4 justify-end">
+            <Button
+              onClick={() => onSetActivePage("receiver")}
+              variant={ButtonVariant.fill}
+              className="!bg-[#fde9d7] !text-brandSec"
+              text="Previous"
+              isRoundedLarge
+            />
+
+            <Button
+              type="submit"
+              variant={ButtonVariant.fill}
+              className="!text-white !bg-brandSec"
+              text="Continue"
+              isRoundedLarge
+            />
+          </div>
         </div>
       </form>
     </Form>
