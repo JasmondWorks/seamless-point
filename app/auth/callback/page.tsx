@@ -46,7 +46,7 @@ const GoogleCallback = () => {
 
         console.log("token data", tokenData);
 
-        if (!tokenData.access_token) throw new Error("Couldn't log in");
+        if (!tokenData) throw new Error("Couldn't log in");
 
         // Step 3: Fetch user info using the access token
         const userInfoResponse = await fetch(
@@ -62,7 +62,7 @@ const GoogleCallback = () => {
 
         console.log(userInfo);
 
-        if (!userInfo.email) throw new Error("User information not found.");
+        if (!userInfo) throw new Error("User information not found.");
 
         // Step 4: Process user data and login
 
@@ -90,7 +90,7 @@ const GoogleCallback = () => {
         );
       } catch (error: any) {
         console.error(error);
-        toast.error(error.message || "An error occurred during login.");
+        // toast.error(error.message || "An error occurred during login.");
         router.push(`/auth/${userType}/login`);
       } finally {
         setLoading(false);

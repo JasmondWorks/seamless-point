@@ -114,6 +114,51 @@ export async function loginUser(userDetails: {
   }
 }
 
+export async function handleGoogleOAuthCallback(code: string, state: string) {
+  const { userType }: { userType: "user" | "admin" } = JSON.parse(
+    decodeURIComponent(state)
+  );
+
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    body: JSON.stringify({
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: "authorization_code",
+    }),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const tokenData = await tokenRes.json();
+  if (!tokenData.access_token) throw new Error("Couldn't get Google token");
+
+  const userInfoRes = await fetch(
+    "https://www.googleapis.com/oauth2/v3/userinfo",
+    {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    }
+  );
+
+  const userInfo = await userInfoRes.json();
+  if (!userInfo?.email) throw new Error("Failed to fetch user info");
+
+  const userDetails = {
+    email: userInfo.email,
+    firstName: userInfo.given_name,
+    lastName: userInfo.family_name,
+    authType: "google",
+  };
+
+  const userResponse =
+    userType === "user"
+      ? await signinUser(userDetails)
+      : await signinAdmin(userDetails);
+
+  return userResponse;
+}
+
 // Google sign in
 export async function signinUser(userDetails: {
   email: string;
@@ -837,6 +882,8 @@ export const initiatePayment = async ({
 export const verifyPayment = async (reference: string) => {
   const token = getUserToken();
 
+  console.log("reference", reference);
+
   try {
     const response = await fetch(
       `${URL}/transactions/paystack/verify?reference=${reference}`,
@@ -1069,7 +1116,9 @@ export const getRates = async ({
     currency,
   };
 
-  // console.log(payload);
+  console.log("*******");
+  console.log("Payload", payload);
+  console.log("*******");
 
   try {
     const res = await fetch(`${URL}/terminal/rates`, {
@@ -1123,11 +1172,71 @@ export const createShipment = async ({
 export const arrangeShipmentPickup = async ({ rateId, shipmentId }: any) => {
   const token = getUserToken();
 
+  console.log("rate id", rateId, "shipment id", shipmentId);
+
   try {
     // Create packaging
     const res = await fetch(`${URL}/terminal/shipments/pickup`, {
       method: "POST",
       body: JSON.stringify({ rateId, shipmentId }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    console.log("*****");
+    console.log("Arranged shipment data", data);
+    console.log("*****");
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    const returnedData = {
+      trackingUrl: data.data.shipmentStatus.data.extras.tracking_url,
+      trackingNumber: data.data.shipmentStatus.data.extras.tracking_number,
+      reference: data.data.shipmentStatus.data.extras.reference,
+    };
+
+    return { status: "success", data: returnedData };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const searchHsCode = async (query: string) => {
+  const token = getUserToken();
+
+  try {
+    // Create packaging
+    const res = await fetch(`${URL}/terminal/hs-codes/search?q=${query}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    console.log({ status: "success", data });
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const getAllHsCodes = async () => {
+  const token = getUserToken();
+
+  try {
+    // Create packaging
+    const res = await fetch(`${URL}/terminal/hs-codes`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -1141,13 +1250,7 @@ export const arrangeShipmentPickup = async ({ rateId, shipmentId }: any) => {
 
     if (data.status === "fail") throw new Error(data.message);
 
-    const returnedData = {
-      trackingUrl: data.data.shipmentStatus.data.extras.tracking_url,
-      trackingNumber: data.data.shipmentStatus.data.extras.tracking_number,
-      reference: data.data.shipmentStatus.data.extras.reference,
-    };
-
-    return { status: "success", data: returnedData };
+    return { status: "success", data };
   } catch (error: any) {
     console.log(error.message);
     return { status: "error", message: error.message };

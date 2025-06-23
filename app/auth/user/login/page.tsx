@@ -3,8 +3,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function LogIn() {
   return (
-    <section className="container-custom h-full mx-auto mt-10">
-      <div className="flex items-center lg:flex-row gap-y-5 lg:gap-x-16 h-full py-10">
+    <section className="container-custom mx-auto mt-10">
+      <div className="flex lg:flex-row gap-y-5 lg:gap-x-16 h-full py-10">
         <div>
           <svg
             className="w-full min-w-96 hidden lg:inline-block"

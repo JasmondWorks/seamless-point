@@ -10,7 +10,7 @@ export const copyToClipboard = (text: string) => {
   navigator.clipboard
     .writeText(text)
     .then(() => {
-      console.log("Copied to clipboard:", text);
+      
       toast.success(`${text} copied to clipboard`);
     })
     .catch((err) => {
@@ -241,12 +241,12 @@ export function getParcelDetails(packageData: any) {
     // proofOfPurchase: package.proofOfPurchase,
   };
 }
-console.log("Selected code is empty, no modifications can be made.");
-console.log("Entire code file has been analyzed for potential log additions.");
-console.log("No specific logs were requested, default logs will be added.");
-console.log("Please note that excessive logging can impact performance.");
-console.log("Logs will be added at the beginning of each function.");
-console.log("Example log: 'Function [functionName] has been called.'");
+
+
+
+
+
+
 
 export function getParcelTotalAmount(parcelDetails: any) {
   return parcelDetails?.parcelItems.reduce(
@@ -289,6 +289,7 @@ export async function uploadFile(
   fileClassification: string = "profile_image", // default fallback
   uniqueName: boolean = false // force same name for overwrite
 ): Promise<string | null> {
+  
   try {
     const folder = getUserId();
 
@@ -327,7 +328,7 @@ export async function uploadFile(
     console.error("Error uploading file:", err);
     toast.error(
       `Error uploading ${fileClassification || "file"} (${
-        file.type.split("/")[0]
+        file?.type.split("/")[0]
       })`
     );
     return null;

@@ -1,9 +1,6 @@
-import ConfirmDialogContent from "@/app/_components/ConfirmDialogContent";
-import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
-import { useFormContext } from "@/app/_contexts/FormContext";
 import { formatCurrency } from "@/app/_lib/utils";
-import { Edit, Plus, Trash2Icon } from "lucide-react";
-import React, { useState } from "react";
+import { Edit, Trash2Icon } from "lucide-react";
+import React from "react";
 
 export default function ParcelItemsList({
   items,
@@ -24,15 +21,13 @@ export default function ParcelItemsList({
           className="whitespace-nowrap flex-wrap col-span-2 border border-neutral-300 bg-white rounded-lg p-4 flex items-center justify-between gap-x-16 md:gap-x-5 gap-y-3"
         >
           <div className="text-sm flex flex-col md:flex-row gap-x-10 flex-1">
-            <span>{item?.name}</span>
+            <span>{item?.description}</span>
             <div className="gap-3 items-center flex md:flex-1 md:justify-center">
               <span className="inline-block md:mx-auto">
                 {item?.quantity} {item?.quantity > 1 ? "pcs" : "pc"}
               </span>
               <span>{item?.weight}kg</span>
-              <span>
-                {!isNaN(item?.value) && formatCurrency(item?.value, "NGN")}
-              </span>
+              {item?.value && <span>{formatCurrency(item?.value)}</span>}
             </div>
           </div>
           <div className="flex gap-3">

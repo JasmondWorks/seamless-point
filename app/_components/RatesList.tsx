@@ -23,8 +23,10 @@ const RatesList = ({
   onSetActivePage: (page: string) => void;
 }) => {
   const [couriers, setCouriers] = useState([]);
-  const courier = useCreateDeliveryStore((store) => store.courier);
+  const store = useCreateDeliveryStore((store) => store);
+
   const {
+    courier,
     receiver,
     sender,
     parcelDetails,
@@ -58,7 +60,7 @@ const RatesList = ({
   useEffect(() => {
     fetchRates();
 
-    showToast("Amount may change from time to time", "info");
+    // showToast("Amount may change from time to time", "info");
   }, []);
   useEffect(() => {
     const foundCourier =
@@ -127,7 +129,7 @@ const RatesList = ({
         .join(", "),
       items: parcelDetails!.parcelItems.map((item) => ({
         description: item.description,
-        name: item.name,
+        name: item.description,
         weight: item.weight,
         currency: parcelDetails!.currency,
         quantity: item.quantity,
@@ -168,7 +170,6 @@ const RatesList = ({
     if (!selectedCourier) return toast.error("You haven't selected a courier");
 
     onSelectCourier(selectedCourier);
-    console.log(selectedCourier);
 
     const courierDetails = {
       amount: selectedCourier.amount,

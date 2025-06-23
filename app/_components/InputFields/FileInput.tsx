@@ -36,8 +36,6 @@ const FileInput = ({ props, field }: { props: any; field: any }) => {
     }
   };
 
-  console.log(filePreview);
-
   return (
     <div className="rounded-lg bg-white space-y-5 p-5">
       <h3 className="font-semibold">{props.title}</h3>

@@ -85,17 +85,11 @@ export default async function Dashboard() {
           />
         </Link>
       </div>
-      <div
-        // className="grid gap-10 justify-start md:pr-20 max-w-4xl [grid-template-columns:repeat(auto-fit,minmax(230px,1fr))]
-        // sm:[grid-template-columns:repeat(auto-fit,minmax(250px,1fr))]
-        // md:[grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]
-        // lg:[grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]"
-        className="grid md:grid-cols-2 gap-5 max-w-xl"
-      >
-        <div className="card bg-white flex flex-col p-3">
-          <div className="flex-1 grid place-items-center md:py-10">
+      <div className="flex flex-wrap gap-5">
+        <div className="card bg-white flex flex-col p-3 flex-1">
+          <div className="flex-1 grid place-items-center py-3">
             <svg
-              className="w-full h-[120px]"
+              className="aspect-square h-[200px]"
               width={280}
               height={216}
               viewBox="0 0 280 216"
@@ -558,7 +552,7 @@ export default async function Dashboard() {
           <div className="mb-3">
             <hr />
           </div>
-          <div className="border-t border-neutral-100">
+          <div>
             <Link href="/user/deliveries/register">
               <Button
                 className="font-light"
@@ -570,10 +564,10 @@ export default async function Dashboard() {
             </Link>
           </div>
         </div>
-        <div className="card bg-white flex flex-col p-3">
-          <div className="flex-1 grid place-items-center md:py-10">
+        <div className="card bg-white flex flex-col p-3 flex-1">
+          <div className="flex-1 grid place-items-center py-3">
             <svg
-              className="w-full h-[120px]"
+              className="aspect-square h-[200px]"
               width={226}
               height={270}
               viewBox="0 0 226 270"
@@ -1158,7 +1152,7 @@ export default async function Dashboard() {
           <div className="mb-3">
             <hr />
           </div>
-          <div className="border-t border-neutral-100">
+          <div>
             <Button
               className="font-light"
               variant={ButtonVariant.fill}

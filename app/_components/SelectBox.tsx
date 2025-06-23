@@ -62,11 +62,21 @@ export default function SelectBox({ field, props, onChange }: Props) {
         {props.selectOptions && props.selectOptions.length > 0
           ? props.selectOptions
               // .map((val) => val[0].toUpperCase() + val.slice(1))
-              .map(({ name, value }: { name: string; value: string }) => (
-                <SelectItem key={value} value={value}>
-                  {name[0].toUpperCase() + name.slice(1)}
-                </SelectItem>
-              ))
+              .map(
+                ({
+                  name,
+                  value,
+                  id,
+                }: {
+                  name: string;
+                  value: string;
+                  id: string;
+                }) => (
+                  <SelectItem key={id || value} value={value}>
+                    {name[0].toUpperCase() + name.slice(1)}
+                  </SelectItem>
+                )
+              )
           : props.selectGroupOptions &&
             props.selectGroupOptions.length > 0 &&
             props.selectGroupOptions.map((group: any) => (

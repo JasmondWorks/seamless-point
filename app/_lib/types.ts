@@ -69,18 +69,17 @@ export interface Receiver {
   toPhoneNumber: string;
 }
 export interface Parcel {
-  name: string;
-  category: string;
-  subCategory: string;
   description: string;
-  hsCode: string;
   weight: number;
   quantity: number;
   value: number;
-  id?: string;
   length: number;
   width: number;
   height: number;
+  id?: string;
+  category?: string;
+  subCategory?: string;
+  hsCode?: string;
 }
 export type StoredFile = {
   base64File: string;
@@ -89,8 +88,8 @@ export type StoredFile = {
 export interface ParcelDetails {
   packagingType: EPackagingType | string;
   currency: ECurrency | string;
-  packageImage?: StoredFile;
-  proofOfPurchase?: StoredFile;
+  packageImage?: StoredFile | null;
+  proofOfPurchase?: StoredFile | null;
   parcelItems: Parcel[];
 }
 export interface newDelivery {

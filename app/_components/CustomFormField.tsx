@@ -24,6 +24,7 @@ import FileInput from "./InputFields/FileInput";
 import SelectBox from "@/app/_components/SelectBox";
 import { StoredFile } from "@/app/_lib/types";
 import Spinner from "@/app/_components/Spinner";
+import AsyncSearchableSelect from "@/app/_components/AsyncSearchableSelect";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -36,6 +37,7 @@ export enum FormFieldType {
   PASSWORD = "password",
   FILE = "file",
   NUMBER = "number",
+  ASYNC_SELECT = "asyncSelect",
 }
 
 interface CustomProps {
@@ -53,7 +55,8 @@ interface CustomProps {
   renderSkeleton?: (field: any) => React.ReactNode;
   fieldType: FormFieldType;
   className?: string;
-  selectOptions?: { name: string; value: string }[];
+  fetchOptions?: (query: string) => Promise<{ label: string; value: string }[]>;
+  selectOptions?: { name: string; value: string; id?: string }[];
   selectGroupOptions?: { title: string; items: string[] }[];
   selectMessage?: string;
   selectValue?: string;
@@ -93,7 +96,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             <Input
               min={1}
               type={props.fieldType}
-              disabled={props.disabled}
+              disabled={props.disabled || props.isLoading}
               placeholder={props.placeholder}
               {...field}
               className="shad-input border-0"
@@ -156,6 +159,17 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
           props={props}
           onChange={(value: string) => handleChange(value)} // Pass onChange to SelectBox
         />
+      );
+    case FormFieldType.ASYNC_SELECT:
+      return (
+        <FormControl>
+          <AsyncSearchableSelect
+            selectedValue={field.value}
+            setSelectedValue={(value: string) => handleChange(value)}
+            fetchOptions={props.fetchOptions!}
+            placeholder={props.placeholder}
+          />
+        </FormControl>
       );
     case FormFieldType.SKELETON:
       return props.renderSkeleton ? props.renderSkeleton(field) : null;

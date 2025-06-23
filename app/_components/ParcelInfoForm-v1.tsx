@@ -1,5 +1,5 @@
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Form } from "@/app/_components/ui/form";
 import CustomFormField, {
@@ -33,7 +33,7 @@ export default function ParcelInfoForm({
     parcelDetails?.parcelItems || []
   );
 
-  
+  console.log(parcelItems);
 
   // const biggestLength = parcelItems.reduce(
   //   (biggest, item) =>
@@ -51,24 +51,25 @@ export default function ParcelInfoForm({
   //   parcelItems[0]?.height
   // );
 
-  // 
-  // 
-  // 
+  // console.log("Biggest Length", biggestLength);
+  // console.log("Biggest Width", biggestWidth);
+  // console.log("Biggest Height", biggestHeight);
 
+  console.log("Parcel items", parcelItems);
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
     defaultValues: {
-      ...parcelDetails,
-      packageImage: parcelDetails?.packageImage?.base64File
+      ...parcelDetailsCopy,
+      packageImage: parcelDetailsCopy?.packageImage?.base64File
         ? base64ToFile(
-            parcelDetails.packageImage.base64File,
-            parcelDetails.packageImage.name || "defaultName.jpg"
+            parcelDetailsCopy.packageImage.base64File,
+            parcelDetailsCopy.packageImage.name || "defaultName.jpg"
           )
         : undefined,
-      proofOfPurchase: parcelDetails?.proofOfPurchase?.base64File
+      proofOfPurchase: parcelDetailsCopy?.proofOfPurchase?.base64File
         ? base64ToFile(
-            parcelDetails.proofOfPurchase.base64File,
-            parcelDetails.proofOfPurchase.name || "defaultName.pdf"
+            parcelDetailsCopy.proofOfPurchase.base64File,
+            parcelDetailsCopy.proofOfPurchase.name || "defaultName.pdf"
           )
         : undefined,
     },
@@ -77,13 +78,6 @@ export default function ParcelInfoForm({
   const addParcelDetails = useCreateDeliveryStore(
     (store) => store.addParcelDetails
   );
-  const resetDeliveryData = useCreateDeliveryStore(
-    (store) => store.resetDeliveryData
-  );
-
-  useEffect(() => {
-    // resetDeliveryData();
-  }, []);
 
   const parcelActions = {
     addItem: handleAddParcelItem,
@@ -112,40 +106,38 @@ export default function ParcelInfoForm({
   }
 
   async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
-    
+    console.log("submitting...");
     if (!parcelItems.length)
       return toast.error("Please add at least one parcel item");
 
-    try {
-      const base64PackageImage = data.packageImage
-        ? await fileToBase64(data.packageImage)
-        : null;
-      const base64ProofOfPurchase = data.proofOfPurchase
-        ? await fileToBase64(data.proofOfPurchase)
-        : null;
+    let parcelDetails = data;
 
-      const parcelDetails = {
-        ...data,
-        packageImage: base64PackageImage
-          ? {
-              base64File: base64PackageImage,
-              name: data.packageImage!.name,
-            }
-          : null,
-        proofOfPurchase: base64ProofOfPurchase
-          ? {
-              base64File: base64ProofOfPurchase,
-              name: data.proofOfPurchase!.name,
-            }
-          : null,
-        parcelItems,
-      };
+    if (data.packageImage && data.proofOfPurchase) {
+      try {
+        const base64packageImage = await fileToBase64(data.packageImage);
+        const base64proofOfPurchase = await fileToBase64(data.proofOfPurchase);
 
-      addParcelDetails(parcelDetails);
-      // Navigate to the next page
-      onSetActivePage("select-rate");
-    } catch (error) {
-      console.error(error);
+        if (base64packageImage && base64proofOfPurchase) {
+          parcelDetails = {
+            ...data,
+            packageImage: {
+              base64File: base64packageImage,
+              name: data.packageImage.name,
+            },
+            proofOfPurchase: {
+              base64File: base64proofOfPurchase,
+              name: data.proofOfPurchase.name,
+            },
+            parcelItems,
+          };
+
+          addParcelDetails(parcelDetails);
+          // Navigate to the next page
+          onSetActivePage("select-rate");
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
