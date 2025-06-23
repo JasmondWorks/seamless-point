@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authenticateAdmin, authenticateUser } from "../_lib/actions";
 import Cookies from "js-cookie";
-import { getLocalStorageKey } from "@/app/_lib/utils";
 
 type User = {
   id: string;

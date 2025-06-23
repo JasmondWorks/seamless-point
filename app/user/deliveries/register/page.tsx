@@ -40,14 +40,25 @@ import PaystackButtonWrapper from "@/components/PaystackButtonWrapper";
 import { AlertCircle } from "lucide-react";
 import SpinnerFull from "@/app/_components/SpinnerFull";
 
-export default function Register() {
-  const searchParams = useSearchParams();
+type ActivePage =
+  | "delivery-type"
+  | "sender"
+  | "receiver"
+  | "parcel-info"
+  | "select-rate"
+  | "package-details"
+  | "payment"
+  | "success";
 
-  const [activePage, setActivePage] = useState(
-    searchParams.get("activePage") || "payment"
+export default function Register() {
+  // const searchParams = useSearchParams();
+
+  const [activePage, setActivePage] = useState<ActivePage>(
+    // searchParams.get("activePage") ||
+    "delivery-type"
   );
 
-  function handleSetActivePage(page: string) {
+  function handleSetActivePage(page: ActivePage) {
     setActivePage(page);
   }
 
@@ -82,7 +93,7 @@ export default function Register() {
 function DeliveryType({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: any) => void;
 }) {
   return (
     <>
@@ -94,11 +105,7 @@ function DeliveryType({
   );
 }
 
-function Sender({
-  onSetActivePage,
-}: {
-  onSetActivePage: (page: string) => void;
-}) {
+function Sender({ onSetActivePage }: { onSetActivePage: (page: any) => void }) {
   return (
     <>
       <h1 className="text-3xl font-bold text-center">Sender’s information</h1>
@@ -110,7 +117,7 @@ function Sender({
 function Receiver({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: any) => void;
 }) {
   return (
     <>
@@ -123,7 +130,7 @@ function Receiver({
 function ParcelInfo({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: any) => void;
 }) {
   return (
     <>
@@ -136,7 +143,7 @@ function ParcelInfo({
 function SelectRate({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: any) => void;
 }) {
   return (
     <>
@@ -149,7 +156,7 @@ function SelectRate({
 function PackageDetailsOverview({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: any) => void;
 }) {
   function onSubmit() {
     onSetActivePage("payment");
@@ -196,7 +203,7 @@ function PackageDetailsOverview({
 function Payment({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: any) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -204,26 +211,25 @@ function Payment({
   const [activeDialog, setActiveDialog] = useState<"submit" | "deposit">(
     "submit"
   );
-  const amount = 4_000_000_000_000;
   const { balance, email } = user;
-  const minDeposit = Number(amount) - Number(balance);
-  const [depositAmount, setDepositAmount] = useState(3000);
+  // const amount = 6_020_999;
 
   const {
     userId,
     resetDeliveryData,
     replaceState,
-    // courierDetails: { amount },
+    courierDetails: { amount },
   } = useCreateDeliveryStore((state) => state);
 
   const state = getNewDeliveryData();
+  const [depositAmount, setDepositAmount] = useState<number>(0);
 
   async function fetchUser() {
     setIsLoading(true);
     const res = await getUser();
 
     setUser(res.user);
-    // setDepositAmount(Number(amount) - Number(res.user.balance));
+    setDepositAmount(Number(amount) - Number(res.user.balance));
 
     setIsLoading(false);
   }
@@ -232,6 +238,16 @@ function Payment({
     fetchUser();
   }, []);
 
+  // const { courier, dispatch, ...deliveryPayload } = {
+  //   ...state,
+  //   parcelDetails: {
+  //     ...state.parcelDetails,
+  //   },
+  //   courierDetails: { ...state.courierDetails },
+  // };
+
+  // console.log("Delivery payload", deliveryPayload);
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -239,39 +255,53 @@ function Payment({
 
     if (balance < amount) return;
 
-    console.log("balance", balance);
-    console.log("amount", amount);
+    console.log("package image", state.parcelDetails?.packageImage);
+    console.log("proof of purchase", state.parcelDetails?.proofOfPurchase);
 
     // UPLOADING OF PACKAGE IMAGE AND PROOF OF PURCHASE
     setIsLoading(true);
 
     let packageImageUrl, proofOfPurchaseUrl;
 
-    if (state.parcelDetails.packageImage)
+    const packageImageFile =
+      state.parcelDetails?.packageImage?.base64File &&
+      state.parcelDetails?.packageImage?.name
+        ? base64ToFile(
+            state.parcelDetails.packageImage.base64File,
+            state.parcelDetails.packageImage.name
+          )
+        : undefined;
+
+    if (packageImageFile) {
       packageImageUrl = await uploadFile(
-        base64ToFile(
-          state.parcelDetails.packageImage.base64File,
-          state.parcelDetails.packageImage.name
-        ),
+        packageImageFile,
         "package_images",
         "Package"
       );
+    }
 
-    if (state.parcelDetails.proofOfPurchase)
+    const proofOfPurchaseFile =
+      state.parcelDetails?.proofOfPurchase?.base64File &&
+      state.parcelDetails?.proofOfPurchase?.name
+        ? base64ToFile(
+            state.parcelDetails.proofOfPurchase.base64File,
+            state.parcelDetails.proofOfPurchase.name
+          )
+        : undefined;
+
+    if (proofOfPurchaseFile) {
       proofOfPurchaseUrl = await uploadFile(
-        base64ToFile(
-          state.parcelDetails.proofOfPurchase.base64File,
-          state.parcelDetails.proofOfPurchase.name
-        ),
+        proofOfPurchaseFile,
         "package_proofs",
         "Package proof"
       );
+    }
 
-    // if (!packageImageUrl || !proofOfPurchaseUrl) {
-    //   // toast.error("Failed to upload files");
-    //   // return;
-    // }
-
+    if (!packageImageUrl || !proofOfPurchaseUrl) {
+      // toast.error("Failed to upload files");
+      // return;
+    }
+    console.log("package image url", packageImageUrl);
     const pickupAddressId = state.courier.pickup_address;
     const deliveryAddressId = state.courier.delivery_address;
     const parcelId = state.courier.parcel;
@@ -282,16 +312,24 @@ function Payment({
       deliveryAddressId,
       parcelId,
     });
-    if (shipmentRes.status === "error") toast.error(shipmentRes.data.message);
+    if (shipmentRes.status === "error") toast.error(shipmentRes.data?.message);
 
     const shipmentId = shipmentRes.data;
 
+    console.log("shipment id", shipmentId);
+
     const pickupRes = await arrangeShipmentPickup({ rateId, shipmentId });
 
-    console.log(pickupRes);
+    console.log("pickup data", pickupRes.data);
 
     if (pickupRes.status === "error") {
-      toast.error(pickupRes.message);
+      if (
+        pickupRes.message ===
+        "Rate has already been used and is no longer valid"
+      ) {
+        toast.error(`${pickupRes.message}, kindly select a rate again`);
+        onSetActivePage("select-rate");
+      } else toast.error(pickupRes.message);
 
       setIsLoading(false);
       return;
@@ -304,7 +342,11 @@ function Payment({
         packageImage: packageImageUrl || "",
         proofOfPurchaseImage: proofOfPurchaseUrl || "",
       },
-      courierDetails: { ...state.courierDetails, ...pickupRes.data },
+      courierDetails: {
+        ...state.courierDetails,
+        ...pickupRes.data,
+        shipmentId,
+      },
     };
     delete deliveryPayload.parcelDetails.proofOfPurchase;
 
@@ -398,8 +440,12 @@ function Payment({
 
     console.log("Created delivery", createdDelivery);
 
-    if (res.status === "success") resetDeliveryData();
-    onSetActivePage("success");
+    if (res.status === "error") toast.error(res.message);
+    // console.log(res);
+    if (res.status === "success") {
+      resetDeliveryData();
+      onSetActivePage("success");
+    }
 
     setIsLoading(false);
   }
@@ -409,13 +455,19 @@ function Payment({
 
     const verifyRes = await verifyPayment(res.reference);
 
+    console.log(verifyRes);
+
     if (verifyRes.status === "error") {
       toast.error(verifyRes.message);
       setIsLoading(false);
+      return;
     }
 
-    console.log(verifyRes);
-    // await createTransaction({ amount: depositAmount, type: "withdraw" });
+    const resTrans = await createTransaction({
+      amount: depositAmount,
+      type: "deposit",
+    });
+    console.log(resTrans.data);
 
     fetchUser();
   }
@@ -423,19 +475,6 @@ function Payment({
     setActiveDialog("deposit");
     setIsDialogOpen(true);
   }
-  // function handleDepositRedirect() {
-  //   const redirectPath = "/user/deliveries/register";
-  //   const params = new URLSearchParams({
-  //     activePage: "payment",
-  //     step: "3",
-  //   }).toString();
-
-  //   const fullRedirect = `${redirectPath}?${params}`;
-  //   const encoded = encodeURIComponent(fullRedirect);
-
-  //   router.push(`/user/deposit?redirect=${encoded}`);
-  // }
-  // if (isLoadingBalance) return <SpinnerFull />;
 
   if (isLoading) return <SpinnerFull />;
 
@@ -445,7 +484,7 @@ function Payment({
       <form onSubmit={onSubmit} className="flex flex-col gap-y-10">
         <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]">
           <BalanceDisplay balance={balance} />
-        </div>{" "}
+        </div>
         <div className="flex flex-col gap-3">
           <Label htmlFor="withdrawAmount">Amount to be paid</Label>
           <Input
@@ -469,18 +508,7 @@ function Payment({
             text="Previous"
             isRoundedLarge
           />
-
-          {amount <= balance && (
-            <Button
-              type="submit"
-              variant={ButtonVariant.fill}
-              className="!text-white !bg-brandSec"
-              isRoundedLarge
-            >
-              Finish creating shipment
-            </Button>
-          )}
-          {amount > balance && (
+          {Number(balance) < Number(amount) ? (
             <Button
               type="button"
               onClick={handleDepositDialog}
@@ -490,6 +518,15 @@ function Payment({
             >
               <AlertCircle />
               <span>Insufficient balance</span>
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              variant={ButtonVariant.fill}
+              className="!text-white !bg-brandSec"
+              isRoundedLarge
+            >
+              Finish creating shipment
             </Button>
           )}
         </div>
