@@ -30,7 +30,6 @@ import {
 } from "@/app/_lib/actions";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import Button, { ButtonVariant } from "@/app/_components/Button";
-import { useSearchParams } from "next/navigation";
 
 import toast from "react-hot-toast";
 import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
@@ -212,7 +211,7 @@ function Payment({
     "submit"
   );
   const { balance, email } = user;
-  // const amount = 6_020_999;
+  // const amount = 6_021_999;
 
   const {
     userId,
@@ -351,89 +350,7 @@ function Payment({
     delete deliveryPayload.parcelDetails.proofOfPurchase;
 
     console.log(deliveryPayload);
-    const mockNewDeliveryData = {
-      deliveryType: "regular-items",
-      sender: {
-        firstName: "Obafemi",
-        lastName: "Olorede",
-        street: "10, DA Street, Shagari Estate, Ipaja, Lagos, Nigeria.",
-        aptUnit: "135",
-        state: "Lagos",
-        country: "NG",
-        city: "Alimosho",
-        postCode: "100278",
-        email: "obafemilared@gmail.com",
-        phoneNumber: "+2348115543766",
-      },
-      receiver: {
-        toFirstName: "Olaoluwa",
-        toLastName: "Olorede",
-        toStreet: "8, Aduni Street, Yaba",
-        toAptUnit: "A",
-        toState: "Lagos",
-        toCountry: "NG",
-        toCity: "Yaba",
-        toPostCode: "100278",
-        toEmail: "olaoluwaolorede8@gmail.com",
-        toPhoneNumber: "+2348123456789",
-      },
-      parcelDetails: {
-        packagingType: "box",
-        currency: "NGN",
-        packageImage:
-          "https://enewerspynkvmaxulbhv.supabase.co/storage/v1/object/public/package_images/6815fd24bd5d56162402045c/Package.jpg",
-        parcelItems: [
-          {
-            name: "New beautiful item",
-            description: "Ooin!",
-            weight: 5,
-            quantity: 5,
-            length: 5,
-            width: 5,
-            height: 5,
-            type: "document",
-            id: "70440e77-1d30-4d30-a212-83825bab855d",
-          },
-          {
-            name: "new new new",
-            description: "kadf;kdkfj",
-            weight: 5,
-            quantity: 5,
-            length: 8,
-            width: 3,
-            height: 4,
-            type: "document",
-            id: "41210317-6a56-4111-969d-4b430aae21e8",
-          },
-          {
-            name: "new new new new",
-            description: "asjfk;afjkd;jkj",
-            weight: 9,
-            quantity: 2,
-            length: 3,
-            width: 38,
-            height: 9,
-            type: "document",
-            id: "1c58dbc1-e7e6-4060-8a96-33fe18386847",
-          },
-        ],
-        proofOfPurchaseImage:
-          "https://enewerspynkvmaxulbhv.supabase.co/storage/v1/object/public/package_proofs/6815fd24bd5d56162402045c/Package%20proof.pdf",
-      },
-      courierDetails: {
-        amount: 56656.27,
-        courierName: "DHL Express",
-        courierLogo:
-          "https://ucarecdn.com/dcdd8109-af8c-4057-8104-192be821dd6e/download4.png",
-        rateId: "RT-CYSVUJ2QGY14BJFR",
-        trackingUrl:
-          "https://testing.terminal.africa/track/SH-TUMXX6PPYDP998EK",
-        shipmentId: "SH-TUMXX6PPYDP998EK",
-        reference: "45832F48H",
-        trackingNumber: "128526F8ABD",
-      },
-      userId: "6815fd24bd5d56162402045c",
-    };
+
     replaceState(deliveryPayload);
     const res = await createDelivery(deliveryPayload);
     const createdDelivery = res.data;
@@ -443,7 +360,8 @@ function Payment({
     if (res.status === "error") toast.error(res.message);
     // console.log(res);
     if (res.status === "success") {
-      resetDeliveryData();
+      // resetDeliveryData();
+      replaceState(createdDelivery);
       onSetActivePage("success");
     }
 
@@ -584,11 +502,16 @@ function Success() {
     (store) => store.resetDeliveryData
   );
   const state = getNewDeliveryData();
-  const { trackingNumber, trackingUrl } = state.courierDetails;
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [trackingUrl, setTrackingUrl] = useState("");
 
-  console.log(state);
+  console.log("state", state);
 
-  // useEffect(() => resetDeliveryData(), []);
+  useEffect(() => {
+    setTrackingNumber(state.courierDetails.trackingNumber);
+    setTrackingUrl(state.courierDetails.trackingUrl);
+    resetDeliveryData();
+  }, []);
 
   return (
     <div className="h-full grid place-items-center">

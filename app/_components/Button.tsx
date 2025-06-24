@@ -47,7 +47,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const classes = clsx(
-    "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11 text-base disabled:cursor-not-allowed transition-all duration-300", // Common classes
+    "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11 text-base !disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300", // Common classes
     {
       // "!cursor-not-allowed": disabled,
       "py-10": isBig,
