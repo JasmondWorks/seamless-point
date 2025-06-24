@@ -36,6 +36,8 @@ const RatesList = ({
   const [selectedCourier, setSelectedCourier] = useState<any>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  console.log("selected", selectedCourier);
+
   const onSelectCourier = useCreateDeliveryStore(
     (store) => store.onSelectCourier
   );
@@ -238,7 +240,7 @@ const RatesList = ({
         />
 
         <Button
-          disabled={Boolean(error)}
+          disabled={Boolean(error) || !selectedCourier}
           onClick={() => setIsDialogOpen(true)}
           variant={ButtonVariant.fill}
           className="!text-white !bg-brandSec"

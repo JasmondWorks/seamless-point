@@ -1,8 +1,13 @@
-// components/PaystackButtonWrapper.tsx
 "use client";
 
-import React from "react";
-import { PaystackButton } from "react-paystack";
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import PaystackButton only on the client
+const PaystackButton = dynamic(
+  () => import("react-paystack").then((mod) => mod.PaystackButton),
+  { ssr: false }
+);
 
 const PaystackButtonWrapper = ({
   text,
