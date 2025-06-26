@@ -23,9 +23,17 @@ export async function POST(req: NextRequest) {
     });
 
     if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.json();
+      let errorData;
+      try {
+        errorData = await tokenResponse.json();
+      } catch {
+        return NextResponse.json(
+          { error: "Failed to parse error from Google." },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: errorData.error_description },
+        { error: errorData?.error_description || "Token exchange failed" },
         { status: 400 }
       );
     }

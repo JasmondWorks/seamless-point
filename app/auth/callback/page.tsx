@@ -32,23 +32,29 @@ const GoogleCallback = () => {
     // Step 2: Fetch tokens using the authorization code
     const fetchTokens = async () => {
       try {
+        // Step 1: Exchange code for tokens
         const tokenResponse = await fetch("/api/google/token", {
           method: "POST",
           body: JSON.stringify({ code }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
 
-        const tokenData = await tokenResponse.json();
+        let tokenData;
+        try {
+          tokenData = await tokenResponse.json();
+        } catch (jsonErr) {
+          throw new Error("Invalid response from token API.");
+        }
 
-        // if (tokenData.error) toast.error(tokenData.error);
+        if (!tokenResponse.ok) {
+          throw new Error(tokenData?.error || "Failed to get access token.");
+        }
 
-        console.log("token data", tokenData);
+        if (!tokenData?.access_token) {
+          throw new Error("Access token not found in token response.");
+        }
 
-        if (!tokenData) throw new Error("Couldn't log in");
-
-        // Step 3: Fetch user info using the access token
+        // Step 2: Get user info
         const userInfoResponse = await fetch(
           "https://www.googleapis.com/oauth2/v3/userinfo",
           {
@@ -58,14 +64,18 @@ const GoogleCallback = () => {
           }
         );
 
-        const userInfo = await userInfoResponse.json();
+        let userInfo;
+        try {
+          userInfo = await userInfoResponse.json();
+        } catch {
+          throw new Error("Invalid user info response.");
+        }
 
-        console.log(userInfo);
+        if (!userInfoResponse.ok || !userInfo?.email) {
+          throw new Error("Failed to fetch user information.");
+        }
 
-        if (!userInfo) throw new Error("User information not found.");
-
-        // Step 4: Process user data and login
-
+        // Step 3: Prepare login payload
         const userDetails = {
           email: userInfo.email,
           firstName: userInfo.given_name,
@@ -73,15 +83,17 @@ const GoogleCallback = () => {
           authType: "google",
         };
 
-        // Sign in based on userType (user/admin)
+        // Step 4: Log the user in
         const userResponse =
           userType === "user"
             ? await signinUser(userDetails)
             : await signinAdmin(userDetails);
-        const { user, token } = userResponse;
 
-        if (userResponse.status !== "success")
+        if (userResponse.status !== "success") {
           throw new Error(userResponse?.message || "Login failed.");
+        }
+
+        const { user, token } = userResponse;
 
         login(user, token);
         toast.success("Successfully signed in");
@@ -89,8 +101,10 @@ const GoogleCallback = () => {
           userType === "user" ? "/user/dashboard" : "/admin/dashboard"
         );
       } catch (error: any) {
-        console.error(error);
-        // toast.error(error.message || "An error occurred during login.");
+        console.error("Login error:", error);
+        toast.error(
+          error?.message || "An unexpected error occurred during login."
+        );
         router.push(`/auth/${userType}/login`);
       } finally {
         setLoading(false);
