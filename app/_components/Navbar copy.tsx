@@ -55,13 +55,6 @@ export default function Navbar({ className = "" }) {
 
   return (
     <>
-      {/* <div
-        className={`h-20 lg:h-auto lg:static flex lg:flex-row items-center justify-between ${
-          pathname.includes("forgot-password") ? "bg-[#f0f9ff]" : "bg-white"
-        } w-full z-50 gap-x-12 lg:gap-20 px-0 lg:px-5 lg:py-2
-          border-b border-neutral-200 transition-shadow duration-300
-          ${hasScrolled ? "shadow-md" : ""} ${className}`}
-      > */}
       <div
         className={`h-20 lg:h-auto lg:static flex lg:flex-row items-center justify-between ${
           pathname.includes("forgot-password") ? "bg-[#f0f9ff]" : "bg-white"
@@ -120,19 +113,17 @@ export default function Navbar({ className = "" }) {
               </div>
             )}
           </div>
-          <div className="flex gap-8 items-center">
+          <div className="flex gap-10 items-center">
             {!user && (
-              <div className="font-medium flex items-center lg:hidden leading-none">
+              <div className="font-medium flex items-center lg:hidden">
                 <Link href="/auth/user/login" className="inline-block">
-                  <Button variant={ButtonVariant.link} className="text-sm !p-4">
-                    Sign in
-                  </Button>
+                  <Button variant={ButtonVariant.link}>Sign in</Button>
                 </Link>
-                <Link href="/auth/user/signup" className="flex items-center">
+                <Link href="/auth/user/signup" className="inline-block">
                   <Button
                     isRoundedLarge
                     variant={ButtonVariant.fill}
-                    className="!bg-brandSec !text-white text-sm !p-3 !py-1"
+                    className="!bg-brandSec !text-white"
                   >
                     Sign up
                   </Button>

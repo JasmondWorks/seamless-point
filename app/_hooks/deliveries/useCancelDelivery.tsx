@@ -1,13 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 
-export default function useCancelDelivery() {
+export default function useCancelDelivery(trackingNumber: string) {
   const {
     mutate: cancelDelivery,
-    isLoading: isCancelling,
+    isLoading,
     error,
   } = useMutation({
-    mutationFn: () => function () {},
+    // mutationFn: () => cancelDeli,
   });
 
-  return { cancelDelivery, isCancelling };
+  return { cancelDelivery, isLoading, error };
 }

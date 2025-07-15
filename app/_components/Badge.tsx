@@ -26,7 +26,7 @@ export default function Badge({
   return (
     <span
       className={clsx(
-        "inline-flex gap-2 p-2 rounded-lg leading-4 whitespace-nowrap text-sm",
+        "inline-flex gap-2 p-2 rounded-lg leading-4 whitespace-nowrap text-sm font-semibold",
         {
           "bg-cyan-100 text-cyan-500": variant === BadgeVariant.blue,
           "bg-orange-100 text-orange-500": variant === BadgeVariant.orange,

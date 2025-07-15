@@ -2,13 +2,12 @@ import { Button } from "@/app/_components/ui/button";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
-type PaginationProps = {
+export function Pagination({
+  totalPages,
+}: {
   currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
-};
-
-export function Pagination({ totalPages, onPageChange }: PaginationProps) {
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
