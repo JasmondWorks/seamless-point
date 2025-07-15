@@ -104,60 +104,54 @@ export default function PackageDetails({
         <h3 className="text-xl font-bold leading-tight text-gray-900">
           Package details
         </h3>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(220px, 1fr))",
-          }}
-          className="whitespace-pre-wrap rounded-3xl p-3 bg-white border border-neutral-300 gap-6 no-scrollbar overflow-x-auto"
-        >
-          <div className="space-y-1">
-            <p className="font-bold">Amount</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 whitespace-pre-wrap rounded-3xl p-3 bg-white border border-neutral-300 gap-6 gap-y-10">
+          <div>
+            <p className="font-bold mb-1">Amount</p>
             <p className="text-muted">
               {/* {formatCurrency(getParcelTotalAmount(parcel))} */}
               {formatCurrency(courierDetails?.amount)}
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Description</p>
+          <div>
+            <p className="font-bold mb-1">Description</p>
             {parcel?.parcelItems.map((item: any) => (
               <p key={item?.name} className="text-muted">
                 {item?.name}
               </p>
             ))}
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Payment Method</p>
+          <div>
+            <p className="font-bold mb-1">Payment Method</p>
             <p className="text-muted">
               {/* {parcel?.paymentMethod || "N/A"} */}
               N/A
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Payment Status</p>
+          <div>
+            <p className="font-bold mb-1">Payment Status</p>
             <p className="text-muted">
               {/* {parcel?.paymentStatus || "N/A"} */}
               N/A
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Item value</p>
+          <div>
+            <p className="font-bold mb-1">Item value</p>
             {parcel?.parcelItems.map((item: any, index: number) => (
               <p key={index} className="text-muted">
                 {item?.value || "N/A"}
               </p>
             ))}
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Weight</p>
+          <div>
+            <p className="font-bold mb-1">Weight</p>
             <p className="text-muted">{getParcelTotalWeight(parcel)}kg</p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Courier</p>
+          <div>
+            <p className="font-bold mb-1">Courier</p>
             <p className="text-muted">{courierDetails?.courierName}</p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Approved by</p>
+          <div>
+            <p className="font-bold mb-1">Approved by</p>
             <p className="text-muted">
               {/* {delivery?.deliveryStatus === "pending"
                 ? "Not approved yet"
@@ -165,20 +159,20 @@ export default function PackageDetails({
               Not approved yet
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Length</p>
+          <div>
+            <p className="font-bold mb-1">Length</p>
             <p className="text-muted">{biggestLength}cm</p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Width</p>
+          <div>
+            <p className="font-bold mb-1">Width</p>
             <p className="text-muted">{biggestWidth}cm</p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Height</p>
+          <div>
+            <p className="font-bold mb-1">Height</p>
             <p className="text-muted">{biggestHeight}cm</p>
           </div>
-          <div className="space-y-1">
-            <p className="font-bold">Quantity</p>
+          <div>
+            <p className="font-bold mb-1">Quantity</p>
             <p className="text-muted">
               {parcel?.parcelItems.reduce(
                 (acc: number, item: any) => acc + item?.quantity,
