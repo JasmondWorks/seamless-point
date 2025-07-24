@@ -18,13 +18,13 @@ import { Form } from "@/app/_components/ui/form";
 import { Label } from "@/app/_components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
 import { useFormContext } from "@/app/_contexts/FormContext";
-import { getAllHsCodes, searchHsCode } from "@/app/_lib/actions";
+import { getAllHsCodes, getCategories, searchHsCode } from "@/app/_lib/actions";
 import { itemCategory } from "@/app/_lib/constants";
 import { parcelDocumentSchema, parcelItemSchema } from "@/app/_lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 enum EDialogContent {
@@ -175,7 +175,7 @@ function DocumentParcelForm({
         onSubmit={handleNestedFormSubmit} // Use custom submit handler
         className="space-y-5"
       >
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-5 gap-y-3">
           <CustomFormField
             className="col-span-2"
             label="Item description"
@@ -228,38 +228,199 @@ function DocumentParcelForm({
   );
 }
 
+type SubCategory = {
+  name: string;
+  hsCodes: { label: string; hsCode: string }[];
+};
+
+type Category = {
+  name: string;
+  subcategories: SubCategory[];
+};
+
+interface ItemParcelFormProps {
+  onAddParcelItem?: (item: any) => void;
+  onEditParcelItem?: (item: any) => void;
+  selectedParcelItem?: any;
+}
+
 function ItemParcelForm({
   onAddParcelItem,
   onEditParcelItem,
   selectedParcelItem,
-}: {
-  onAddParcelItem?: (item: any) => void;
-  onEditParcelItem?: (item: any) => void;
-  selectedParcelItem?: any;
-}) {
+}: ItemParcelFormProps) {
   const form = useForm<z.infer<typeof parcelItemSchema>>({
     resolver: zodResolver(parcelItemSchema),
-    defaultValues: selectedParcelItem || {
-      itemDescription: "",
-      category: "",
-      subCategory: "",
-      hsCode: "",
-      weight: "",
-      quantity: "",
-      value: "",
-    },
+    defaultValues: selectedParcelItem
+      ? {
+          description: selectedParcelItem.description || "",
+          category: selectedParcelItem.category || "",
+          subCategory: selectedParcelItem.subCategory || "",
+          hsCode: selectedParcelItem.hsCode || "",
+          weight: selectedParcelItem.weight || "",
+          quantity: selectedParcelItem.quantity || "",
+          value: selectedParcelItem.value || "",
+          length: selectedParcelItem.length || "",
+          width: selectedParcelItem.width || "",
+          height: selectedParcelItem.height || "",
+        }
+      : {
+          description: "",
+          category: "",
+          subCategory: "",
+          hsCode: "",
+          weight: "",
+          quantity: "",
+          value: "",
+          length: "",
+          width: "",
+          height: "",
+        },
   });
 
-  console.log("selected", selectedParcelItem);
+  console.log(selectedParcelItem);
+
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [hsCodes, setHsCodes] = useState<{ label: string; hsCode: string }[]>(
+    []
+  );
+
+  // Watch category and subcategory fields
+  const selectedCategory = useWatch({
+    control: form.control,
+    name: "category",
+  });
+  const selectedSubCategory = useWatch({
+    control: form.control,
+    name: "subCategory",
+  });
+
+  // Fetch categories on mount
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        setIsLoadingCategories(true);
+        const res = await getCategories();
+        if (res.status === "success" && res.data?.data?.categories) {
+          setCategories(res.data.data.categories);
+        } else {
+          console.error("Failed to fetch categories:", res);
+          setCategories([]);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    }
+
+    fetchCategories();
+  }, []);
+
+  // Update form when selectedParcelItem changes
+  useEffect(() => {
+    if (selectedParcelItem) {
+      form.reset({
+        description: selectedParcelItem.description || "",
+        category: selectedParcelItem.category || "",
+        subCategory: selectedParcelItem.subCategory || "",
+        hsCode: selectedParcelItem.hsCode || "",
+        weight: selectedParcelItem.weight || "",
+        quantity: selectedParcelItem.quantity || "",
+        value: selectedParcelItem.value || "",
+        length: selectedParcelItem.length || "",
+        width: selectedParcelItem.width || "",
+        height: selectedParcelItem.height || "",
+      });
+    }
+  }, [selectedParcelItem, form]);
+
+  // Update subcategories when selectedCategory or categories change
+  useEffect(() => {
+    if (!selectedCategory) {
+      setSubCategories([]);
+      setHsCodes([]);
+      form.setValue("subCategory", "");
+      form.setValue("hsCode", "");
+      return;
+    }
+
+    const matchedCategory = categories.find(
+      (cat) => cat.name === selectedCategory
+    );
+    const newSubCategories = matchedCategory?.subcategories ?? [];
+    setSubCategories(newSubCategories);
+
+    // Reset subCategory and hsCode only if current subCategory is invalid
+    const currentSubCategory = form.getValues("subCategory");
+    if (
+      currentSubCategory &&
+      !newSubCategories.some((sub) => sub.name === currentSubCategory)
+    ) {
+      form.setValue("subCategory", "");
+      form.setValue("hsCode", "");
+      setHsCodes([]);
+    }
+  }, [selectedCategory, categories, form]);
+
+  // Update HS codes when selectedSubCategory or subCategories change
+  useEffect(() => {
+    if (!selectedSubCategory) {
+      setHsCodes([]);
+      form.setValue("hsCode", "");
+      return;
+    }
+
+    const matchedSubCategory = subCategories.find(
+      (sub) => sub.name === selectedSubCategory
+    );
+    const newHsCodes = matchedSubCategory?.hsCodes ?? [];
+    setHsCodes(newHsCodes);
+
+    // Reset hsCode only if current hsCode is invalid
+    const currentHsCode = form.getValues("hsCode");
+    if (
+      currentHsCode &&
+      !newHsCodes.some((hs) => hs.hsCode === currentHsCode)
+    ) {
+      form.setValue("hsCode", "");
+    }
+  }, [selectedSubCategory, subCategories, form]);
+
+  // Memoized select options for performance
+  const categoryOptions = useMemo(
+    () =>
+      categories.map((category) => ({
+        name: category.name,
+        value: category.name,
+      })),
+    [categories]
+  );
+
+  const subCategoryOptions = useMemo(
+    () =>
+      subCategories.map((subcat) => ({
+        name: subcat.name,
+        value: subcat.name,
+      })),
+    [subCategories]
+  );
+
+  const hsCodeOptions = useMemo(
+    () => hsCodes.map((item) => ({ name: item.label, value: item.hsCode })),
+    [hsCodes]
+  );
+
   function onSubmit(data: z.infer<typeof parcelItemSchema>) {
     const itemDetails = {
       ...data,
       type: "item",
-      name: data.description,
+      name: data.itemDescription,
       id: selectedParcelItem ? selectedParcelItem.id : crypto.randomUUID(),
     };
-
-    console.log(itemDetails);
 
     selectedParcelItem
       ? onEditParcelItem?.(itemDetails)
@@ -267,37 +428,39 @@ function ItemParcelForm({
   }
 
   function handleNestedFormSubmit(event: React.FormEvent) {
-    // Prevent the outer form submission
     event.stopPropagation();
-    form.handleSubmit(onSubmit)(event); // Trigger the inner form submission
+    form.handleSubmit(onSubmit)(event);
   }
+
+  // Debugging logs
+  useEffect(() => {
+    console.log("selectedCategory:", selectedCategory);
+    console.log("subCategories:", subCategories);
+    console.log("hsCodes:", hsCodes);
+  }, [selectedCategory, subCategories, hsCodes]);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={handleNestedFormSubmit} // Use custom submit handler
-        className="space-y-5"
-      >
-        <div className="grid sm:grid-cols-2 gap-5">
+      <form onSubmit={handleNestedFormSubmit} className="space-y-5">
+        <div className="grid sm:grid-cols-2 gap-5 gap-y-3">
           <CustomFormField
             className="col-span-2"
             label="Item description"
             name="description"
             control={form.control}
             fieldType={FormFieldType.INPUT}
-            placeholder="123 main street"
+            placeholder="E.g., Electronics"
           />
           <CustomFormField
             className="col-span-2 sm:col-span-1"
+            disabled={isLoadingCategories || !categories.length}
+            isLoading={isLoadingCategories}
             label="Item Category"
             name="category"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={itemCategory.map((item) => ({
-              name: item,
-              value: item,
-            }))}
             placeholder="Select a category"
+            selectOptions={categoryOptions}
           />
           <CustomFormField
             className="col-span-2 sm:col-span-1"
@@ -305,56 +468,41 @@ function ItemParcelForm({
             name="subCategory"
             control={form.control}
             fieldType={FormFieldType.SELECT}
-            selectOptions={itemCategory.map((item) => ({
-              name: item,
-              value: item,
-            }))}
+            selectOptions={subCategoryOptions}
             placeholder="Select a sub category"
+            disabled={!selectedCategory || !subCategories.length}
           />
           <CustomFormField
             className="col-span-2"
-            control={form.control}
+            label="HS code"
             name="hsCode"
-            label="Select HS Code"
-            fieldType={FormFieldType.ASYNC_SELECT}
-            placeholder="Start typing to search..."
-            fetchOptions={async (query) => {
-              const res = await searchHsCode(query);
-
-              if (res.status === "success" && res.data?.data?.hsCodes) {
-                return res.data.data.hsCodes.map((item: any) => ({
-                  label: item.label, // or item.name, adjust as needed
-                  value: item.hs_code, // or item.id
-                }));
-              }
-
-              console.log(res.data);
-
-              return []; // fallback on error
-            }}
+            control={form.control}
+            fieldType={FormFieldType.SELECT}
+            selectOptions={hsCodeOptions}
+            placeholder="Select an HS code"
+            disabled={!selectedSubCategory || !hsCodes.length}
           />
-
           <div className="grid sm:grid-cols-3 gap-5 col-span-2">
             <CustomFormField
               label="Weight (kg)"
               name="weight"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5kg"
+              placeholder="E.g., 5kg"
             />
             <CustomFormField
               label="Quantity"
               name="quantity"
               control={form.control}
               fieldType={FormFieldType.NUMBER}
-              placeholder="E.g 5cm"
+              placeholder="E.g., 5"
             />
             <CustomFormField
               label="Item Value"
               name="value"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="E.g N5"
+              placeholder="E.g., N5000"
             />
           </div>
           <div className="grid sm:grid-cols-3 gap-5 col-span-2">
@@ -363,21 +511,21 @@ function ItemParcelForm({
               name="length"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5cm"
+              placeholder="E.g., 5cm"
             />
             <CustomFormField
               label="Width (cm)"
               name="width"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5cm"
+              placeholder="E.g., 5cm"
             />
             <CustomFormField
               label="Height (cm)"
               name="height"
               control={form.control}
               fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5cm"
+              placeholder="E.g., 5cm"
             />
           </div>
         </div>

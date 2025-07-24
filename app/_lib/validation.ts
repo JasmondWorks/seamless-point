@@ -1,4 +1,5 @@
-import { string, z } from "zod";
+import { parsePhoneNumber } from "react-phone-number-input";
+import { z } from "zod";
 
 // Base schema for common fields (sign-in and sign-up)
 export const emailSchema = z.object({
@@ -161,136 +162,136 @@ export const signUpSchema = baseUserSchema
 // Schema for sign-in (email and password only)
 export const signInSchema = baseUserSchema;
 
-export const deliverySourceSchema = z.object({
-  firstName: z
-    .string({
-      required_error: "Please provide a first name",
-    })
-    .trim()
-    .min(1, "Please provide a first name"),
-  lastName: z
-    .string({
-      required_error: "Please provide a last name",
-    })
-    .trim()
-    .min(1, "Please provide a last name"),
-  street: z
-    .string({
-      required_error: "Please provide a street",
-    })
-    .trim()
-    .min(1, "Please provide a street"),
-  aptUnit: z
-    .string({
-      required_error: "Please provide an apartment/unit",
-    })
-    .trim()
-    .min(1, "Please provide an apartment/unit"),
-  state: z.string().trim().min(1, "Please provide a state"),
-  // .optional()
-  // .or(z.literal("")),
-
-  country: z.string().trim().min(1, "Please provide a country"),
-  // .optional()
-  // .or(z.literal("")),
-
-  city: z.string().trim().min(1, "Please provide a city"),
-  // .optional()
-  // .or(z.literal("")),
-
-  postCode: z
-    .string({
-      required_error: "Please provide a postcode",
-    })
-    .trim()
-    .min(1, "Please provide a postcode"),
-  email: z
-    .string({
-      required_error: "Please provide a valid email",
-    })
-    .trim()
-    .email("Please provide a valid email"),
-  phoneNumber: z
-    .string({
-      required_error: "Phone number is required",
-    })
-    .trim()
-    .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
-    .regex(/^[+]?\d{10,14}$/, {
-      message: "Phone number must be valid and can include a country code",
-    }),
-  // deliveryTitle: z
-  //   .string({
-  //     required_error: "Please provide a delivery title",
-  //   })
-  //   .trim()
-  //   .min(1, "Please provide a delivery title"),
-  // summary: z
-  //   .string({
-  //     required_error: "Please provide a delivery summary",
-  //   })
-  //   .trim()
-  //   .min(1, "Please provide a delivery summary"),
-});
-export const deliveryDestinationSchema = z.object({
-  toFirstName: z
-    .string({
-      required_error: "Please provide a first name",
-    })
-    .trim()
-    .min(1, "Please provide a first name"),
-  toLastName: z
-    .string({
-      required_error: "Please provide a last name",
-    })
-    .trim()
-    .min(1, "Please provide a last name"),
-  toStreet: z
-    .string({
-      required_error: "Please provide a street",
-    })
-    .trim()
-    .min(1, "Please provide a street"),
-  toAptUnit: z
-    .string({
-      required_error: "Please provide an apt/unit",
-    })
-    .trim()
-    .min(1, "Please provide an apt/unit"),
-  toState: z.string().trim().min(1, "Please provide a state"),
-  // .optional()
-  // .or(z.literal("")),
-
-  toCountry: z.string().trim().min(1, "Please provide a country"),
-  // .optional()
-  // .or(z.literal("")),
-
-  toCity: z.string().trim().min(1, "Please provide a city"),
-  // .optional()
-  // .or(z.literal("")),
-
-  toPostCode: z
-    .string({
-      required_error: "Please provide a postcode",
-    })
-    .trim()
-    .min(1, "Please provide a postcode"),
-  toEmail: z
-    .string({
-      required_error: "Please provide a valid email",
-    })
-    .trim()
-    .email("Please provide a valid email"),
-  toPhoneNumber: z
-    .string({
-      required_error: "Phone number is required",
-    })
-    .trim()
-    .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
-    .regex(/^[+]?\d{10,14}$/, {
-      message: "Phone number must be valid and can include a country code",
-    }),
-});
+export const deliverySourceSchema = z
+  .object({
+    firstName: z
+      .string({
+        required_error: "Please provide a first name",
+      })
+      .trim()
+      .min(1, "Please provide a first name"),
+    lastName: z
+      .string({
+        required_error: "Please provide a last name",
+      })
+      .trim()
+      .min(1, "Please provide a last name"),
+    street: z
+      .string({
+        required_error: "Please provide a street",
+      })
+      .trim()
+      .min(1, "Please provide a street"),
+    aptUnit: z
+      .string({
+        required_error: "Please provide an apartment/unit",
+      })
+      .trim()
+      .min(1, "Please provide an apartment/unit"),
+    state: z.string().trim().min(1, "Please provide a state"),
+    country: z.string().trim().min(1, "Please provide a country"),
+    city: z.string().trim().min(1, "Please provide a city"),
+    postCode: z
+      .string({
+        required_error: "Please provide a postcode",
+      })
+      .trim()
+      .min(1, "Please provide a postcode"),
+    email: z
+      .string({
+        required_error: "Please provide a valid email",
+      })
+      .trim()
+      .email("Please provide a valid email"),
+    phoneNumber: z
+      .string({
+        required_error: "Phone number is required",
+      })
+      .trim()
+      .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
+      .regex(/^[+]?\d{10,14}$/, {
+        message: "Phone number must be valid and can include a country code",
+      }),
+  })
+  .refine(
+    (data) => {
+      try {
+        const phoneNumberParsed = parsePhoneNumber(data.phoneNumber);
+        return phoneNumberParsed?.country === data.country;
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: "Phone number does not match selected country",
+      path: ["phoneNumber"],
+    }
+  );
+export const deliveryDestinationSchema = z
+  .object({
+    toFirstName: z
+      .string({
+        required_error: "Please provide a first name",
+      })
+      .trim()
+      .min(1, "Please provide a first name"),
+    toLastName: z
+      .string({
+        required_error: "Please provide a last name",
+      })
+      .trim()
+      .min(1, "Please provide a last name"),
+    toStreet: z
+      .string({
+        required_error: "Please provide a street",
+      })
+      .trim()
+      .min(1, "Please provide a street"),
+    toAptUnit: z
+      .string({
+        required_error: "Please provide an apt/unit",
+      })
+      .trim()
+      .min(1, "Please provide an apt/unit"),
+    toState: z.string().trim().min(1, "Please provide a state"),
+    toCountry: z.string().trim().min(1, "Please provide a country"),
+    toCity: z.string().trim().min(1, "Please provide a city"),
+    toPostCode: z
+      .string({
+        required_error: "Please provide a postcode",
+      })
+      .trim()
+      .min(1, "Please provide a postcode"),
+    toEmail: z
+      .string({
+        required_error: "Please provide a valid email",
+      })
+      .trim()
+      .email("Please provide a valid email"),
+    toPhoneNumber: z
+      .string({
+        required_error: "Phone number is required",
+      })
+      .trim()
+      .min(10, { message: "Phone number must be at least 10 digits long" }) // Ensuring minimum length
+      .regex(/^[+]?\d{10,14}$/, {
+        message: "Phone number must be valid and can include a country code",
+      }),
+  })
+  .refine(
+    (data) => {
+      try {
+        const phoneNumberParsed = parsePhoneNumber(data.toPhoneNumber);
+        return phoneNumberParsed?.country === data.toCountry;
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: "Phone number does not match selected country",
+      path: ["toPhoneNumber"],
+    }
+  );
 
 export const parcelItemSchema = z.object({
   description: z

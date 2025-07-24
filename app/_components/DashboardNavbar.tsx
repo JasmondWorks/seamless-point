@@ -261,7 +261,7 @@ export default function Navbar() {
 
       <div
         className={`${
-          isNavShowing ? "w-72" : "w-14"
+          isNavShowing ? "w-72" : "w-12"
         } absolute lg:relative h-full bg-[#fafafa] z-20 lg:min-w-72 items-center md:items-start py-6 border-r border-neutral-200 lg:py-10 pb-0 flex flex-col justify-between overflow-hidden overflow-y-scroll transition-all duration-300 ease-in-out`}
       >
         {/* Rectangle shapes */}

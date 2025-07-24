@@ -13,6 +13,7 @@ export default function ParcelItemsList({
 }) {
   if (!items?.length) return;
 
+  console.log(items);
   return (
     <div className="flex flex-col gap-y-2">
       {items?.map((item: any) => (
@@ -20,7 +21,7 @@ export default function ParcelItemsList({
           key={item.id}
           className="whitespace-nowrap flex-wrap col-span-2 border border-neutral-300 bg-white rounded-lg p-4 flex items-center justify-between gap-x-16 md:gap-x-5 gap-y-3"
         >
-          <div className="text-sm flex flex-col md:flex-row gap-x-10 flex-1">
+          <div className="text-sm flex flex-col md:flex-row gap-2 gap-x-10 flex-1">
             <span>{item?.description}</span>
             <div className="gap-3 items-center flex md:flex-1 md:justify-center">
               <span className="inline-block md:mx-auto">

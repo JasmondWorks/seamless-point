@@ -37,27 +37,13 @@ const RatesList = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   console.log("selected", selectedCourier);
+  console.log("parcel", parcelDetails);
 
   const onSelectCourier = useCreateDeliveryStore(
     (store) => store.onSelectCourier
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showLeftShadow, setShowLeftShadow] = useState(false);
-  const [showRightShadow, setShowRightShadow] = useState(false);
-
-  const handleScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    setShowLeftShadow(el.scrollLeft > 0);
-    setShowRightShadow(el.scrollLeft + el.clientWidth < el.scrollWidth);
-  };
-
-  useEffect(() => {
-    handleScroll(); // run on mount
-  }, [couriers]);
 
   useEffect(() => {
     fetchRates();
@@ -160,11 +146,9 @@ const RatesList = ({
   }
 
   function handleSelectCourier(courier: any) {
+    console.log(courier);
     setSelectedCourier((prev: any) =>
-      prev?.carrier_name === courier.carrier_name &&
-      prev?.carrier_rate_description === courier.carrier_rate_description
-        ? null
-        : courier
+      prev?._id === courier._id ? null : courier
     );
   }
 
@@ -201,20 +185,8 @@ const RatesList = ({
         </div>
       )}
       <div className="relative">
-        {/* Shadows */}
-        {showLeftShadow && (
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#fafafa] to-transparent z-10" />
-        )}
-        {showRightShadow && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#fafafa] to-transparent z-10" />
-        )}
-
         {/* Scrollable Content */}
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="overflow-x-auto space-y-5 px-2"
-        >
+        <div className="space-y-5">
           {!isLoading &&
             couriers?.length === 0 &&
             "No rates available at this time"}

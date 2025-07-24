@@ -9,14 +9,19 @@ import CustomFormField, {
 import { deliverySourceSchema } from "@/app/_lib/validation";
 import { Form } from "@/app/_components/ui/form";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
-import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
-import { getCities, getCountries, getStates } from "@/app/_lib/actions";
+import {
+  createAddress,
+  getCities,
+  getCountries,
+  getStates,
+} from "@/app/_lib/actions";
 
 import styles from "./DeliverySourceForm.module.css";
 import { cn } from "@/app/_lib/utils";
 import Button, { ButtonVariant } from "@/app/_components/Button";
+import toast from "react-hot-toast";
 
 interface State {
   countries: any;
@@ -69,6 +74,7 @@ export default function DeliverySourceForm({
 }) {
   const sender = useCreateDeliveryStore((store) => store.sender);
   const updateSender = useCreateDeliveryStore((state) => state.updateSender);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof deliverySourceSchema>>({
     resolver: zodResolver(deliverySourceSchema),
@@ -173,12 +179,23 @@ export default function DeliverySourceForm({
       else setValue("city", "");
     }
   }
+  console.log(selectedCountry);
 
   // Form submission
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
-    if (data) updateSender(data);
+    // setIsSubmitting(true);
+    // const res = await createAddress(data);
+    // setIsSubmitting(false);
 
+    updateSender(data);
     onSetActivePage("receiver");
+    // console.log(res.data);
+
+    // if (res.status === "error") {
+    // }
+    // if (res.status === "success") {
+    //   toast.success(res.data.message);
+    // }
   }
 
   return (
@@ -282,7 +299,6 @@ export default function DeliverySourceForm({
         </div>
 
         <PrivacyPolicyBlock />
-        {/* <ButtonFormSubmit text="Continue" /> */}
 
         <div className="flex gap-4 justify-end">
           <Button
@@ -294,6 +310,8 @@ export default function DeliverySourceForm({
           />
 
           <Button
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
             type="submit"
             variant={ButtonVariant.fill}
             className="!text-white !bg-brandSec"

@@ -62,7 +62,7 @@ export default function Register() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout isContained={false}>
       {activePage === "delivery-type" && (
         <DeliveryType onSetActivePage={handleSetActivePage} />
       )}
@@ -96,7 +96,7 @@ function DeliveryType({
 }) {
   return (
     <>
-      <h1 className="text-3xl font-bold text-center">
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
         What are you trying to deliver
       </h1>
       <SelectDeliveryType onSetActivePage={onSetActivePage} />
@@ -106,11 +106,13 @@ function DeliveryType({
 
 function Sender({ onSetActivePage }: { onSetActivePage: (page: any) => void }) {
   return (
-    <>
-      <h1 className="text-3xl font-bold text-center">Sender’s information</h1>
+    <div className="space-y-8 max-w-5xl md:px-5">
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
+        Sender’s information
+      </h1>
 
       <DeliverySourceForm onSetActivePage={onSetActivePage} />
-    </>
+    </div>
   );
 }
 function Receiver({
@@ -119,10 +121,12 @@ function Receiver({
   onSetActivePage: (page: any) => void;
 }) {
   return (
-    <>
-      <h1 className="text-3xl font-bold text-center">Receiver’s information</h1>
+    <div className="space-y-8 max-w-5xl md:px-5">
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
+        Receiver’s information
+      </h1>
       <DeliveryReceiverForm onSetActivePage={onSetActivePage} />
-    </>
+    </div>
   );
 }
 
@@ -132,10 +136,12 @@ function ParcelInfo({
   onSetActivePage: (page: any) => void;
 }) {
   return (
-    <>
-      <h1 className="text-3xl font-bold text-center">Parcel information</h1>
+    <div className="space-y-8 max-w-5xl md:px-5">
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
+        Parcel information
+      </h1>
       <ParcelInfoForm onSetActivePage={onSetActivePage} />
-    </>
+    </div>
   );
 }
 
@@ -146,7 +152,9 @@ function SelectRate({
 }) {
   return (
     <>
-      <h1 className="text-3xl font-bold text-center">Select Courier</h1>
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
+        Select Courier
+      </h1>
       <RatesList onSetActivePage={onSetActivePage} />
     </>
   );
@@ -169,10 +177,13 @@ function PackageDetailsOverview({
   } = useCreateDeliveryStore((store) => store);
 
   return (
-    <div className="space-y-8 ">
-      <h1 className="text-3xl font-bold text-center">Package details</h1>
+    <div className="space-y-8 max-w-5xl md:px-5">
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
+        Package details
+      </h1>
 
       <PackageDetails
+        onSetActivePage={onSetActivePage}
         courierDetails={courierDetails}
         sender={sender}
         receiver={receiver}
@@ -205,6 +216,7 @@ function Payment({
   onSetActivePage: (page: any) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [user, setUser] = useState<any>({});
   const [activeDialog, setActiveDialog] = useState<"submit" | "deposit">(
@@ -258,7 +270,7 @@ function Payment({
     console.log("proof of purchase", state.parcelDetails?.proofOfPurchase);
 
     // UPLOADING OF PACKAGE IMAGE AND PROOF OF PURCHASE
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     let packageImageUrl, proofOfPurchaseUrl;
 
@@ -300,6 +312,7 @@ function Payment({
       // toast.error("Failed to upload files");
       // return;
     }
+    console.log(state.parcelDetails);
     console.log("package image url", packageImageUrl);
     const pickupAddressId = state.courier.pickup_address;
     const deliveryAddressId = state.courier.delivery_address;
@@ -330,7 +343,7 @@ function Payment({
         onSetActivePage("select-rate");
       } else toast.error(pickupRes.message);
 
-      setIsLoading(false);
+      setIsSubmitting(false);
       return;
     }
 
@@ -365,7 +378,7 @@ function Payment({
       onSetActivePage("success");
     }
 
-    setIsLoading(false);
+    setIsSubmitting(false);
   }
   async function handleDepositSuccess(res: any) {
     setIsLoading(true);
@@ -398,7 +411,9 @@ function Payment({
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-center">Payment</h1>
+      <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
+        Payment
+      </h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-y-10">
         <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]">
           <BalanceDisplay balance={balance} />
@@ -439,12 +454,15 @@ function Payment({
             </Button>
           ) : (
             <Button
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
               type="submit"
               variant={ButtonVariant.fill}
               className="!text-white !bg-brandSec"
               isRoundedLarge
             >
-              Finish creating shipment
+              {!isSubmitting && "Finish creating shipment"}
+              {isSubmitting && "Arranging shipment"}
             </Button>
           )}
         </div>

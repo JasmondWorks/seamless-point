@@ -40,6 +40,36 @@ body {
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 } */
 
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* White */
+    --foreground: 222.2 47.4% 11.2%; /* Dark gray */
+    --muted: 210 40% 96.1%; /* Light gray */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Medium gray */
+    --primary: 222.2 47.4% 11.2%; /* Dark gray (often overridden) */
+    --primary-foreground: 210 40% 98%; /* Nearly white */
+    --input: 214.3 31.8% 91.4%; /* Light gray for input borders */
+    --ring: 222.2 47.4% 11.2%; /* Ring color, often matches primary */
+    --tw-ring-inset: 0; /* No inset for ring */
+    --tw-ring-offset-width: 0px; /* No offset for ring */
+    --tw-ring-color: hsl(222.2 47.4% 11.2% / 0.5); /* Ring color with opacity */
+  }
+
+  .dark {
+    --background: 222.2 47.4% 11.2%; /* Dark gray */
+    --foreground: 210 40% 98%; /* Nearly white */
+    --muted: 223.4 32.4% 15.7%; /* Darker gray */
+    --muted-foreground: 215 20.2% 65.1%; /* Lighter gray */
+    --primary: 210 40% 98%; /* Light color for primary */
+    --primary-foreground: 222.2 47.4% 11.2%; /* Dark gray */
+    --input: 216 34.3% 16.9%; /* Darker input border */
+    --ring: 210 40% 98%; /* Ring color, often matches primary */
+    --tw-ring-inset: 0;
+    --tw-ring-offset-width: 0px;
+    --tw-ring-color: hsl(210 40% 98% / 0.5);
+  }
+}
+
 :root {
   --clr-brand-pry: #0daced;
   --clr-brand-pry--light: #f0f9ff;
@@ -509,7 +539,7 @@ h2.react-datepicker__current-month {
 
 [role="dialog"] {
   width: 90vw;
-  max-height: 90vh;
+  max-height: 65vh;
   overflow-y: auto;
   border-radius: 15px;
   -webkit-border-radius: 15px;
@@ -595,4 +625,38 @@ h2.react-datepicker__current-month {
 
 [class^="react-datepicker"] {
   font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.shad-container {
+  font-family: inherit;
+}
+
+.shad__control {
+  font-size: 0.875rem !important;
+  padding-block: 0.25rem !important;
+  box-shadow: none !important;
+}
+.shad__menu,
+.shad__menu * {
+  font-size: 0.875rem !important;
+}
+.shad__indicator {
+  padding-block: 0 !important;
+}
+.shad__control--is-focused {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary));
+}
+
+.shad__menu {
+  z-index: 50;
+}
+
+.shad__option--is-focused {
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+.shad__option--is-selected {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
 }

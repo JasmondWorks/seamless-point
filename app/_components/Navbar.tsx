@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Button, { ButtonVariant } from "./Button";
 import Image from "next/image";
-import { FiLogOut, FiMenu } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import { useUserAuth } from "../_contexts/UserAuthContext";
 import { Bell } from "lucide-react";
@@ -12,7 +12,6 @@ import { usePathname } from "next/navigation";
 import useNotifications from "@/app/_hooks/notifications/useNotifications";
 import { TNotification } from "@/app/_lib/types";
 import { cn } from "@/app/_lib/utils";
-import SignOutButton from "@/app/_components/SignOutButton";
 
 const navLinks = [
   { title: "Home", href: "/#home" },
@@ -55,15 +54,8 @@ export default function Navbar({ className = "" }) {
 
   return (
     <>
-      {/* <div
-        className={`h-20 lg:h-auto lg:static flex lg:flex-row items-center justify-between ${
-          pathname.includes("forgot-password") ? "bg-[#f0f9ff]" : "bg-white"
-        } w-full z-50 gap-x-12 lg:gap-20 px-0 lg:px-5 lg:py-2
-          border-b border-neutral-200 transition-shadow duration-300
-          ${hasScrolled ? "shadow-md" : ""} ${className}`}
-      > */}
       <div
-        className={`h-20 lg:h-auto lg:static flex lg:flex-row items-center justify-between ${
+        className={`py-2 lg:py-3 lg:h-auto lg:static flex lg:flex-row items-center justify-between ${
           pathname.includes("forgot-password") ? "bg-[#f0f9ff]" : "bg-white"
         } w-full z-50 gap-x-12 lg:gap-20 px-0 lg:px-5 lg:py-2
           border-b border-neutral-200 transition-shadow duration-300
@@ -214,7 +206,7 @@ export function BrandLogo({ type = "" }) {
     <>
       {type === "desktop" && (
         <Image
-          className="hidden lg:inline-block h-14 object-contain w-full"
+          className="hidden lg:inline-block h-12 object-contain w-full"
           src="/assets/images/logo.png"
           alt="logo"
           width={200}
@@ -223,7 +215,7 @@ export function BrandLogo({ type = "" }) {
       )}
       {type === "mobile" && (
         <Image
-          className="lg:hidden h-14 object-contain w-full"
+          className="lg:hidden h-12 object-contain w-full"
           src="/assets/images/logo_mobile.png"
           alt="logo"
           width={200}
@@ -234,14 +226,14 @@ export function BrandLogo({ type = "" }) {
       {!type && (
         <>
           <Image
-            className="hidden lg:inline-block h-14 object-contain w-full"
+            className="hidden lg:inline-block h-12 object-contain w-full"
             src="/assets/images/logo.png"
             alt="logo"
             width={200}
             height={200}
           />
           <Image
-            className="lg:hidden h-14 object-contain w-full"
+            className="lg:hidden h-12 object-contain w-full"
             src="/assets/images/logo_mobile.png"
             alt="logo"
             width={200}

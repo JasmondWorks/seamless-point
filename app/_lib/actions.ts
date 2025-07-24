@@ -1099,6 +1099,30 @@ export const getCities = async (countryCode: string, stateCode: string) => {
     return { status: "error", message: error.message };
   }
 };
+export const createAddress = async (addressDetails: any) => {
+  const token = getUserToken();
+
+  try {
+    const res = await fetch(`${URL}/terminal/addresses`, {
+      method: "POST",
+      body: JSON.stringify(addressDetails),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    console.log(data);
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data: data.data.address };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
 export const getRates = async ({
   pickupAddress,
   deliveryAddress,
@@ -1237,6 +1261,31 @@ export const getAllHsCodes = async () => {
   try {
     // Create packaging
     const res = await fetch(`${URL}/terminal/hs-codes`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    console.log("Data", data);
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const getCategories = async () => {
+  const token = getUserToken();
+
+  try {
+    // Create packaging
+    const res = await fetch(`${URL}/terminal/categories`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
