@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable no-unused-vars */
-import { Control } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 
 import PhoneInput from "react-phone-number-input";
 import { E164Number } from "libphonenumber-js/core";
@@ -122,8 +122,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         <FormControl>
           <PhoneInput
             disabled={props.disabled}
-            country={props.country || "NG"}
-            coun
+            defaultCountry={"NG"}
             placeholder={props.placeholder}
             international
             withCountryCallingCode
@@ -154,10 +153,16 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     // return <BasicDatePicker field={field} props={props} />;
     case FormFieldType.SELECT:
       return (
-        <SelectBox
-          field={field}
-          props={props}
-          onChange={(value: string) => handleChange(value)} // Pass onChange to SelectBox
+        <Controller
+          name={props.name}
+          control={props.control}
+          render={({ field }) => (
+            <SelectBox
+              field={field}
+              props={props}
+              onChange={(value) => field.onChange(value)}
+            />
+          )}
         />
       );
     case FormFieldType.ASYNC_SELECT:
@@ -196,7 +201,7 @@ const CustomFormField = (props: CustomProps) => {
           )}
           <div className="relative">
             {isLoading && (
-              <div className="absolute top-[50%] right-[30px] z-[99] translate-y-[-50%] flex items-center">
+              <div className="absolute top-[50%] right-[57px] z-[99] translate-y-[-50%] flex items-center">
                 <Spinner size="small" />
               </div>
             )}

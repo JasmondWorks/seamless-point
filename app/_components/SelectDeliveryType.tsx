@@ -24,15 +24,15 @@ export default function SelectDeliveryType({
   }
 
   return (
-    <div className="flex flex-wrap gap-5">
+    <div className="flex flex-col sm:flex-row gap-6 lg:gap-8 justify-center">
       <button
         onClick={() => handleSetDeliveryType(DeliveryType.REGULAR)}
-        className="flex flex-col gap-3 justify-center items-center flex-1"
+        className="flex flex-col gap-3 justify-center items-center"
       >
         <div className="card flex-1 bg-white flex flex-col">
-          <div className="flex-1 grid place-items-center px-5 py-10">
+          <div className="flex-1 grid place-items-center px-3 py-5 lg:py-10">
             <svg
-              className="aspect-square h-[200px]"
+              className="aspect-square w-full"
               width={300}
               height={300}
               viewBox="0 0 300 300"
@@ -427,12 +427,12 @@ export default function SelectDeliveryType({
       </button>
       <button
         onClick={() => handleSetDeliveryType(DeliveryType.FOOD)}
-        className="flex flex-col gap-3 justify-center items-center flex-1"
+        className="flex flex-col gap-3 justify-center items-center"
       >
         <div className="card flex-1 bg-white flex flex-col">
-          <div className="flex-1 grid place-items-center px-5 py-10">
+          <div className="flex-1 grid place-items-center px-3 py-5 lg:py-10">
             <svg
-              className="aspect-square h-[200px]"
+              className="aspect-square w-full"
               width={300}
               height={300}
               viewBox="0 0 300 300"

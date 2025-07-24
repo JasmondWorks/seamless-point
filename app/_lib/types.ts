@@ -41,20 +41,17 @@ export enum DispatchEnum {
 }
 
 export interface Sender {
-  firstName?: string;
-  lastName?: string;
-  street?: string;
-  aptUnit?: string;
+  firstName: string;
+  lastName: string;
+  street: string;
+  aptUnit: string;
   country: string;
   state: string;
   city: string;
-  postCode?: string;
+  postCode: string;
   email?: string;
   phoneNumber?: string;
-  // deliveryTitle: string;
-  // summary: string;
-  // amountOfItems?: number;
-  // instructions?: string;
+  addressId?: string;
 }
 export interface Receiver {
   toFirstName: string;
@@ -67,6 +64,7 @@ export interface Receiver {
   toPostCode: string;
   toEmail: string;
   toPhoneNumber: string;
+  addressId?: string;
 }
 export interface Parcel {
   description: string;
