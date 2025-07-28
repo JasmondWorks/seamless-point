@@ -644,8 +644,7 @@ h2.react-datepicker__current-month {
   padding-block: 0 !important;
 }
 .shad__control--is-focused {
-  border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 1px hsl(var(--primary));
+  border-color: var(--clr-brand-sec) !important;
 }
 
 .shad__menu {

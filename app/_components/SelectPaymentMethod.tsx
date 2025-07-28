@@ -12,10 +12,6 @@ function SelectPaymentMethod({
   selectedPaymentMethod: string;
   setSelectedPaymentMethod: (paymentMethod: string) => void;
 }) {
-  function handleSelectPaymentMethod(type: string) {
-    setSelectedPaymentMethod(type);
-  }
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     console.log("here");
@@ -30,7 +26,10 @@ function SelectPaymentMethod({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-16">
       <div className="space-y-2">
-        <h1 className="headline text-center">Select a Payment Method</h1>
+        <h1 className="text-3xl font-bold text-center">
+          Select a Payment Method
+        </h1>
+
         <p className="text-center text-muted">
           Please select one of the two payment methods listed below
         </p>

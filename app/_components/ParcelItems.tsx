@@ -1,13 +1,11 @@
 "use client";
 
-import { Option } from "@/app/_components/AsyncSearchableSelect";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import ConfirmDialogContent from "@/app/_components/ConfirmDialogContent";
 import CustomFormField, {
   FormFieldType,
 } from "@/app/_components/CustomFormField";
 import ParcelItemsList from "@/app/_components/ParcelItemsList";
-import Spinner from "@/app/_components/Spinner";
 import {
   Dialog,
   DialogContent,
@@ -17,13 +15,11 @@ import {
 import { Form } from "@/app/_components/ui/form";
 import { Label } from "@/app/_components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/app/_components/ui/radio-group";
-import { useFormContext } from "@/app/_contexts/FormContext";
-import { getAllHsCodes, getCategories, searchHsCode } from "@/app/_lib/actions";
-import { itemCategory } from "@/app/_lib/constants";
+import { getCategories } from "@/app/_lib/actions";
 import { parcelDocumentSchema, parcelItemSchema } from "@/app/_lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 

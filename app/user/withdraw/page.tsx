@@ -1,13 +1,10 @@
 "use client";
 
 import AddWithdrawalAccount from "@/app/_components/AddWithdrawalAccount";
-import Spinner from "@/app/_components/Spinner";
 import SpinnerFull from "@/app/_components/SpinnerFull";
 import WithdrawalForm from "@/app/_components/WithdrawalForm";
 import { getUser } from "@/app/_lib/actions";
-import { showToast } from "@/app/_lib/toast";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
 export default function Withdraw() {
   const [bankDetails, setBankDetails] = useState({

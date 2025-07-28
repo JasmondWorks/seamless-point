@@ -3,7 +3,6 @@ import styles from "./CourierDetails.module.css";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { cn, formatCurrency } from "@/app/_lib/utils";
-import { Check } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
@@ -16,9 +15,7 @@ export default function CourierDetails({
   selectedCourier: any;
   onSelectCourier: any;
 }) {
-  console.log(courier);
-
-  const isSelected = selectedCourier?.carrier_name === courier.carrier_name;
+  const isSelected = selectedCourier?.id === courier.id;
   const {
     amount,
     carrier_logo,

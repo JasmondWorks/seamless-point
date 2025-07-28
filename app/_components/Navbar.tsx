@@ -114,9 +114,9 @@ export default function Navbar({ className = "" }) {
           </div>
           <div className="flex gap-8 items-center">
             {!user && (
-              <div className="font-medium flex items-center lg:hidden leading-none">
+              <div className="font-medium flex items-center lg:hidden leading-none space-x-4">
                 <Link href="/auth/user/login" className="inline-block">
-                  <Button variant={ButtonVariant.link} className="text-sm !p-4">
+                  <Button variant={ButtonVariant.link} className="text-sm !p-0">
                     Sign in
                   </Button>
                 </Link>
@@ -124,7 +124,7 @@ export default function Navbar({ className = "" }) {
                   <Button
                     isRoundedLarge
                     variant={ButtonVariant.fill}
-                    className="!bg-brandSec !text-white text-sm !p-3 !py-1"
+                    className="!bg-brandSec !text-white text-sm !p-2  !h-auto"
                   >
                     Sign up
                   </Button>

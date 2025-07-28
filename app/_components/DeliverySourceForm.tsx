@@ -11,17 +11,13 @@ import { Form } from "@/app/_components/ui/form";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { useEffect, useReducer, useState } from "react";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
-import {
-  createAddress,
-  getCities,
-  getCountries,
-  getStates,
-} from "@/app/_lib/actions";
+import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 
 import styles from "./DeliverySourceForm.module.css";
 import { cn } from "@/app/_lib/utils";
 import Button, { ButtonVariant } from "@/app/_components/Button";
-import toast from "react-hot-toast";
+import Badge, { BadgeVariant } from "@/app/_components/Badge";
+import { X } from "lucide-react";
 
 interface State {
   countries: any;
@@ -74,7 +70,6 @@ export default function DeliverySourceForm({
 }) {
   const sender = useCreateDeliveryStore((store) => store.sender);
   const updateSender = useCreateDeliveryStore((state) => state.updateSender);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof deliverySourceSchema>>({
     resolver: zodResolver(deliverySourceSchema),
@@ -93,12 +88,12 @@ export default function DeliverySourceForm({
     },
   });
 
+  const { setValue, reset, handleSubmit } = form;
+
   const [{ countries, states, cities, isLoading }, dispatch] = useReducer(
     reducer,
     initialState
   );
-
-  const { setValue } = form;
 
   const selectedCountry = useWatch({ control: form.control, name: "country" });
   const selectedState = useWatch({ control: form.control, name: "state" });
@@ -183,27 +178,46 @@ export default function DeliverySourceForm({
 
   // Form submission
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {
-    // setIsSubmitting(true);
-    // const res = await createAddress(data);
-    // setIsSubmitting(false);
-
     updateSender(data);
     onSetActivePage("receiver");
-    // console.log(res.data);
-
-    // if (res.status === "error") {
-    // }
-    // if (res.status === "success") {
-    //   toast.success(res.data.message);
-    // }
   }
+
+  const handleClearFields = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const confirm = window.confirm(
+      "Are you sure that you want to clear all fields?"
+    );
+    if (confirm) {
+      reset({
+        firstName: "",
+        lastName: "",
+        street: "",
+        aptUnit: "",
+        country: "",
+        state: "",
+        city: "",
+        postCode: "",
+        email: "",
+        phoneNumber: "",
+      }); // Explicitly reset to empty values
+    }
+  };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit)}
         className={cn("space-y-5", styles.container)}
       >
+        <div className="flex justify-end">
+          <button onClick={handleClearFields} type="button">
+            <Badge variant={BadgeVariant.red} className="!gap-1 items-center">
+              <X size={16} strokeWidth={3} /> Clear all
+            </Badge>
+          </button>
+        </div>
         <div className="grid lg:grid-cols-2 gap-5">
           <CustomFormField
             label="First name"
@@ -308,10 +322,7 @@ export default function DeliverySourceForm({
             text="Previous"
             isRoundedLarge
           />
-
           <Button
-            disabled={isSubmitting}
-            isLoading={isSubmitting}
             type="submit"
             variant={ButtonVariant.fill}
             className="!text-white !bg-brandSec"
