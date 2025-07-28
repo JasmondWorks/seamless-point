@@ -36,9 +36,6 @@ const RatesList = ({
   const [selectedCourier, setSelectedCourier] = useState<any>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  console.log("selected", selectedCourier);
-  console.log("parcel", parcelDetails);
-
   const onSelectCourier = useCreateDeliveryStore(
     (store) => store.onSelectCourier
   );
@@ -145,11 +142,10 @@ const RatesList = ({
     setCouriers(res.data);
   }
 
+  console.log(selectedCourier);
+
   function handleSelectCourier(courier: any) {
-    console.log(courier);
-    setSelectedCourier((prev: any) =>
-      prev?._id === courier._id ? null : courier
-    );
+    setSelectedCourier(courier);
   }
 
   function onSubmit() {

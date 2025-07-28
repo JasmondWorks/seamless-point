@@ -86,7 +86,7 @@ export default async function Dashboard() {
         </Link>
       </div>
       <div className="flex flex-wrap gap-5">
-        <div className="card bg-white flex flex-col p-3 flex-1">
+        <div className="card bg-white p-3 flex-1">
           <div className="flex-1 grid place-items-center py-3">
             <svg
               className="aspect-square h-[200px]"
@@ -552,17 +552,14 @@ export default async function Dashboard() {
           <div className="mb-3">
             <hr />
           </div>
-          <div>
-            <Link href="/user/deliveries/register">
-              <Button
-                className="font-light"
-                variant={ButtonVariant.fill}
-                isPrimaryDark
-                text="Delivery"
-                isRoundedLarge
-              />
-            </Link>
-          </div>
+          <Button
+            href="/user/deliveries/register"
+            className="font-light w-fit"
+            variant={ButtonVariant.fill}
+            isPrimaryDark
+            text="Delivery"
+            isRoundedLarge
+          />
         </div>
         <div className="card bg-white flex flex-col p-3 flex-1">
           <div className="flex-1 grid place-items-center py-3">

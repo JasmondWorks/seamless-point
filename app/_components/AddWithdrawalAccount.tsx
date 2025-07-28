@@ -172,7 +172,7 @@ const AddWithdrawalAccount = ({
   return (
     <div className="max-w-3xl">
       <div className="flex flex-col gap-10">
-        <h1 className="headline text-center">
+        <h1 className="text-3xl font-bold text-center">
           {isEditing ? "Update" : "Add"} Withdrawal Account
         </h1>
 

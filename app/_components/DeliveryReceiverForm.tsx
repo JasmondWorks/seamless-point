@@ -19,6 +19,8 @@ import { newDelivery } from "@/app/_lib/types";
 import React from "react";
 import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 import Button, { ButtonVariant } from "@/app/_components/Button";
+import Badge, { BadgeVariant } from "@/app/_components/Badge";
+import { X } from "lucide-react";
 
 interface State {
   countries: any;
@@ -94,7 +96,8 @@ export default function DeliveryReceiverForm({
     },
   });
 
-  const router = useRouter();
+  const { setValue, reset, handleSubmit } = form;
+
   const updateReceiver = useCreateDeliveryStore(
     (state) => state.updateReceiver
   );
@@ -103,8 +106,6 @@ export default function DeliveryReceiverForm({
     reducer,
     initialState
   );
-
-  const { setValue } = form;
 
   const selectedCountry = useWatch({
     control: form.control,
@@ -197,9 +198,39 @@ export default function DeliveryReceiverForm({
     onSetActivePage("parcel-info");
   }
 
+  const handleClearFields = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const confirm = window.confirm(
+      "Are you sure that you want to clear all fields?"
+    );
+    if (confirm) {
+      reset({
+        toFirstName: "",
+        toLastName: "",
+        toStreet: "",
+        toAptUnit: "",
+        toCountry: "",
+        toState: "",
+        toCity: "",
+        toPostCode: "",
+        toEmail: "",
+        toPhoneNumber: "",
+      }); // Explicitly reset to empty values
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <div className="flex justify-end">
+          <button onClick={handleClearFields} type="button">
+            <Badge variant={BadgeVariant.red} className="!gap-1 items-center">
+              <X size={16} strokeWidth={3} /> Clear all
+            </Badge>
+          </button>
+        </div>
         <div className="grid lg:grid-cols-2 gap-5">
           <CustomFormField
             label="Receiver's first name"

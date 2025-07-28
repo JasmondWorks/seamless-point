@@ -4,8 +4,8 @@ import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { useUserAuth } from "@/app/_contexts/UserAuthContext";
 import { initiatePayment } from "@/app/_lib/actions";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useState, Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 
@@ -80,6 +80,9 @@ function Summary({
     }
   };
 
+  const handleShowAccount = async () => {
+    console.log(user);
+  };
   return (
     <>
       <div className="flex flex-col gap-10">
@@ -118,7 +121,10 @@ function Summary({
           />
         )}
         {selectedPaymentMethod === "bank-transfer" && (
-          <ButtonFormSubmit text="Show account details" />
+          <ButtonFormSubmit
+            onClick={handleShowAccount}
+            text="Show account details"
+          />
         )}
       </div>
     </>
