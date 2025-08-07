@@ -10,12 +10,17 @@ import {
 } from "@/app/_components/ui/dialog";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getRates } from "@/app/_lib/actions";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 import { showToast } from "@/app/_lib/toast";
 import { formatCurrency } from "@/app/_lib/utils";
+import { RefreshCcw } from "lucide-react";
+import { Select } from "@/app/_components/ui/select";
+import CustomFormField, {
+  FormFieldType,
+} from "@/app/_components/CustomFormField";
 
 const RatesList = ({
   onSetActivePage,
@@ -23,6 +28,7 @@ const RatesList = ({
   onSetActivePage: (page: string) => void;
 }) => {
   const [couriers, setCouriers] = useState([]);
+
   const store = useCreateDeliveryStore((store) => store);
 
   const {
@@ -41,11 +47,42 @@ const RatesList = ({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState<
+    "+price" | "-price" | "fastest" | "clear" | string
+  >("fastest");
+
+  let filteredCouriers = couriers;
+
+  if (sortBy === "+price")
+    filteredCouriers = couriers?.sort((a: any, b: any) => a.amount - b.amount);
+  else if (sortBy === "-price")
+    filteredCouriers = couriers?.sort((a: any, b: any) => b.amount - a.amount);
+  else if (sortBy === "fastest")
+    filteredCouriers = couriers?.sort(
+      (a: any, b: any) => a.delivery_eta - b.delivery_eta
+    );
+  else if (sortBy === "clear") filteredCouriers = couriers;
+
+  console.log(couriers);
 
   useEffect(() => {
     fetchRates();
 
     // showToast("Amount may change from time to time", "info");
+
+    // if (sortBy === "+price")
+    //   filteredCouriers = couriers?.sort(
+    //     (a: any, b: any) => a.amount - b.amount
+    //   );
+    // else if (sortBy === "-price")
+    //   filteredCouriers = couriers?.sort(
+    //     (a: any, b: any) => b.amount - a.amount
+    //   );
+    // else if (sortBy === "fastest")
+    //   filteredCouriers = couriers?.sort(
+    //     (a: any, b: any) => a.delivery_eta - b.delivery_eta
+    //   );
+    // else if (sortBy === "clear") filteredCouriers = couriers;
   }, []);
   useEffect(() => {
     const foundCourier =
@@ -180,23 +217,39 @@ const RatesList = ({
           </Button2>
         </div>
       )}
-      <div className="relative">
-        {/* Scrollable Content */}
-        <div className="space-y-5">
-          {!isLoading &&
-            couriers?.length === 0 &&
-            "No rates available at this time"}
-          {!isLoading &&
-            couriers?.length > 0 &&
-            couriers?.map((courier: any) => (
-              <CourierDetails
-                key={courier._id}
-                courier={courier}
-                selectedCourier={selectedCourier}
-                onSelectCourier={handleSelectCourier}
-              />
-            ))}
-        </div>
+      <div className="flex justify-end gap-5">
+        <Button
+          isRoundedLarge
+          onClick={fetchRates}
+          variant={ButtonVariant.fill}
+          className="flex items-center gap-2 text-sm"
+        >
+          Refresh <RefreshCcw strokeWidth={3} size={21} />
+        </Button>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="font-[inherit] text-[inherit] border rounded-lg text-sm"
+        >
+          <option value="-price">Sort by: Highest Price</option>
+          <option value="+price">Sort by: Lowest Price</option>
+          <option value="fastest">Sort by: Fastest</option>
+        </select>
+      </div>
+      <div className="space-y-5">
+        {!isLoading &&
+          filteredCouriers?.length === 0 &&
+          "No rates available at this time"}
+        {!isLoading &&
+          filteredCouriers?.length > 0 &&
+          filteredCouriers?.map((courier: any) => (
+            <CourierDetails
+              key={courier._id}
+              courier={courier}
+              selectedCourier={selectedCourier}
+              onSelectCourier={handleSelectCourier}
+            />
+          ))}
       </div>
       <div className="flex gap-4 justify-end">
         <Button

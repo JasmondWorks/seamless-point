@@ -69,7 +69,7 @@ export default function CourierDetails({
       </span>
       <div className="flex justify-center items-center sm:col-span-2 md:col-span-3 xl:col-span-1">
         <Button
-          className={`pointer-events-none text-sm !h-auto !p-3 ${
+          className={`pointer-events-none text-xs !h-auto !p-2.5 font-extrabold tracking-wide ${
             !isSelected
               ? "!bg-[#fde9d7] !text-brandSec"
               : "text-white bg-[var(--clr-brand-sec)]"
@@ -78,7 +78,6 @@ export default function CourierDetails({
           variant={ButtonVariant.fill}
         >
           <span className="">{isSelected ? "SELECTED" : "SELECT"}</span>
-          {/* <Check className="" strokeWidth={3} /> */}
         </Button>
       </div>
     </div>
