@@ -15,12 +15,14 @@ const PaystackButtonWrapper = ({
   email,
   onSuccess,
   onClose,
+  channels = ["card"],
 }: {
   text?: "";
   amount: number;
   email: string;
   onSuccess?: (reference: any) => void;
   onClose?: () => void;
+  channels?: string[];
 }) => {
   const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!;
 
@@ -30,6 +32,7 @@ const PaystackButtonWrapper = ({
     metadata: {
       custom_fields: [],
     },
+    channels,
     publicKey,
     text: text || "Pay Now",
     onSuccess,

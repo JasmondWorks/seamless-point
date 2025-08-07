@@ -38,6 +38,9 @@ import BalanceDisplay from "@/app/_components/BalanceDisplay";
 import PaystackButtonWrapper from "@/components/PaystackButtonWrapper";
 import { AlertCircle } from "lucide-react";
 import SpinnerFull from "@/app/_components/SpinnerFull";
+import { buttonVariants } from "@/app/_components/ui/button";
+import Card from "@/app/_components/Card";
+import Image from "next/image";
 
 type ActivePage =
   | "delivery-type"
@@ -54,7 +57,8 @@ export default function Register() {
 
   const [activePage, setActivePage] = useState<ActivePage>(
     // searchParams.get("activePage") ||
-    "delivery-type"
+    // "delivery-type"
+    "payment"
   );
 
   function handleSetActivePage(page: ActivePage) {
@@ -95,12 +99,12 @@ function DeliveryType({
   onSetActivePage: (page: any) => void;
 }) {
   return (
-    <>
+    <div className="space-y-8 max-w-5xl md:px-5">
       <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
         What are you trying to deliver
       </h1>
       <SelectDeliveryType onSetActivePage={onSetActivePage} />
-    </>
+    </div>
   );
 }
 
@@ -151,12 +155,12 @@ function SelectRate({
   onSetActivePage: (page: any) => void;
 }) {
   return (
-    <>
+    <div className="space-y-8 max-w-5xl md:px-5">
       <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
         Select Courier
       </h1>
       <RatesList onSetActivePage={onSetActivePage} />
-    </>
+    </div>
   );
 }
 
@@ -223,7 +227,7 @@ function Payment({
     "submit"
   );
   const { balance, email } = user;
-  // const amount = 6_021_999;
+  // const amount = 10_021_999;
 
   const {
     userId,
@@ -234,7 +238,10 @@ function Payment({
 
   const state = getNewDeliveryData();
   const [depositAmount, setDepositAmount] = useState<number>(0);
+  const [isShowingAccDetails, setIsShowingAccDetails] = useState(false);
+  const [amountIsPaid, setAmountIsPaid] = useState(false);
 
+  console.log(user);
   async function fetchUser() {
     setIsLoading(true);
     const res = await getUser();
@@ -406,112 +413,195 @@ function Payment({
     setActiveDialog("deposit");
     setIsDialogOpen(true);
   }
-
+  function handleShowAccountDetails() {
+    setIsShowingAccDetails(true);
+  }
   if (isLoading) return <SpinnerFull />;
 
   return (
-    <>
+    <div className="space-y-8 max-w-5xl md:px-5">
       <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
         Payment
       </h1>
-      <form onSubmit={onSubmit} className="flex flex-col gap-y-10">
-        <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]">
-          <BalanceDisplay balance={balance} />
-        </div>
-        <div className="flex flex-col gap-3">
-          <Label htmlFor="withdrawAmount">Amount to be paid</Label>
-          <Input
-            disabled={true}
-            value={amount}
-            className="bg-white h-11"
-            id="withdrawAmount"
-            type="text"
-            placeholder="20, 000"
-          />
-          <p className="text-sm text-muted">
-            This amount will be deducted from your balance
-          </p>
-        </div>
-        <PrivacyPolicyBlock />
-        <div className="flex gap-4 justify-end">
-          <Button
-            onClick={() => onSetActivePage("package-details")}
-            variant={ButtonVariant.fill}
-            className="!bg-[#fde9d7] !text-brandSec"
-            text="Previous"
-            isRoundedLarge
-          />
-          {Number(balance) < Number(amount) ? (
-            <Button
-              type="button"
-              onClick={handleDepositDialog}
-              variant={ButtonVariant.fill}
-              className="!text-white !bg-red-500 flex items-center gap-2"
-              isRoundedLarge
-            >
-              <AlertCircle />
-              <span>Insufficient balance</span>
-            </Button>
-          ) : (
-            <Button
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
-              type="submit"
-              variant={ButtonVariant.fill}
-              className="!text-white !bg-brandSec"
-              isRoundedLarge
-            >
-              {!isSubmitting && "Finish creating shipment"}
-              {isSubmitting && "Arranging shipment"}
-            </Button>
-          )}
-        </div>
-      </form>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          {activeDialog === "submit" && (
-            <SuccessDialogContent
-              title="Payment successful"
-              description="Your delivery has been confirmed and your delivery process has started"
-              onConfirmSuccess={() => {
-                onSetActivePage("success");
-              }}
-            />
-          )}
-          {activeDialog === "deposit" && (
-            <div className="space-y-8">
-              <DialogTitle className="text-2xl font-bold">
-                Deposit now
-              </DialogTitle>
-              <div className="flex flex-col gap-3">
-                <span>Amount</span>
-                <Input
-                  value={depositAmount}
-                  onChange={(e) => setDepositAmount(Number(e.target.value))}
-                  className="h-11 bg-white"
-                  type="text"
-                  placeholder="100NGN"
-                />
+      {!isShowingAccDetails && (
+        <>
+          <form onSubmit={onSubmit} className="flex flex-col gap-y-10">
+            <hr />
+            <div className="grid lg:grid-cols-2 gap-10 gap-y-5">
+              {/* <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]"> */}
+              <div>
+                <BalanceDisplay balance={balance} amount={amount} />
               </div>
-              <Button
-                onClick={() => setIsDialogOpen(false)}
-                type="button"
-                variant={ButtonVariant.fill}
-                className="!text-white flex items-center w-full"
-                isRoundedLarge
-              >
-                <PaystackButtonWrapper
-                  onSuccess={handleDepositSuccess}
-                  amount={depositAmount}
-                  email={email}
-                />
-              </Button>
+              <div className="space-y-3 bg-white p-5 rounded-lg shadow-lg">
+                <p className="font-semibold text-sm">
+                  Want to pay with bank transfer instead?
+                </p>
+                <div>
+                  <Button
+                    onClick={handleShowAccountDetails}
+                    variant={ButtonVariant.outline}
+                    className="!text-[var(--clr-brand-sec)] !border-[var(--clr-brand-sec)]"
+                  >
+                    Pay with bank transfer
+                  </Button>
+                </div>
+              </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+            <hr />
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="withdrawAmount">Amount to be paid</Label>
+              <Input
+                disabled={true}
+                value={amount}
+                className="bg-white h-11 font-bold"
+                id="withdrawAmount"
+                type="text"
+                placeholder="20, 000"
+              />
+              <p className="text-sm text-muted">
+                This amount will be deducted from your balance
+              </p>
+            </div>
+            <PrivacyPolicyBlock />
+            <div className="flex gap-4 justify-end">
+              <Button
+                onClick={() => onSetActivePage("package-details")}
+                variant={ButtonVariant.fill}
+                className="!bg-[#fde9d7] !text-brandSec"
+                text="Previous"
+                isRoundedLarge
+              />
+              {Number(balance) < Number(amount) ? (
+                <Button
+                  type="button"
+                  onClick={handleDepositDialog}
+                  variant={ButtonVariant.fill}
+                  className="!text-white !bg-red-500 flex items-center gap-2"
+                  isRoundedLarge
+                >
+                  <AlertCircle />
+                  <span>Top-up Wallet</span>
+                </Button>
+              ) : (
+                <Button
+                  disabled={isSubmitting}
+                  isLoading={isSubmitting}
+                  type="submit"
+                  variant={ButtonVariant.fill}
+                  className="!text-white !bg-brandSec"
+                  isRoundedLarge
+                >
+                  {!isSubmitting && "Finish creating shipment"}
+                  {isSubmitting && "Arranging shipment"}
+                </Button>
+              )}
+            </div>
+          </form>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+              {activeDialog === "submit" && (
+                <SuccessDialogContent
+                  title="Payment successful"
+                  description="Your delivery has been confirmed and your delivery process has started"
+                  onConfirmSuccess={() => {
+                    onSetActivePage("success");
+                  }}
+                />
+              )}
+              {activeDialog === "deposit" && (
+                <div className="space-y-8">
+                  <DialogTitle className="text-2xl font-bold">
+                    Deposit now
+                  </DialogTitle>
+                  <div className="flex flex-col gap-3">
+                    <span>Amount</span>
+                    <Input
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(Number(e.target.value))}
+                      className="h-11 bg-white"
+                      type="text"
+                      placeholder="100NGN"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => setIsDialogOpen(false)}
+                    type="button"
+                    variant={ButtonVariant.fill}
+                    className="!text-white flex items-center w-full"
+                    isRoundedLarge
+                  >
+                    <PaystackButtonWrapper
+                      onSuccess={handleDepositSuccess}
+                      amount={depositAmount}
+                      email={email}
+                    />
+                  </Button>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
+      {isShowingAccDetails && (
+        <div className="space-y-8">
+          <div className="flex flex-col gap-3">
+            <Label htmlFor="withdrawAmount">Amount to be paid</Label>
+            <Input
+              disabled={true}
+              value={amount}
+              className="bg-white h-11 font-bold"
+              id="withdrawAmount"
+              type="text"
+              placeholder="20, 000"
+            />
+          </div>
+          <p className="text-sm">
+            <strong>
+              Initiate the payment by clicking on the button below
+            </strong>
+          </p>
+          {/* <Card className="gap-3 flex flex-col mb-5">
+            <h3 className="font-bold text-lg">Corporate account details</h3>
+            <hr />
+            <div className="flex items-center gap-5">
+              <img
+                className="h-20"
+                src="/assets/images/access-logo.png"
+                alt="Access bank logo"
+              />
+              <div className="gap-3 flex flex-col">
+                <span className="text-4xl font-bold">1927670372</span>
+                <span className="text-sm font-semibold">
+                  SeamlessPoints Technology Limited (Access Bank)
+                </span>
+              </div>
+            </div>
+          </Card> */}
+          {/* <p className="text-sm">
+            <strong>
+              Successfully made the transfer? Click on the verify button below
+            </strong>
+          </p> */}
+          <div className="flex justify-end gap-5">
+            <Button
+              onClick={() => setIsShowingAccDetails(false)}
+              variant={ButtonVariant.fill}
+              className="!bg-[#fde9d7] !text-brandSec"
+              text="Back"
+              isRoundedLarge
+            />
+
+            <Button variant={ButtonVariant.fill}>
+              <PaystackButtonWrapper
+                email={user.email}
+                amount={amount}
+                channels={["bank_transfer"]}
+              />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

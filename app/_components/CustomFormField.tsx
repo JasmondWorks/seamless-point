@@ -41,8 +41,8 @@ export enum FormFieldType {
 }
 
 interface CustomProps {
-  control: Control<any>;
-  name: string;
+  control?: Control<any>;
+  name?: string;
   label?: string;
   title?: string;
   placeholder?: string;

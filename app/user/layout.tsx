@@ -3,6 +3,11 @@ import DashboardNavbar from "@/app/_components/DashboardNavbar";
 import ProtectedRoutes from "../_components/UserProtectedRoutes";
 import Navbar from "../_components/Navbar";
 
+export const metadata = {
+  title: "Seamlesss Point",
+  description: "Seamless Point",
+};
+
 export default async function DashboardLayout({
   children,
 }: {

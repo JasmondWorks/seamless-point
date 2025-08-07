@@ -6,6 +6,11 @@ import Username from "@/app/_components/Username";
 import DashboardLayout from "@/app/_components/DashboardLayout";
 import { getUser } from "@/app/_lib/actions";
 
+export const metadata = {
+  title: "Dashboard",
+  description: "Dashboard for Seamless Point",
+};
+
 export default async function Dashboard() {
   const res = await getUser();
   const balance = res?.user.balance ?? 0;

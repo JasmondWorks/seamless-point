@@ -2,14 +2,12 @@
 
 import Badge, { BadgeVariant } from "./Badge";
 import Searchbox from "@/app/_components/Searchbox";
-import { useDeliveriesStore } from "@/app/_stores/deliveriesStore";
 
 import {
   formatCurrency,
   formatDateTime,
   getBadgeStyle,
 } from "@/app/_lib/utils";
-import { EDeliveryStatus } from "@/app/_lib/types";
 import useDeliveries from "@/app/_hooks/deliveries/useDeliveries";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 import Table from "@/app/_components/Table";

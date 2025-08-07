@@ -1,7 +1,8 @@
+import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import { formatCurrency } from "@/app/_lib/utils";
 import { cn } from "@/app/_lib/utils";
 
-export default function BalanceDisplay({ balance = 0 }) {
+export default function BalanceDisplay({ balance = 0, amount = 0 }) {
   return (
     <div
       style={{
@@ -14,6 +15,11 @@ export default function BalanceDisplay({ balance = 0 }) {
       <p className="text-4xl font-bold leading-none whitespace-normal">
         {formatCurrency(balance)}
       </p>
+      {amount !== 0 && amount > balance && (
+        <Badge className="border border-red-200" variant={BadgeVariant.red}>
+          Insufficient balance
+        </Badge>
+      )}
     </div>
   );
 }
