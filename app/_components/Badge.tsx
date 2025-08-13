@@ -28,12 +28,15 @@ export default function Badge({
       className={clsx(
         "inline-flex gap-2 p-2 rounded-lg leading-none whitespace-nowrap text-sm font-semibold",
         {
-          "bg-cyan-100 text-cyan-500": variant === BadgeVariant.blue,
-          "bg-orange-100 text-orange-500": variant === BadgeVariant.orange,
-          "bg-neutral-200 text-neutral-500":
+          "bg-cyan-100 bg-opacity-80 text-brandPry":
+            variant === BadgeVariant.blue,
+          "bg-orange-100 bg-opacity-80 text-brandSec":
+            variant === BadgeVariant.orange,
+          "bg-neutral-200 text-neutral-400":
             variant === BadgeVariant.neutralDark,
-          "bg-red-100 text-red-500": variant === BadgeVariant.red,
-          "bg-green-100 text-green-500": variant === BadgeVariant.green,
+          "bg-red-100 bg-opacity-80 text-red-500": variant === BadgeVariant.red,
+          "bg-green-100 bg-opacity-80 text-green-500":
+            variant === BadgeVariant.green,
           "!rounded-full": isRoundedFull,
         },
         className

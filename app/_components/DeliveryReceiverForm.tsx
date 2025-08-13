@@ -21,6 +21,7 @@ import { getCities, getCountries, getStates } from "@/app/_lib/actions";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import { X } from "lucide-react";
+import { ActivePage } from "@/app/user/deliveries/register/page";
 
 interface State {
   countries: any;
@@ -69,7 +70,7 @@ function reducer(state: State, action: any) {
 export default function DeliveryReceiverForm({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   const receiver = useCreateDeliveryStore(
     (store: newDelivery) => store.receiver

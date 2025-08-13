@@ -16,10 +16,21 @@ import PrivacyPolicyBlock from "@/app/_components/PrivacyPolicyBlock";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 
-import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/app/_components/ui/dialog";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
 
-import { base64ToFile, getNewDeliveryData, uploadFile } from "@/app/_lib/utils";
+import {
+  base64ToFile,
+  cn,
+  formatCurrency,
+  getNewDeliveryData,
+  uploadFile,
+} from "@/app/_lib/utils";
 import {
   arrangeShipmentPickup,
   createDelivery,
@@ -28,7 +39,11 @@ import {
   getUser,
   verifyPayment,
 } from "@/app/_lib/actions";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import {
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 
 import toast from "react-hot-toast";
@@ -36,13 +51,19 @@ import CopyPhoneNumber from "@/app/_components/CopyPhoneNumber";
 import Link from "next/link";
 import BalanceDisplay from "@/app/_components/BalanceDisplay";
 import PaystackButtonWrapper from "@/components/PaystackButtonWrapper";
-import { AlertCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeftIcon,
+  RefreshCcw,
+  RefreshCcwIcon,
+} from "lucide-react";
 import SpinnerFull from "@/app/_components/SpinnerFull";
-import { buttonVariants } from "@/app/_components/ui/button";
 import Card from "@/app/_components/Card";
-import Image from "next/image";
+import Badge, { BadgeVariant } from "@/app/_components/Badge";
+import Spinner from "@/app/_components/Spinner";
+import { FiRefreshCcw } from "react-icons/fi";
 
-type ActivePage =
+export type ActivePage =
   | "delivery-type"
   | "sender"
   | "receiver"
@@ -53,8 +74,6 @@ type ActivePage =
   | "success";
 
 export default function Register() {
-  // const searchParams = useSearchParams();
-
   const [activePage, setActivePage] = useState<ActivePage>(
     // searchParams.get("activePage") ||
     // "delivery-type"
@@ -96,7 +115,7 @@ export default function Register() {
 function DeliveryType({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: any) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   return (
     <div className="space-y-8 max-w-5xl md:px-5">
@@ -122,7 +141,7 @@ function Sender({ onSetActivePage }: { onSetActivePage: (page: any) => void }) {
 function Receiver({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: any) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   return (
     <div className="space-y-8 max-w-5xl md:px-5">
@@ -137,7 +156,7 @@ function Receiver({
 function ParcelInfo({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: any) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   return (
     <div className="space-y-8 max-w-5xl md:px-5">
@@ -152,7 +171,7 @@ function ParcelInfo({
 function SelectRate({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: any) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   return (
     <div className="space-y-8 max-w-5xl md:px-5">
@@ -167,7 +186,7 @@ function SelectRate({
 function PackageDetailsOverview({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: any) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   function onSubmit() {
     onSetActivePage("payment");
@@ -217,7 +236,7 @@ function PackageDetailsOverview({
 function Payment({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: any) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -226,20 +245,23 @@ function Payment({
   const [activeDialog, setActiveDialog] = useState<"submit" | "deposit">(
     "submit"
   );
+  const [isRefreshingBal, setIsRefreshingBal] = useState(false);
   const { balance, email } = user;
   // const amount = 10_021_999;
 
   const {
-    userId,
+    // userId,
     resetDeliveryData,
     replaceState,
-    courierDetails: { amount },
+    courier: { amount },
   } = useCreateDeliveryStore((state) => state);
 
   const state = getNewDeliveryData();
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const [isShowingAccDetails, setIsShowingAccDetails] = useState(false);
   const [amountIsPaid, setAmountIsPaid] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState(100);
+  const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false);
 
   console.log(user);
   async function fetchUser() {
@@ -252,6 +274,14 @@ function Payment({
     setIsLoading(false);
   }
 
+  async function handleRefreshBal() {
+    setIsRefreshingBal(true);
+
+    const res = await getUser();
+    setUser(res.user);
+
+    setIsRefreshingBal(false);
+  }
   useEffect(() => {
     fetchUser();
   }, []);
@@ -315,16 +345,23 @@ function Payment({
       );
     }
 
-    if (!packageImageUrl || !proofOfPurchaseUrl) {
-      // toast.error("Failed to upload files");
-      // return;
-    }
     console.log(state.parcelDetails);
     console.log("package image url", packageImageUrl);
     const pickupAddressId = state.courier.pickup_address;
     const deliveryAddressId = state.courier.delivery_address;
     const parcelId = state.courier.parcel;
     const rateId = state.courier.rate_id;
+
+    console.log(
+      "pickup addr id",
+      pickupAddressId,
+      "delivery addr id",
+      deliveryAddressId,
+      "parcel id",
+      parcelId,
+      "rate id",
+      rateId
+    );
 
     const shipmentRes = await createShipment({
       pickupAddressId,
@@ -336,9 +373,9 @@ function Payment({
     const shipmentId = shipmentRes.data;
 
     console.log("shipment id", shipmentId);
+    console.log("rate id", rateId);
 
     const pickupRes = await arrangeShipmentPickup({ rateId, shipmentId });
-
     console.log("pickup data", pickupRes.data);
 
     if (pickupRes.status === "error") {
@@ -371,19 +408,19 @@ function Payment({
 
     console.log(deliveryPayload);
 
-    replaceState(deliveryPayload);
-    const res = await createDelivery(deliveryPayload);
-    const createdDelivery = res.data;
+    // replaceState(deliveryPayload);
+    // const res = await createDelivery(deliveryPayload);
+    // const createdDelivery = res.data;
 
-    console.log("Created delivery", createdDelivery);
+    // console.log("Created delivery", createdDelivery);
 
-    if (res.status === "error") toast.error(res.message);
-    // console.log(res);
-    if (res.status === "success") {
-      // resetDeliveryData();
-      replaceState(createdDelivery);
-      onSetActivePage("success");
-    }
+    // if (res.status === "error") toast.error(res.message);
+    // // console.log(res);
+    // if (res.status === "success") {
+    //   // resetDeliveryData();
+    //   replaceState(createdDelivery);
+    //   // onSetActivePage("success");
+    // }
 
     setIsSubmitting(false);
   }
@@ -423,32 +460,190 @@ function Payment({
       <h1 className="text-2xl lg:text-3xl leading-tight font-bold text-center">
         Payment
       </h1>
+      <hr />
+      <div className="flex justify-end">
+        <Button
+          onClick={() => onSetActivePage("package-details")}
+          isRoundedLarge
+          variant={ButtonVariant.outline}
+          className="text-sm text-brandSec border-brandSec !h-auto !p-1.5 items-center"
+        >
+          <ArrowLeftIcon size={20} strokeWidth={2} /> Review package details
+        </Button>
+      </div>
       {!isShowingAccDetails && (
         <>
           <form onSubmit={onSubmit} className="flex flex-col gap-y-10">
-            <hr />
-            <div className="grid lg:grid-cols-2 gap-10 gap-y-5">
-              {/* <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]"> */}
-              <div>
-                <BalanceDisplay balance={balance} amount={amount} />
+            <Card className="grid grid-cols-1 md:grid-cols-[auto_auto_1fr] items-center gap-8">
+              <div className="space-y-3 flex flex-col items-center">
+                <p>
+                  <strong>Total Amount</strong>
+                </p>
+                <div>
+                  <Badge
+                    variant={BadgeVariant.orange}
+                    className="!text-3xl font-bold text-opacity-85"
+                  >
+                    {formatCurrency(amount)}
+                  </Badge>
+                </div>
               </div>
-              <div className="space-y-3 bg-white p-5 rounded-lg shadow-lg">
+              <div className="hidden md:block border border-l-[1px] h-full opacity-60"></div>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted font-medium">
+                    Shipping Charge
+                  </span>
+                  <strong>{formatCurrency(amount)}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted font-medium">Insurance</span>
+                  <strong>{formatCurrency(0)}</strong>
+                </div>
+                <hr />
+                <div className="flex justify-between">
+                  <span className="text-muted font-medium">Total</span>
+                  <strong>{formatCurrency(amount)}</strong>
+                </div>
+              </div>
+            </Card>
+            <div className="grid lg:grid-cols-2 gap-8 gap-y-5">
+              {/* <div className="w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px]"> */}
+              <Card className={cn("text-neutral-700 relative !p-0")}>
+                <div
+                  className="p-5 space-y-5"
+                  style={{
+                    background:
+                      "url('/assets/images/naira-illustration.png') no-repeat right center/contain",
+                  }}
+                >
+                  <div className="flex gap-3 items-center">
+                    <h3 className="leading-none text-sm font-medium text-muted">
+                      Balance
+                    </h3>
+                    <button onClick={handleRefreshBal} type="button">
+                      <FiRefreshCcw
+                        strokeWidth="2"
+                        size={30}
+                        className="p-1.5 text-brandSec border border-brandSec rounded-md text-opacity-80"
+                      />
+                    </button>
+                    <Dialog
+                      open={isTopUpDialogOpen}
+                      onOpenChange={setIsTopUpDialogOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          variant={ButtonVariant.fill}
+                          isRoundedLarge
+                          className="!h-auto !p-3 !py-2 text-brandSec border-brandSec text-xs"
+                          disabled={isRefreshingBal}
+                          type="button"
+                        >
+                          {isRefreshingBal ? "Refreshing" : "Top Up"}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="text-left space-y-3">
+                        <DialogHeader>
+                          <DialogTitle asChild>
+                            <h3 className="text-xl font-bold">Amount</h3>
+                          </DialogTitle>
+                          <DialogDescription className="text-opacity-75">
+                            Enter the amount to top up with
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Input
+                          value={topUpAmount}
+                          onChange={(e) =>
+                            setTopUpAmount(Number(e.target.value))
+                          }
+                        />
+                        <DialogFooter>
+                          <Button
+                            onClick={() => {
+                              if (topUpAmount < 100)
+                                toast.error(
+                                  "Top Up amount must be at least " +
+                                    formatCurrency(100)
+                                );
+
+                              setIsTopUpDialogOpen(false);
+
+                              return;
+                            }}
+                            variant={ButtonVariant.fill}
+                            isRoundedLarge
+                            type="button"
+                          >
+                            <PaystackButtonWrapper
+                              onSuccess={async (el) => {
+                                console.log(el);
+
+                                toast.success(
+                                  "Successfully paid " +
+                                    formatCurrency(topUpAmount)
+                                );
+
+                                setIsLoading(true);
+
+                                const res = await createTransaction({
+                                  amount: topUpAmount,
+                                  type: "deposit",
+                                  reference: el.reference,
+                                });
+
+                                if (res.status === "success") {
+                                  toast.success(
+                                    "Successfully deposited " +
+                                      formatCurrency(topUpAmount) +
+                                      " into your wallet"
+                                  );
+                                }
+
+                                fetchUser();
+                                setIsLoading(false);
+                              }}
+                              amount={topUpAmount}
+                              email={email}
+                              text="Top Up"
+                            />
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <div className="flex gap-4 items-center">
+                    <p className="text-xl font-bold leading-none whitespace-normal">
+                      {formatCurrency(balance)}
+                    </p>
+                    {Number(amount) > Number(balance) && (
+                      <Badge
+                        className="border border-red-200 !text-xs italic"
+                        variant={BadgeVariant.red}
+                      >
+                        Insufficient balance
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </Card>
+              <Card className="space-y-3">
                 <p className="font-semibold text-sm">
-                  Want to pay with bank transfer instead?
+                  Want to pay directly with bank transfer instead?
                 </p>
                 <div>
                   <Button
                     onClick={handleShowAccountDetails}
                     variant={ButtonVariant.outline}
-                    className="!text-[var(--clr-brand-sec)] !border-[var(--clr-brand-sec)]"
+                    className="!text-[var(--clr-brand-sec)] !border-[var(--clr-brand-sec)] !text-sm !h-auto !p-2"
                   >
                     Pay with bank transfer
                   </Button>
                 </div>
-              </div>
+              </Card>
             </div>
             <hr />
-            <div className="flex flex-col gap-3">
+            {/* <div className="flex flex-col gap-3">
               <Label htmlFor="withdrawAmount">Amount to be paid</Label>
               <Input
                 disabled={true}
@@ -461,7 +656,7 @@ function Payment({
               <p className="text-sm text-muted">
                 This amount will be deducted from your balance
               </p>
-            </div>
+            </div> */}
             <PrivacyPolicyBlock />
             <div className="flex gap-4 justify-end">
               <Button
@@ -471,7 +666,18 @@ function Payment({
                 text="Previous"
                 isRoundedLarge
               />
-              {Number(balance) < Number(amount) ? (
+              <Button
+                disabled={isSubmitting || Number(balance) < Number(amount)}
+                isLoading={isSubmitting}
+                type="submit"
+                variant={ButtonVariant.fill}
+                className="!text-white !bg-brandSec"
+                isRoundedLarge
+              >
+                {!isSubmitting && "Finish creating shipment"}
+                {isSubmitting && "Arranging shipment"}
+              </Button>
+              {/* {Number(balance) < Number(amount) ? (
                 <Button
                   type="button"
                   onClick={handleDepositDialog}
@@ -484,7 +690,7 @@ function Payment({
                 </Button>
               ) : (
                 <Button
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || Number(balance) < Number(amount)}
                   isLoading={isSubmitting}
                   type="submit"
                   variant={ButtonVariant.fill}
@@ -494,7 +700,7 @@ function Payment({
                   {!isSubmitting && "Finish creating shipment"}
                   {isSubmitting && "Arranging shipment"}
                 </Button>
-              )}
+              )} */}
             </div>
           </form>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -524,7 +730,7 @@ function Payment({
                     />
                   </div>
                   <Button
-                    onClick={() => setIsDialogOpen(false)}
+                    // onClick={() => setIsDialogOpen(false)}
                     type="button"
                     variant={ButtonVariant.fill}
                     className="!text-white flex items-center w-full"

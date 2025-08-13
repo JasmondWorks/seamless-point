@@ -17,11 +17,12 @@ import { useForm } from "react-hook-form";
 import { base64ToFile, fileToBase64 } from "@/app/_lib/utils";
 import toast from "react-hot-toast";
 import Button, { ButtonVariant } from "@/app/_components/Button";
+import { ActivePage } from "@/app/user/deliveries/register/page";
 
 export default function ParcelInfoForm({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   const [selectedParcelItem, setSelectedParcelItem] = useState<any>(null);
 
@@ -32,28 +33,6 @@ export default function ParcelInfoForm({
   const [parcelItems, setParcelItems] = useState<any[]>(
     parcelDetails?.parcelItems || []
   );
-
-  
-
-  // const biggestLength = parcelItems.reduce(
-  //   (biggest, item) =>
-  //     item.length > biggest ? (biggest = item.length) : biggest,
-  //   parcelItems[0]?.length
-  // );
-  // const biggestWidth = parcelItems.reduce(
-  //   (biggest, item) =>
-  //     item.width > biggest ? (biggest = item.width) : biggest,
-  //   parcelItems[0]?.width
-  // );
-  // const biggestHeight = parcelItems.reduce(
-  //   (biggest, item) =>
-  //     item.height > biggest ? (biggest = item.height) : biggest,
-  //   parcelItems[0]?.height
-  // );
-
-  // 
-  // 
-  // 
 
   const form = useForm<z.infer<typeof parcelInfoSchema>>({
     resolver: zodResolver(parcelInfoSchema),
@@ -73,7 +52,7 @@ export default function ParcelInfoForm({
         : undefined,
     },
   });
-  // const addParcelFile = useCreateDeliveryStore((store) => store.addParcelFile);
+
   const addParcelDetails = useCreateDeliveryStore(
     (store) => store.addParcelDetails
   );
@@ -112,7 +91,6 @@ export default function ParcelInfoForm({
   }
 
   async function onSubmit(data: z.infer<typeof parcelInfoSchema>) {
-    
     if (!parcelItems.length)
       return toast.error("Please add at least one parcel item");
 

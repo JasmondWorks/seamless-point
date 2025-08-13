@@ -9,21 +9,6 @@ export default function PackageDetails({
   courierDetails,
   onSetActivePage,
 }: any) {
-  const biggestLength = parcel!.parcelItems.reduce(
-    (biggest: number, item: any) =>
-      item.length > biggest ? (biggest = item.length) : biggest,
-    parcel!.parcelItems[0].length
-  );
-  const biggestWidth = parcel!.parcelItems.reduce(
-    (biggest: number, item: any) =>
-      item.width > biggest ? (biggest = item.width) : biggest,
-    parcel!.parcelItems[0].width
-  );
-  const biggestHeight = parcel!.parcelItems.reduce(
-    (biggest: number, item: any) =>
-      item.height > biggest ? (biggest = item.height) : biggest,
-    parcel!.parcelItems[0].height
-  );
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between gap-8">
@@ -171,7 +156,7 @@ export default function PackageDetails({
               Not approved yet
             </p>
           </div>
-          <div>
+          {/* <div>
             <p className="font-medium mb-1">Length</p>
             <p className="text-muted">{biggestLength}cm</p>
           </div>
@@ -182,7 +167,7 @@ export default function PackageDetails({
           <div>
             <p className="font-medium mb-1">Height</p>
             <p className="text-muted">{biggestHeight}cm</p>
-          </div>
+          </div> */}
           <div>
             <p className="font-medium mb-1">Quantity</p>
             <p className="text-muted">

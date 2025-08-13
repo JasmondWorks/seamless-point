@@ -7,7 +7,7 @@ export default function Spinner({
 }: {
   className?: string;
   size?: "small" | "medium" | "large";
-  color?: string;
+  color?: "text" | "orange";
 }) {
   const base = "loader border-b-transparent";
   const sizes: any = {
