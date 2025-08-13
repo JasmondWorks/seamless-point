@@ -17,10 +17,7 @@ export default async function DashboardLayout({
 }) {
   return (
     <ProtectedRoutes>
-      <div
-        style={{ display: "grid", gridTemplateRows: "auto 1fr" }}
-        className="h-dvh w-screen"
-      >
+      <div className="h-dvh w-screen">
         <Navbar />
         <div className="bg-neutral-50 flex-1 overflow-hidden flex relative">
           <DashboardNavbar />

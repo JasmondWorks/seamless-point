@@ -76,8 +76,8 @@ export type ActivePage =
 export default function Register() {
   const [activePage, setActivePage] = useState<ActivePage>(
     // searchParams.get("activePage") ||
-    // "delivery-type"
-    "payment"
+    "delivery-type"
+    // "payment"
   );
 
   function handleSetActivePage(page: ActivePage) {
