@@ -22,7 +22,6 @@ import Password from "./InputFields/Password";
 import DatePicker from "./InputFields/DatePicker";
 import FileInput from "./InputFields/FileInput";
 import SelectBox from "@/app/_components/SelectBox";
-import { StoredFile } from "@/app/_lib/types";
 import Spinner from "@/app/_components/Spinner";
 import AsyncSearchableSelect from "@/app/_components/AsyncSearchableSelect";
 
@@ -61,7 +60,7 @@ interface CustomProps {
   selectMessage?: string;
   selectValue?: string;
   onChange?: (value: string) => void;
-  selectedFile?: StoredFile;
+  selectedFile?: any;
   accept?: string;
   isLoading?: boolean;
   country?: string;
@@ -187,8 +186,6 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
 
 const CustomFormField = (props: CustomProps) => {
   const { control, name, label, className, isLoading } = props;
-
-  if (name === "phoneNumber") console.log(props.country);
 
   return (
     <FormField

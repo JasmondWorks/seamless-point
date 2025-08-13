@@ -36,7 +36,6 @@ export const useCreateDeliveryStore = create(
       parcelDetails: null,
       courier: null,
       courierDetails: null,
-      step: 1, // Initial step (sender form)
       userId: getUserId(),
 
       replaceState: (newState: any) => set(() => ({ ...newState })),
@@ -50,7 +49,6 @@ export const useCreateDeliveryStore = create(
           parcelDetails: null, // Reset to an empty collection
           courier: null,
           courierDetails: null,
-          step: 1, // Reset to step 1
         });
       },
 
@@ -69,14 +67,6 @@ export const useCreateDeliveryStore = create(
         set((state: newDelivery) => ({
           parcelDetails: { ...state.parcelDetails, ...parcelDetails },
         })),
-
-      // Step navigation
-      goToNextStep: () =>
-        set((state: newDelivery) => ({ step: state.step + 1 })),
-      goToPreviousStep: () =>
-        set((state: newDelivery) => ({ step: state.step - 1 })),
-      setStep: (step: number) => set({ step }),
-
       // User ID check
       checkUserId: () => {
         set((state) => ({
@@ -93,7 +83,6 @@ export const useCreateDeliveryStore = create(
         receiver: state.receiver,
         parcelDetails: state.parcelDetails,
         courier: state.courier,
-        step: state.step,
         courierDetails: state.courierDetails,
       }),
       onRehydrateStorage: () => (state) => {

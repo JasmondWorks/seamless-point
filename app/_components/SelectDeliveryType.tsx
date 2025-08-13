@@ -1,25 +1,34 @@
 import { DeliveryType } from "@/app/_lib/types";
+import { getUserId } from "@/app/_lib/utils";
 import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
+import { ActivePage } from "@/app/user/deliveries/register/page";
 import React, { useEffect } from "react";
 
 export default function SelectDeliveryType({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   const onSelectDeliveryType = useCreateDeliveryStore(
     (state) => state.onSelectDeliveryType
   );
-  const goToNextStep = useCreateDeliveryStore((state) => state.goToNextStep);
-  const userId = useCreateDeliveryStore((state) => state.userId);
-  
+  const resetDeliveryType = useCreateDeliveryStore(
+    (state) => state.resetDeliveryData
+  );
 
-  const setStep = useCreateDeliveryStore((state) => state.setStep);
-  useEffect(() => setStep(1), []);
+  const storedUserId = useCreateDeliveryStore((state) => state.userId);
+  console.log(storedUserId);
+
+  const userId = getUserId();
+
+  console.log("stored id", storedUserId, "user id", userId);
+
+  useEffect(() => {
+    // if (storedUserId !== userId) resetDeliveryType();
+  }, []);
 
   function handleSetDeliveryType(type: DeliveryType) {
     onSelectDeliveryType(type);
-    goToNextStep();
     onSetActivePage("sender");
   }
 

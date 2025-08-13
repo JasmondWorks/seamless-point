@@ -10,7 +10,6 @@ export const copyToClipboard = (text: string) => {
   navigator.clipboard
     .writeText(text)
     .then(() => {
-      
       toast.success(`${text} copied to clipboard`);
     })
     .catch((err) => {
@@ -72,12 +71,12 @@ export function formatCurrency(
     maximumFractionDigits = 2,
   } = options;
 
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency,
     minimumFractionDigits,
     maximumFractionDigits,
-    // Removed compact settings to avoid rounding
+    currencyDisplay: "symbol", // Use symbol (e.g., ₦) instead of code (NGN)
   }).format(amount);
 }
 
@@ -242,12 +241,6 @@ export function getParcelDetails(packageData: any) {
   };
 }
 
-
-
-
-
-
-
 export function getParcelTotalAmount(parcelDetails: any) {
   return parcelDetails?.parcelItems.reduce(
     (acc: number, item: Parcel) => acc + (item?.value * item?.quantity || 0),
@@ -289,7 +282,6 @@ export async function uploadFile(
   fileClassification: string = "profile_image", // default fallback
   uniqueName: boolean = false // force same name for overwrite
 ): Promise<string | null> {
-  
   try {
     const folder = getUserId();
 

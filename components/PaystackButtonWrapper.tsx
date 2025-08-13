@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamically import PaystackButton only on the client
@@ -17,7 +17,7 @@ const PaystackButtonWrapper = ({
   onClose,
   channels = ["card"],
 }: {
-  text?: "";
+  text?: string | ReactNode;
   amount: number;
   email: string;
   onSuccess?: (reference: any) => void;
@@ -39,12 +39,7 @@ const PaystackButtonWrapper = ({
     onClose,
   };
 
-  return (
-    <PaystackButton
-      {...componentProps}
-      className="bg-brand text-white px-4 py-2 rounded w-full"
-    />
-  );
+  return <PaystackButton {...componentProps} />;
 };
 
 export default PaystackButtonWrapper;

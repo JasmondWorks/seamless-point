@@ -99,7 +99,6 @@ export interface newDelivery {
   courier: any;
   courierDetails: any;
   userId: string;
-  step: number; // Keep track of the current form step
   onSelectDeliveryType: (type: DeliveryType) => void;
   onSelectCourier: (courier: Dispatch | null) => void;
   onSetCourierDetails: (courier: any) => void;
@@ -108,9 +107,6 @@ export interface newDelivery {
   addParcelDetails: (parcelDetails: ParcelDetails) => void;
   resetDeliveryData: () => void;
   replaceState: (newState: any) => void;
-  goToNextStep: () => void;
-  goToPreviousStep: () => void;
-  setStep: (step: number) => void;
 }
 export enum EPackagingType {
   BOX = "Box",

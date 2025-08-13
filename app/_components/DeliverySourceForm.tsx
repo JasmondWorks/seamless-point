@@ -18,6 +18,7 @@ import { cn } from "@/app/_lib/utils";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import { X } from "lucide-react";
+import { ActivePage } from "@/app/user/deliveries/register/page";
 
 interface State {
   countries: any;
@@ -66,7 +67,7 @@ function reducer(state: State, action: any) {
 export default function DeliverySourceForm({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   const sender = useCreateDeliveryStore((store) => store.sender);
   const updateSender = useCreateDeliveryStore((state) => state.updateSender);
@@ -155,10 +156,8 @@ export default function DeliverySourceForm({
     if (!state) return;
 
     dispatch({ type: "cities/loading" });
-    console.log("Fetch start");
     const res = await getCities(countryCode, state.isoCode);
 
-    console.log("Cities", res.data);
     if (res.status === "success") {
       dispatch({ type: "cities/fetched", payload: res.data });
 
@@ -174,7 +173,6 @@ export default function DeliverySourceForm({
       else setValue("city", "");
     }
   }
-  console.log(selectedCountry);
 
   // Form submission
   async function onSubmit(data: z.infer<typeof deliverySourceSchema>) {

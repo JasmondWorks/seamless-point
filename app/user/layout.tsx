@@ -2,9 +2,11 @@ import Image from "next/image";
 import DashboardNavbar from "@/app/_components/DashboardNavbar";
 import ProtectedRoutes from "../_components/UserProtectedRoutes";
 import Navbar from "../_components/Navbar";
+import React, { ReactNode, useRef } from "react";
+import ScrollWrapper from "@/app/_components/ScrollWrapper";
 
 export const metadata = {
-  title: "Seamlesss Point",
+  title: "Seamless Point",
   description: "Seamless Point",
 };
 

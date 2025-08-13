@@ -1,5 +1,6 @@
 "use client";
 
+import Button, { ButtonVariant } from "@/app/_components/Button";
 import ButtonFormSubmit from "@/app/_components/ButtonFormSubmit";
 import ConfirmDialogContent from "@/app/_components/ConfirmDialogContent";
 import CustomFormField, {
@@ -21,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 
 enum EDialogContent {
@@ -140,7 +142,7 @@ function DocumentParcelForm({
   const form = useForm<z.infer<typeof parcelDocumentSchema>>({
     resolver: zodResolver(parcelDocumentSchema),
     defaultValues: selectedParcelItem || {
-      itemDescription: "",
+      description: "",
       weight: "",
       quantity: "",
     },
@@ -194,29 +196,6 @@ function DocumentParcelForm({
             fieldType={FormFieldType.NUMBER}
             placeholder="1"
           />
-          <div className="grid sm:grid-cols-3 gap-5 col-span-2">
-            <CustomFormField
-              label="Length (cm)"
-              name="length"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5cm"
-            />
-            <CustomFormField
-              label="Width (cm)"
-              name="width"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5cm"
-            />
-            <CustomFormField
-              label="Height (cm)"
-              name="height"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="E.g 5cm"
-            />
-          </div>
         </div>
         <ButtonFormSubmit text="Continue" />
       </form>
@@ -247,37 +226,15 @@ function ItemParcelForm({
 }: ItemParcelFormProps) {
   const form = useForm<z.infer<typeof parcelItemSchema>>({
     resolver: zodResolver(parcelItemSchema),
-    defaultValues: selectedParcelItem
-      ? {
-          description: selectedParcelItem.description || "",
-          category: selectedParcelItem.category || "",
-          subCategory: selectedParcelItem.subCategory || "",
-          hsCode: selectedParcelItem.hsCode || "",
-          weight: selectedParcelItem.weight || "",
-          quantity: selectedParcelItem.quantity || "",
-          value: selectedParcelItem.value || "",
-          length: selectedParcelItem.length || "",
-          width: selectedParcelItem.width || "",
-          height: selectedParcelItem.height || "",
-        }
-      : {
-          description: "",
-          category: "",
-          subCategory: "",
-          hsCode: "",
-          weight: "",
-          quantity: "",
-          value: "",
-          length: "",
-          width: "",
-          height: "",
-        },
+    defaultValues: selectedParcelItem,
   });
+  const { setValue } = form;
 
   console.log(selectedParcelItem);
 
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesError, setCategoriesError] = useState("");
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [hsCodes, setHsCodes] = useState<{ label: string; hsCode: string }[]>(
     []
@@ -294,27 +251,32 @@ function ItemParcelForm({
   });
 
   // Fetch categories on mount
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        setIsLoadingCategories(true);
-        const res = await getCategories();
-        if (res.status === "success" && res.data?.data?.categories) {
-          setCategories(res.data.data.categories);
-        } else {
-          console.error("Failed to fetch categories:", res);
-          setCategories([]);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        setCategories([]);
-      } finally {
-        setIsLoadingCategories(false);
-      }
+  async function fetchCategories() {
+    setIsLoadingCategories(true);
+
+    const res = await getCategories();
+
+    if (res.status === "success" && res.data?.data?.categories) {
+      setCategories(res.data.data.categories);
+      setCategoriesError("");
+    } else {
+      toast.error("Failed to fetch categories:", res.message);
+      setCategoriesError(res.message);
+      setCategories([]);
     }
 
+    setIsLoadingCategories(false);
+  }
+  useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (selectedParcelItem) {
+      setValue("subCategory", selectedParcelItem.subCategory || "");
+      setValue("hsCode", selectedParcelItem.hsCode || "");
+    }
+  }, [categories, selectedParcelItem]);
 
   // Update form when selectedParcelItem changes
   useEffect(() => {
@@ -327,9 +289,6 @@ function ItemParcelForm({
         weight: selectedParcelItem.weight || "",
         quantity: selectedParcelItem.quantity || "",
         value: selectedParcelItem.value || "",
-        length: selectedParcelItem.length || "",
-        width: selectedParcelItem.width || "",
-        height: selectedParcelItem.height || "",
       });
     }
   }, [selectedParcelItem, form]);
@@ -414,7 +373,7 @@ function ItemParcelForm({
     const itemDetails = {
       ...data,
       type: "item",
-      name: data.itemDescription,
+      name: data.description,
       id: selectedParcelItem ? selectedParcelItem.id : crypto.randomUUID(),
     };
 
@@ -437,6 +396,17 @@ function ItemParcelForm({
 
   return (
     <Form {...form}>
+      {categoriesError && !isLoadingCategories && (
+        <div className="flex">
+          <Button
+            onClick={fetchCategories}
+            variant={ButtonVariant.outline}
+            className="!h-auto !p-2 text-brandSec border-brandSec text-sm"
+          >
+            Refetch categories
+          </Button>
+        </div>
+      )}
       <form onSubmit={handleNestedFormSubmit} className="space-y-5">
         <div className="grid sm:grid-cols-2 gap-5 gap-y-3">
           <CustomFormField
@@ -499,29 +469,6 @@ function ItemParcelForm({
               control={form.control}
               fieldType={FormFieldType.INPUT}
               placeholder="E.g., N5000"
-            />
-          </div>
-          <div className="grid sm:grid-cols-3 gap-5 col-span-2">
-            <CustomFormField
-              label="Length (cm)"
-              name="length"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="E.g., 5cm"
-            />
-            <CustomFormField
-              label="Width (cm)"
-              name="width"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="E.g., 5cm"
-            />
-            <CustomFormField
-              label="Height (cm)"
-              name="height"
-              control={form.control}
-              fieldType={FormFieldType.INPUT}
-              placeholder="E.g., 5cm"
             />
           </div>
         </div>

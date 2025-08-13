@@ -299,7 +299,16 @@ export const parcelItemSchema = z.object({
       required_error: "Please provide an item description",
     })
     .trim()
-    .min(3, "Description must be a minimum of 3 characters"),
+    .min(1, "Description cannot be empty")
+    .refine(
+      (value) => {
+        const wordCount = value.split(/\s+/).filter(Boolean).length;
+        return wordCount >= 3;
+      },
+      {
+        message: "Description must contain at least 3 words",
+      }
+    ),
   category: z
     .string({
       required_error: "Please provide an item category",
@@ -349,9 +358,6 @@ export const parcelItemSchema = z.object({
       .int("Value must be an integer")
       .min(1, "Value must be at least 1")
   ),
-  length: z.coerce.number().positive("Length must be at least 1cm"),
-  width: z.coerce.number().positive("Width must be at least 1cm"),
-  height: z.coerce.number().positive("Height must be at least 1cm"),
 });
 export const parcelDocumentSchema = z.object({
   description: z
@@ -371,36 +377,6 @@ export const parcelDocumentSchema = z.object({
       .min(0, "Weight must be at least 0")
   ),
   quantity: z.coerce.number().positive("Weight must be at least 1"),
-  length: z.preprocess(
-    (val) => {
-      if (typeof val === "string" && val.trim() === "") return undefined; // Default to 1 for empty string
-      if (!isNaN(Number(val))) return Number(val); // Convert valid number-like strings to numbers
-      return val; // Pass invalid values to Zod for validation
-    },
-    z
-      .number({ invalid_type_error: "Must be a number" }) // Custom message for invalid numbers
-      .min(0, "Length must be above 0")
-  ),
-  width: z.preprocess(
-    (val) => {
-      if (typeof val === "string" && val.trim() === "") return undefined; // Default to 1 for empty string
-      if (!isNaN(Number(val))) return Number(val); // Convert valid number-like strings to numbers
-      return val; // Pass invalid values to Zod for validation
-    },
-    z
-      .number({ invalid_type_error: "Must be a number" }) // Custom message for invalid numbers
-      .min(0, "Width must be above 0")
-  ),
-  height: z.preprocess(
-    (val) => {
-      if (typeof val === "string" && val.trim() === "") return undefined; // Default to 1 for empty string
-      if (!isNaN(Number(val))) return Number(val); // Convert valid number-like strings to numbers
-      return val; // Pass invalid values to Zod for validation
-    },
-    z
-      .number({ invalid_type_error: "Must be a number" }) // Custom message for invalid numbers
-      .min(0, "Height must be above 0")
-  ),
 });
 
 const createFileSchema = (maxFileSize: number, allowedMimeTypes: string[]) =>

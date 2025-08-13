@@ -12,7 +12,7 @@ import { useCreateDeliveryStore } from "@/app/_stores/createDeliveryStore";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { getRates } from "@/app/_lib/actions";
+import { createAddress, getRates } from "@/app/_lib/actions";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 import { showToast } from "@/app/_lib/toast";
 import { formatCurrency } from "@/app/_lib/utils";
@@ -21,11 +21,13 @@ import { Select } from "@/app/_components/ui/select";
 import CustomFormField, {
   FormFieldType,
 } from "@/app/_components/CustomFormField";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { ActivePage } from "@/app/user/deliveries/register/page";
 
 const RatesList = ({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) => {
   const [couriers, setCouriers] = useState([]);
 
@@ -63,26 +65,8 @@ const RatesList = ({
     );
   else if (sortBy === "clear") filteredCouriers = couriers;
 
-  console.log(couriers);
-
   useEffect(() => {
     fetchRates();
-
-    // showToast("Amount may change from time to time", "info");
-
-    // if (sortBy === "+price")
-    //   filteredCouriers = couriers?.sort(
-    //     (a: any, b: any) => a.amount - b.amount
-    //   );
-    // else if (sortBy === "-price")
-    //   filteredCouriers = couriers?.sort(
-    //     (a: any, b: any) => b.amount - a.amount
-    //   );
-    // else if (sortBy === "fastest")
-    //   filteredCouriers = couriers?.sort(
-    //     (a: any, b: any) => a.delivery_eta - b.delivery_eta
-    //   );
-    // else if (sortBy === "clear") filteredCouriers = couriers;
   }, []);
   useEffect(() => {
     const foundCourier =
@@ -119,43 +103,17 @@ const RatesList = ({
       last_name: receiver!.toLastName,
     };
 
-    const biggestLength = parcelDetails!.parcelItems.reduce(
-      (biggest, item) =>
-        item.length > biggest ? (biggest = item.length) : biggest,
-      parcelDetails!.parcelItems[0].length
-    );
-    const biggestWidth = parcelDetails!.parcelItems.reduce(
-      (biggest, item) =>
-        item.width > biggest ? (biggest = item.width) : biggest,
-      parcelDetails!.parcelItems[0].width
-    );
-    const biggestHeight = parcelDetails!.parcelItems.reduce(
-      (biggest, item) =>
-        item.height > biggest ? (biggest = item.height) : biggest,
-      parcelDetails!.parcelItems[0].height
-    );
+    console.log(parcelDetails);
 
-    const packagingDetails = {
-      length: biggestLength,
-      width: biggestWidth,
-      height: biggestHeight,
-      name: parcelDetails?.packagingType,
-      type: parcelDetails?.packagingType.toLowerCase(),
-      weight: 0.25,
-      size_unit: "cm",
-      weight_unit: "kg",
-    };
     const parcel = {
       description: parcelDetails!.parcelItems
         .map((parcel) => parcel.description)
         .join(", "),
       items: parcelDetails!.parcelItems.map((item) => ({
-        description: item.description,
+        ...item,
         name: item.description,
-        weight: item.weight,
         currency: parcelDetails!.currency,
-        quantity: item.quantity,
-        value: 2000,
+        // value: 2000,
       })),
       weight_unit: "kg",
     };
@@ -166,7 +124,6 @@ const RatesList = ({
     const res = await getRates({
       pickupAddress,
       deliveryAddress,
-      packagingDetails,
       parcel,
       currency,
     });
@@ -178,8 +135,6 @@ const RatesList = ({
     }
     setCouriers(res.data);
   }
-
-  console.log(selectedCourier);
 
   function handleSelectCourier(courier: any) {
     setSelectedCourier(courier);
@@ -208,34 +163,36 @@ const RatesList = ({
       {error && (
         <div className="flex flex-col items-center gap-3">
           <h3 className="text-xl font-bold">{error}</h3>
-          <Button2
-            variant="outline"
-            className="border border-brandSec font-bold"
+          <Button
+            variant={ButtonVariant.outline}
+            className="border border-brandSec text-brandSec !p-2 !h-auto font-bold text-sm"
             onClick={fetchRates}
           >
             Get rates
-          </Button2>
+          </Button>
         </div>
       )}
-      <div className="flex justify-end gap-5">
-        <Button
-          isRoundedLarge
-          onClick={fetchRates}
-          variant={ButtonVariant.fill}
-          className="flex items-center gap-2 text-sm"
-        >
-          Refresh <RefreshCcw strokeWidth={3} size={21} />
-        </Button>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="font-[inherit] text-[inherit] border rounded-lg text-sm"
-        >
-          <option value="-price">Sort by: Highest Price</option>
-          <option value="+price">Sort by: Lowest Price</option>
-          <option value="fastest">Sort by: Fastest</option>
-        </select>
-      </div>
+      {!error && (
+        <div className="flex justify-end gap-5">
+          <Button
+            isRoundedLarge
+            onClick={fetchRates}
+            variant={ButtonVariant.fill}
+            className="flex items-center gap-2 text-sm"
+          >
+            Refresh <RefreshCcw strokeWidth={3} size={21} />
+          </Button>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="font-[inherit] text-[inherit] border rounded-lg text-sm"
+          >
+            <option value="-price">Sort by: Highest Price</option>
+            <option value="+price">Sort by: Lowest Price</option>
+            <option value="fastest">Sort by: Fastest</option>
+          </select>
+        </div>
+      )}
       <div className="space-y-5">
         {!isLoading &&
           filteredCouriers?.length === 0 &&
@@ -272,6 +229,7 @@ const RatesList = ({
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
+          <DialogDescription></DialogDescription>
           <div className="space-y-10">
             <DialogTitle>
               <div className="flex items-center gap-5">

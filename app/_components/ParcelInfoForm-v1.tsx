@@ -21,7 +21,7 @@ import Button, { ButtonVariant } from "@/app/_components/Button";
 export default function ParcelInfoForm({
   onSetActivePage,
 }: {
-  onSetActivePage: (page: string) => void;
+  onSetActivePage: (page: ActivePage) => void;
 }) {
   const [selectedParcelItem, setSelectedParcelItem] = useState<any>(null);
 
