@@ -17,7 +17,7 @@ export default async function DashboardLayout({
 }) {
   return (
     <ProtectedRoutes>
-      <div className="h-dvh w-screen">
+      <div className="h-dvh w-screen grid grid-rows-[auto_1fr]">
         <Navbar />
         <div className="bg-neutral-50 flex-1 overflow-hidden flex relative">
           <DashboardNavbar />
