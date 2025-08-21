@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamically import PaystackButton only on the client

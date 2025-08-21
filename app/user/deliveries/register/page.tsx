@@ -263,6 +263,10 @@ function Payment({
   const [topUpAmount, setTopUpAmount] = useState(100);
   const [isTopUpDialogOpen, setIsTopUpDialogOpen] = useState(false);
 
+  useEffect(() => {
+    setTopUpAmount(100);
+  }, [isTopUpDialogOpen]);
+
   console.log(user);
   async function fetchUser() {
     setIsLoading(true);
@@ -408,19 +412,20 @@ function Payment({
 
     console.log(deliveryPayload);
 
-    // replaceState(deliveryPayload);
-    // const res = await createDelivery(deliveryPayload);
-    // const createdDelivery = res.data;
+    replaceState(deliveryPayload);
+    const res = await createDelivery(deliveryPayload);
+    const createdDelivery = res.data;
 
-    // console.log("Created delivery", createdDelivery);
+    console.log("Created delivery", createdDelivery);
 
-    // if (res.status === "error") toast.error(res.message);
-    // // console.log(res);
-    // if (res.status === "success") {
-    //   // resetDeliveryData();
-    //   replaceState(createdDelivery);
-    //   // onSetActivePage("success");
-    // }
+    if (res.status === "error") toast.error(res.message);
+    // console.log(res);
+    if (res.status === "success") {
+      toast.success("Shipment created successfully!");
+
+      replaceState(createdDelivery);
+      onSetActivePage("success");
+    }
 
     setIsSubmitting(false);
   }
@@ -561,23 +566,28 @@ function Payment({
                         <DialogFooter>
                           <Button
                             onClick={() => {
-                              if (topUpAmount < 100)
+                              console.log(
+                                "initiating...",
+                                "top up amount",
+                                topUpAmount
+                              );
+                              if (topUpAmount < 100) {
                                 toast.error(
                                   "Top Up amount must be at least " +
                                     formatCurrency(100)
                                 );
-
-                              setIsTopUpDialogOpen(false);
-
-                              return;
+                                return;
+                              }
                             }}
                             variant={ButtonVariant.fill}
                             isRoundedLarge
-                            type="button"
+                            type="submit"
                           >
                             <PaystackButtonWrapper
                               onSuccess={async (el) => {
                                 console.log(el);
+
+                                setIsTopUpDialogOpen(false);
 
                                 toast.success(
                                   "Successfully paid " +
@@ -816,14 +826,13 @@ function Success() {
     (store) => store.resetDeliveryData
   );
   const state = getNewDeliveryData();
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [trackingUrl, setTrackingUrl] = useState("");
+
+  const trackingNumber = state?.courierDetails.trackingNumber;
+  const trackingUrl = state?.courierDetails.trackingUrl;
 
   console.log("state", state);
 
   useEffect(() => {
-    setTrackingNumber(state.courierDetails.trackingNumber);
-    setTrackingUrl(state.courierDetails.trackingUrl);
     resetDeliveryData();
   }, []);
 
