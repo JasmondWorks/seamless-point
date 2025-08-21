@@ -22,7 +22,7 @@ export default function Searchbox({
       <Input
         onChange={onChange}
         value={value}
-        className="w-full pl-12 min-h-11 rounded-xl"
+        className="w-full pl-12 min-h-11 rounded-lg"
         type="search"
         placeholder={placeholder}
       />

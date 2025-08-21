@@ -4,6 +4,7 @@ import Badge, { BadgeVariant } from "./Badge";
 import Searchbox from "@/app/_components/Searchbox";
 
 import {
+  copyToClipboard,
   formatCurrency,
   formatDateTime,
   getBadgeStyle,
@@ -21,11 +22,14 @@ import {
 } from "@/app/_components/ui/dialog"; // Adjust import
 import ConfirmDialogContent from "@/app/_components/ConfirmDialogContent";
 import SuccessDialogContent from "@/app/_components/SuccessDialogContent";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { Trash2Icon } from "lucide-react";
 import useCancelDelivery from "@/app/_hooks/deliveries/useCancelDelivery";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { IoCopyOutline } from "react-icons/io5";
+
+const columns = "30px 250px 250px 150px 150px 150px 150px";
 
 export function DeliveriesTable({
   page,
@@ -86,8 +90,52 @@ export function DeliveriesTable({
     );
 
   const formattedDeliveries = deliveriesResponse.data.delivery.map(
-    (d: any) => ({ ...d, link: d.courierDetails.trackingNumber })
+    (d: any) => ({
+      ...d,
+      href: `/user/deliveries/${d.courierDetails.trackingNumber}`,
+    })
   );
+  // formattedDeliveries.push({
+  //   ...formattedDeliveries.at(-1),
+  //   status: "success",
+  // });
+
+  function filterDeliveries(
+    formattedDeliveries: any[],
+    searchQuery: string | undefined,
+    selectedTags: string[] | undefined
+  ) {
+    if (!searchQuery && (!selectedTags || selectedTags.length === 0)) {
+      return formattedDeliveries;
+    }
+
+    return formattedDeliveries.filter((item: any) => {
+      const matchesSearch = !searchQuery
+        ? true
+        : Object.values(item).some((value) =>
+            String(value).toLowerCase().includes(searchQuery.toLowerCase())
+          );
+
+      const matchesTags =
+        !selectedTags || selectedTags.length === 0
+          ? true
+          : selectedTags.some((tag) =>
+              tag === "cancelled/failed"
+                ? item.status === "cancelled" || item.status === "failed"
+                : item.status.toLowerCase() === tag.toLowerCase()
+            );
+
+      return matchesSearch && matchesTags;
+    });
+  }
+
+  const filteredItems = filterDeliveries(
+    formattedDeliveries,
+    searchQuery,
+    selectedTags
+  );
+
+  console.log(formattedDeliveries);
 
   return (
     <div className="bg-white p-5 rounded-xl">
@@ -117,8 +165,9 @@ export function DeliveriesTable({
         </div>
       </div>
       <Table
-        columns="30px 250px 220px 100px 120px 120px 130px"
-        data={formattedDeliveries}
+        hasLinkedRows
+        columns={columns}
+        data={filteredItems}
         renderHead={() => (
           <>
             <div className="flex items-center">
@@ -172,7 +221,6 @@ function DeliveryRow({
   const [activeDialog, setActiveDialog] = useState<
     "confirmCancelDelivery" | "successCancelDelivery"
   >("confirmCancelDelivery");
-  const pathname = usePathname();
 
   // const { cancelDelivery, isLoading } = useCancelDelivery(trackingNumber);
 
@@ -181,19 +229,13 @@ function DeliveryRow({
     setActiveDialog("successCancelDelivery");
   }
   return (
-    <Link
-      href={`${pathname}/${trackingNumber}`}
-      style={{
-        display: "grid",
-        gridTemplateColumns: "30px 250px 220px 100px 120px 120px 130px",
-      }}
-    >
-      <div>
+    <>
+      <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
         <input
-          className="scale-150 origin-left mr-4"
+          className="scale-150 origin-left mr-3"
           type="checkbox"
           checked={isSelected}
-          onChange={() => setIsSelected((cur) => !cur)}
+          onChange={(e) => setIsSelected((cur) => !cur)}
         />
 
         {isSelected && (
@@ -225,10 +267,17 @@ function DeliveryRow({
         </Badge>
       </div>
 
-      <div className="flex items-center gap-2">
-        <CopyToClipboard text={`Invoice ${trackingNumber}`} />
+      <button
+        className="flex items-center gap-2 relative z-10"
+        onClick={(e) => {
+          e.stopPropagation();
+          copyToClipboard(`Invoice ${trackingNumber}`);
+        }}
+      >
+        <IoCopyOutline className="text-2xl" />
         <span>Invoice {trackingNumber}</span>
-      </div>
+      </button>
+
       <div className="relative h-8">
         <Image
           fill
@@ -237,13 +286,13 @@ function DeliveryRow({
           className="object-contain"
         />
       </div>
-      <span>
+      <span className="text-left">
         {toFirstName} {toLastName}
       </span>
-      <span>
+      <span className="text-left">
         {toState}, {toCountry}
       </span>
-      <span>{formatDateTime(createdAt)}</span>
-    </Link>
+      <span className="text-left">{formatDateTime(createdAt)}</span>
+    </>
   );
 }

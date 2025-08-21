@@ -1,5 +1,10 @@
 import { DeliveriesTable } from "@/app/_components/DeliveriesTable";
 
+export const metadata = {
+  title: "Deliveries",
+  description: "Deliveries pages",
+};
+
 export default function Deliveries({
   searchParams,
 }: {

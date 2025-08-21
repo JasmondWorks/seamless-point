@@ -159,7 +159,7 @@ export default function Navbar({ className = "" }) {
                     height={50}
                     alt="profile"
                     src={user.profileImage || "/assets/images/avatar.png"}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-8 h-8 rounded-full object-cover"
                   />
                 </Link>
                 <button onClick={logout} className="">

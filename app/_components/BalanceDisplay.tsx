@@ -9,9 +9,9 @@ export default function BalanceDisplay({ balance = 0, amount = 0 }) {
         background:
           "white url('/assets/images/naira-illustration.png') no-repeat right center/contain",
       }}
-      className={cn("text-neutral-700 relative p-5 card space-y-5")}
+      className={cn("text-neutral-700 relative p-5 card space-y-2")}
     >
-      <h3 className="font-bold leading-none text-muted">Balance</h3>
+      <h3 className="font-bold leading-none text-muted text-sm">Balance</h3>
       <p className="text-4xl font-bold leading-none whitespace-normal">
         {formatCurrency(balance)}
       </p>
