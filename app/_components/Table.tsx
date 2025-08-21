@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 type TableProps<T> = {
   columns: string;
   data: T[];
+  hasLinkedRows?: boolean;
   renderHead: () => ReactNode;
   renderRow: (item: T, index: number) => ReactNode;
 };
@@ -12,9 +13,12 @@ type TableProps<T> = {
 export default function Table<T>({
   columns,
   data,
+  hasLinkedRows = false,
   renderHead,
   renderRow,
 }: TableProps<T>) {
+  const router = useRouter();
+
   const lastColWidth =
     columns
       .split(" ")
@@ -42,19 +46,34 @@ export default function Table<T>({
 
       {/* Table Rows */}
       <div>
-        {data.map((item: any, index) => (
-          <div
-            key={index}
-            style={{
-              display: "grid",
-              gridTemplateColumns: columns,
-              minWidth: `${rowWidth + Number(lastColWidth)}px`,
-            }}
-            className="py-3 border-t border-neutral-200 gap-5 items-center"
-          >
-            {renderRow(item, index)}
-          </div>
-        ))}
+        {data.map((item: any, index) =>
+          hasLinkedRows ? (
+            <button
+              onClick={() => router.push(item?.href)}
+              key={index}
+              style={{
+                display: "grid",
+                gridTemplateColumns: columns,
+                minWidth: `${rowWidth + Number(lastColWidth)}px`,
+              }}
+              className="py-3 border-t border-neutral-200 gap-5 items-center"
+            >
+              {renderRow(item, index)}
+            </button>
+          ) : (
+            <div
+              key={index}
+              style={{
+                display: "grid",
+                gridTemplateColumns: columns,
+                minWidth: `${rowWidth + Number(lastColWidth)}px`,
+              }}
+              className="py-3 border-t border-neutral-200 gap-5 items-center"
+            >
+              {renderRow(item, index)}
+            </div>
+          )
+        )}
       </div>
     </div>
   );

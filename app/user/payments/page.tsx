@@ -6,6 +6,11 @@ import { getUser } from "@/app/_lib/actions";
 
 import Link from "next/link";
 
+export const metadata = {
+  title: "Payments",
+  description: "Payments pages",
+};
+
 export default async function Payments() {
   const res = await getUser();
   const { user } = res;
