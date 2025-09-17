@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
-import { clsx } from "clsx";
 import Link from "next/link";
 import Spinner from "@/app/_components/Spinner";
+import { cn } from "@/app/_lib/utils";
 
 export enum ButtonVariant {
   link = "LINK",
@@ -46,7 +46,7 @@ export default function Button({
   href,
   ...props
 }: ButtonProps) {
-  const classes = clsx(
+  const classes = cn(
     "flex items-center whitespace-nowrap justify-center gap-2 px-6 py-3 font-semibold leading-4 h-11 text-base !disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300", // Common classes
     {
       // "!cursor-not-allowed": disabled,
@@ -59,8 +59,7 @@ export default function Button({
       "flex-row-reverse": isReversed,
       "rounded-lg": isRoundedLarge,
       "rounded-sm": !isRoundedLarge,
-      "border-2 border-brandPry text-brandPry":
-        variant === ButtonVariant.outline,
+      "border border-brandPry text-brandPry": variant === ButtonVariant.outline,
       "bg-brandSec text-white": variant === ButtonVariant.fill && !isPrimary,
       "!bg-brandPryDark text-white":
         variant === ButtonVariant.fill && isPrimaryDark,
