@@ -314,7 +314,7 @@ export default function Navbar() {
             />
             <path
               d="M35.5262 42.3427L253.678 183.445L22.4035 301.819L35.5262 42.3427Z"
-              fill="#EE5E21"
+              fill="#f2844c"
             />
           </svg>
         </div>

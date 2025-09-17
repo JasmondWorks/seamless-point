@@ -11,13 +11,14 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "./_components/Navbar";
 import Footer from "./_components/Footer";
+import FaqList from "@/app/_components/FaqList";
 
 export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <Navbar />
       <main className="h-full flex-1 overflow-auto">
-        <section id="home" className="py-16">
+        <section id="home" className="py-20">
           <div className="container-custom">
             <div className="grid gap-10 gap-y-5 lg:grid-cols-2 items-center">
               <div className="space-y-8">
@@ -1362,14 +1363,14 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="py-3">
+        <section className="py-16 pb-24">
           <h2 className="light section-heading">Meet Our Partners</h2>
           <LogoSlider />
         </section>
         <section id="products" className="py-16">
           <div className="container-custom">
-            <div className="flex flex-col md:flex-row justify-center gap-28 items-start">
-              <div className="relative ml-3 md:ml-5 max-w-md">
+            <div className="flex flex-col md:flex-row justify-center gap-16 items-center">
+              <div className="relative ml-3 md:ml-5 max-w-[20rem] w-full">
                 {/* Shadow */}
                 <div className="absolute -z-10 inset-0 -translate-x-5 translate-y-5 bg-brandSec rounded-3xl"></div>
                 <Image
@@ -1380,12 +1381,12 @@ export default function Home() {
                   alt="image"
                 />
               </div>
-              <div className="space-y-10">
-                <h2 className="!text-left section-heading">
+              <div>
+                <h2 className="!text-left section-heading !mb-3">
                   Send anything you want from the comfort of your home
                   seamlessly
                 </h2>
-                <p>
+                <p className="mb-8">
                   Seamless point is aiming to be a logistics platform designed
                   to facilitate the seamless shipment of parcels and packages
                   and the offering of services by individuals state-wide.
@@ -1412,9 +1413,11 @@ export default function Home() {
               <div className="lg:col-span-3">
                 <ImageSkillsGallery />
               </div>
-              <div className="lg:col-span-2 space-y-10">
-                <p className="section-subheading text-brandSec">Service Hub</p>
-                <h2 className="section-heading !text-left text-brandPryDark">
+              <div className="lg:col-span-2">
+                <p className="section-subheading text-brandSec mb-3">
+                  Service Hub
+                </p>
+                <h2 className="section-heading !text-left text-brandPryDark !mb-8">
                   Search for any essential skill you need and have it brought to
                   your doorstep
                 </h2>
@@ -1428,48 +1431,7 @@ export default function Home() {
             <h2 className="section-heading">
               Frequently Asked <span className="text-brandSec">Questions</span>
             </h2>
-            <div className="max-h-[500px] overflow-auto max-w-3xl mx-auto">
-              <div className="px-2 md:px-4">
-                <AccordionComponent
-                  items={[
-                    {
-                      title: "How do I create a shipment?",
-                      desc: "Learn the simple steps to book your shipments quickly and efficiently on our platform.",
-                    },
-                    {
-                      title:
-                        "How do I complete my KYC (Know Your Customer) verification?",
-                      desc: "Follow our guide to upload your documents and complete your KYC verification for a seamless experience.",
-                    },
-                    {
-                      title:
-                        "How do I register as a 3PL (Third-Party Logistics Provider) or Merchant?",
-                      desc: "Join our network of partners by signing up as a 3PL provider or merchant. We’ll walk you through the registration process.",
-                    },
-                    {
-                      title: "How do I track my shipments?",
-                      desc: "Keep tabs on your packages in real-time with our easy-to-use tracking system.",
-                    },
-                    {
-                      title: "Where are your drop-off locations?",
-                      desc: "Find our conveniently located drop-off points to ensure a smooth shipping process.",
-                    },
-                    {
-                      title: "How do I upload my KYC documents?",
-                      desc: "Learn how to securely upload your KYC documents to verify your account.",
-                    },
-                    {
-                      title: "How do I insure my package?",
-                      desc: "Discover how to add insurance to your shipments for added peace of mind.",
-                    },
-                    {
-                      title: "How do I ship food items?",
-                      desc: "Get to know our guidelines and requirements for shipping food items safely and legally.",
-                    },
-                  ]}
-                />
-              </div>
-            </div>
+            <FaqList />
           </div>
           <svg
             className="absolute right-0 bottom-[50%] translate-y-[50%]"

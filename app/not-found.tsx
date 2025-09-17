@@ -19,6 +19,7 @@ export default function NotFound() {
             height={270}
             viewBox="0 0 271 270"
             fill="none"
+            className="w-56 aspect-square"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
