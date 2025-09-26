@@ -18,9 +18,13 @@ export const metadata = {
   description: "Dashboard for Seamless Point",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Dashboard() {
   const res = await getUser();
-  const balance = res?.user.balance ?? 0;
+  const balance =
+    res?.status === "success" && res.user ? res.user.balance ?? 0 : 0;
 
   return (
     <DashboardLayout isRightContained={true}>
@@ -44,3 +48,4 @@ export default async function Dashboard() {
     </DashboardLayout>
   );
 }
+
