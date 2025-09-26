@@ -1,4 +1,4 @@
-﻿import Button, { ButtonVariant } from "@/app/_components/Button";
+import Button, { ButtonVariant } from "@/app/_components/Button";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 import SelectNetworkProvider from "@/app/_components/SelectNetworkProvider";
 import {
@@ -12,7 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
 } from "@/app/_components/ui/dropdown-menu";
-import { getDataBundles, getUser } from "@/app/_lib/actions";
+import { buyData, getDataBundles, getUser } from "@/app/_lib/actions";
 import { bucketizeByCategory } from "@/app/_lib/data_bundle_categorizer";
 import { capitalise, cn, formatCurrency } from "@/app/_lib/utils";
 import { ngPhoneNumberSchema } from "@/app/_lib/validation";
@@ -119,7 +119,7 @@ const deriveBucketsForProvider = (
 ): Bucket[] => {
   if (!rawPlans?.length) return [];
 
-  // 9mobile not supported by the normalizer yet → dumb fallback
+  // 9mobile not supported by the normalizer yet ? dumb fallback
   if (providerKey === "9mobile") {
     return [
       {
@@ -177,7 +177,7 @@ const schema = z.object({
   amount: z.coerce
     .number()
     .refine((v) => Number.isFinite(v), { message: "Amount is required" })
-    .pipe(z.number().min(100, { message: "Min ₦100" })),
+    .pipe(z.number().min(100, { message: "Min ?100" })),
 });
 
 type BuyAirtimeForm = z.infer<typeof schema>;
@@ -199,6 +199,15 @@ export default function BuyDataModal({
     useState<CategorizedPackage | null>(null);
   const [dataBundles, setDataBundles] = useState<Bucket[]>([]);
   const [isLoadingBundles, setIsLoadingBundles] = useState(false);
+  const [purchaseDetails, setPurchaseDetails] = useState<{
+    provider: NetworkProvider | null;
+    recipient: string;
+    pkg: CategorizedPackage | null;
+  }>({
+    provider: null,
+    recipient: "",
+    pkg: null,
+  });
 
   const {
     handleSubmit,
@@ -231,31 +240,37 @@ export default function BuyDataModal({
   useEffect(() => {
     setSelectedNetwork(undefined);
     setSelectedCategory(null);
+    setSelectedPackage(null);
     setDataBundles([]);
+    setPurchaseDetails({ provider: null, recipient: "", pkg: null });
+    setStep("browse");
   }, [open]);
 
   // Fetch bundles for the selected provider
-  useEffect(() => {
-    (async () => {
-      if (!selectedProvider) return;
+  const fetchBundles = async () => {
+    if (!selectedProvider) return;
 
-      try {
-        setIsLoadingBundles(true);
-        const key = selectedProvider.name.toLowerCase() as
-          | "glo"
-          | "mtn"
-          | "airtel"
-          | "9mobile";
-        const res = await getDataBundles(key); // expect { data: { data: any[] } }
-        const list: any[] = res?.data?.data ?? res?.data ?? [];
-        const buckets = deriveBucketsForProvider(key, list);
-        setDataBundles(buckets);
-      } catch (error: any) {
-        toast.error(error?.message ?? "Failed to load bundles");
-      } finally {
-        setIsLoadingBundles(false);
-      }
-    })();
+    try {
+      setIsLoadingBundles(true);
+      const key = selectedProvider.name.toLowerCase() as
+        | "glo"
+        | "mtn"
+        | "airtel"
+        | "9mobile";
+      const res = await getDataBundles(key); // expect { data: { data: any[] } }
+      const list: any[] = res?.data?.data ?? res?.data ?? [];
+      const buckets = deriveBucketsForProvider(key, list);
+      setDataBundles(buckets);
+    } catch (error: any) {
+      toast.error(error?.message ?? "Failed to load bundles");
+    } finally {
+      setIsLoadingBundles(false);
+    }
+  };
+
+  useEffect(() => {
+    setSelectedCategory(null);
+    fetchBundles();
   }, [selectedProvider]);
 
   // Pick first category automatically
@@ -270,8 +285,15 @@ export default function BuyDataModal({
     setIsSelectNetworkDropdownOpen(false);
   }
 
-  function onSubmit(data: BuyAirtimeForm) {
+  function onSubmit(formValues: BuyAirtimeForm) {
     if (!selectedProvider || !selectedPackage) return;
+
+    setPurchaseDetails({
+      provider: selectedProvider as NetworkProvider,
+      recipient: formValues.phoneNumber,
+      pkg: selectedPackage,
+    });
+
     setStep("confirm");
   }
 
@@ -279,7 +301,7 @@ export default function BuyDataModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         {step === "browse" && (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 min-w-0">
             <div className="flex flex-col gap-1">
               <DialogHeader>
                 <DialogTitle>Buy Data</DialogTitle>
@@ -331,7 +353,7 @@ export default function BuyDataModal({
               </div>
 
               {/* Categories + Packages */}
-              <div className="space-y-6">
+              <div className="space-y-6 min-w-0">
                 <h4 className="mb-2 font-bold text-center">Choose a package</h4>
 
                 {isLoadingBundles && <DataFetchSpinner />}
@@ -339,8 +361,8 @@ export default function BuyDataModal({
                 {!isLoadingBundles && dataBundles.length > 0 && (
                   <div>
                     <h5 className="mb-2 font-bold text-xs">Categories</h5>
-                    <div className="w-full max-w-full overflow-x-auto">
-                      <div className="flex w-max gap-1 p-1 bg-muted rounded-lg">
+                    <div className="w-full max-w-full overflow-x-auto min-w-0">
+                      <div className="flex w-max flex-nowrap gap-1 p-1 bg-muted rounded-lg">
                         {dataBundles.map((cat) => (
                           <button
                             key={cat.name}
@@ -362,57 +384,57 @@ export default function BuyDataModal({
 
                 <div>
                   <h5 className="mb-2 font-bold text-xs">Packages</h5>
-                  <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {selectedCategory?.packages.map((pkg) => {
-                      const isSelected = selectedPackage?.id === pkg.id;
-                      return (
-                        <div
-                          onClick={() => setSelectedPackage(pkg)}
-                          key={pkg.id}
-                          className={cn(
-                            "bg-brandSecLight rounded-md text-sm text-center overflow-hidden cursor-pointer grid grid-rows-[1fr_auto] p-3 space-y-3",
-                            isSelected && "bg-brandSec text-white"
-                          )}
-                        >
-                          <div className="my-auto">
-                            <div>{pkg.durationLabel}</div>
-                            <div className="font-bold">
-                              {pkg.allocationLabel}
-                            </div>
-                            {pkg.categoryLabel && (
-                              <div className="opacity-75 text-xs font-medium">
-                                ({pkg.categoryLabel})
-                              </div>
-                            )}
-                          </div>
-                          <hr
+                  {selectedCategory && (
+                    <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {selectedCategory?.packages.map((pkg) => {
+                        const isSelected = selectedPackage?.id === pkg.id;
+                        return (
+                          <div
+                            onClick={() => setSelectedPackage(pkg)}
+                            key={pkg.id}
                             className={cn(
-                              "border-t",
-                              isSelected
-                                ? "border-white/15"
-                                : "border-[#f2844c]/15"
+                              "bg-brandSecLight rounded-md text-sm text-center overflow-hidden cursor-pointer grid grid-rows-[1fr_auto] p-3 space-y-3",
+                              isSelected && "bg-brandSec text-white"
                             )}
-                          />
-                          <div className="font-bold">
-                            {formatCurrency(pkg.amount)}
+                          >
+                            <div className="my-auto">
+                              <div>{pkg.durationLabel}</div>
+                              <div className="font-bold">
+                                {pkg.allocationLabel}
+                              </div>
+                              {pkg.categoryLabel && (
+                                <div className="opacity-75 text-xs font-medium">
+                                  ({pkg.categoryLabel})
+                                </div>
+                              )}
+                            </div>
+                            <hr
+                              className={cn(
+                                "border-t",
+                                isSelected
+                                  ? "border-white/15"
+                                  : "border-[#f2844c]/15"
+                              )}
+                            />
+                            <div className="font-bold">
+                              {formatCurrency(pkg.amount)}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Prefilled Amount */}
               <div className="grid grid-cols-[auto_1fr] items-center gap-2">
                 <span>₦</span>
-                <input
-                  disabled
-                  value={selectedPackage ? selectedPackage.amount : ""}
-                  type="tel"
-                  placeholder="Amount"
-                  className="border-b p-1.5 px-2 outline-none focus-visible:border-brandSec disabled:cursor-not-allowed bg-transparent"
-                />
+                {selectedPackage?.amount ? (
+                  <span>{selectedPackage.amount}</span>
+                ) : (
+                  <span className="text-muted">Amount</span>
+                )}
               </div>
             </div>
 
@@ -420,24 +442,29 @@ export default function BuyDataModal({
               type="submit"
               className="w-full"
               variant={ButtonVariant.fill}
-              disabled={!selectedPackage}
-              onClick={() => {
-                if (selectedPackage) setStep("confirm");
-              }}
+              disabled={
+                !selectedPackage ||
+                !selectedProvider ||
+                !!errors.phoneNumber ||
+                !phone
+              }
             >
               Next
             </Button>
           </form>
         )}
 
-        {step === "confirm" && selectedProvider && selectedPackage && (
-          <ConfirmPurchaseContent
-            provider={selectedProvider}
-            pkg={selectedPackage}
-            recipient={phone}
-            setStep={setStep}
-          />
-        )}
+        {step === "confirm" &&
+          purchaseDetails.provider &&
+          purchaseDetails.pkg && (
+            <ConfirmPurchaseContent
+              provider={purchaseDetails.provider!}
+              pkg={purchaseDetails.pkg!}
+              recipient={purchaseDetails.recipient}
+              setStep={setStep}
+              onCloseModal={() => onOpenChange(false)}
+            />
+          )}
       </DialogContent>
     </Dialog>
   );
@@ -450,14 +477,18 @@ function ConfirmPurchaseContent({
   provider,
   pkg,
   recipient,
+  onCloseModal,
 }: {
   setStep: (step: Step) => void;
   provider: NetworkProvider;
   pkg: CategorizedPackage;
   recipient: string;
+  onCloseModal?: () => void;
 }) {
   const [balance, setBalance] = useState(0);
   const [isLoading, setisLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const amount = pkg.amount;
 
   useEffect(() => {
@@ -471,6 +502,38 @@ function ConfirmPurchaseContent({
       }
     })();
   }, []);
+
+  async function handleSubmit() {
+    // API expects lowercase provider name
+    const providerName = provider.name.toLowerCase();
+    const payload = {
+      amount,
+      provider: providerName,
+      recipient: "08011111111", // change to actual recipient later
+      bundleCode: pkg.id,
+    };
+    console.log(payload);
+
+    try {
+      setIsSubmitting(true);
+
+      const response = await buyData(payload);
+
+      console.log(response);
+
+      setIsSubmitting(false);
+
+      if (response.status === "success") {
+        toast.success("Data purchase successful");
+        onCloseModal && onCloseModal();
+        return;
+      } else {
+        toast.error(response.message || "Data purchase failed");
+        // onCloseModal && onCloseModal();
+        return;
+      }
+    } catch (error) {}
+  }
 
   return (
     <>
@@ -560,11 +623,13 @@ function ConfirmPurchaseContent({
               Back
             </Button>
             <Button
-              disabled={amount > balance}
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              disabled={amount > balance || isSubmitting}
               className="w-full"
               variant={ButtonVariant.fill}
             >
-              Next
+              {isSubmitting ? "Buying Data..." : "Buy Data"}
             </Button>
           </div>
         </>
@@ -572,13 +637,3 @@ function ConfirmPurchaseContent({
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
