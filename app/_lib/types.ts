@@ -135,3 +135,5 @@ export type TNotification = {
   createdAt: string; // ISO date string representing when the notification was created.
   updatedAt: string; // ISO date string representing when the notification was last updated.
 };
+
+export type NetworkProvider = { name: string; logoSrc: string };

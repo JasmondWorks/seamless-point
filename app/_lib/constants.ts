@@ -3,6 +3,7 @@ import {
   DispatchEnum,
   ECurrency,
   EDeliveryStatus,
+  NetworkProvider,
 } from "@/app/_lib/types";
 
 export const deliveryStatus = [
@@ -75,3 +76,24 @@ export const paginationSearchParams = {
   limit: "10",
   sortBy: "-createdAt",
 };
+
+export const commonAirtimeAmounts = [100, 200, 500, 1000, 2000, 5000];
+
+export const networkProviders: NetworkProvider[] = [
+  {
+    name: "Glo",
+    logoSrc: "/assets/images/glo-logo.png",
+  },
+  {
+    name: "Airtel",
+    logoSrc: "/assets/images/airtel-logo.png",
+  },
+  {
+    name: "MTN",
+    logoSrc: "/assets/images/mtn-logo.png",
+  },
+  {
+    name: "9mobile",
+    logoSrc: "/assets/images/9mobile-logo.png",
+  },
+];
