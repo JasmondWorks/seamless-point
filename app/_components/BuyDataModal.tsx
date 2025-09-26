@@ -1,6 +1,6 @@
-import Button, { ButtonVariant } from "@/app/_components/Button";
+﻿import Button, { ButtonVariant } from "@/app/_components/Button";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
-import Spinner from "@/app/_components/Spinner";
+import SelectNetworkProvider from "@/app/_components/SelectNetworkProvider";
 import {
   Dialog,
   DialogContent,
@@ -12,344 +12,465 @@ import {
   DropdownMenu,
   DropdownMenuContent,
 } from "@/app/_components/ui/dropdown-menu";
-import { getUser } from "@/app/_lib/actions";
+import { getDataBundles, getUser } from "@/app/_lib/actions";
+import { bucketizeByCategory } from "@/app/_lib/data_bundle_categorizer";
 import { capitalise, cn, formatCurrency } from "@/app/_lib/utils";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { ngPhoneNumberSchema } from "@/app/_lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight, Wallet } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { z } from "zod";
+
+/* ----------------------------- Types & Consts ----------------------------- */
 
 type BuyAirtimeModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-type Network = { name: string; logoSrc: string };
+type NetworkProvider = { name: string; logoSrc: string };
 type Step = "browse" | "confirm";
 
-const networks: Network[] = [
-  {
-    name: "Glo",
-    logoSrc: "/assets/images/glo-logo.png",
-  },
-  {
-    name: "Airtel",
-    logoSrc: "/assets/images/airtel-logo.png",
-  },
-  {
-    name: "MTN",
-    logoSrc: "/assets/images/mtn-logo.png",
-  },
-  {
-    name: "9Mobile",
-    logoSrc: "/assets/images/9mobile-logo.png",
-  },
+const CATEGORY_ORDER = [
+  "hourly",
+  "daily",
+  "multi_day",
+  "weekly",
+  "fortnight",
+  "monthly",
+  "quarterly",
+  "yearly",
+  "special",
+] as const;
+
+type BundleCategoryName = (typeof CATEGORY_ORDER)[number];
+type BucketizerResult = ReturnType<typeof bucketizeByCategory>;
+type NormalizedPlan = BucketizerResult["normalized"][number];
+
+type CategorizedPackage = {
+  id: string;
+  title: string;
+  amount: number;
+  durationLabel: string;
+  allocationLabel: string;
+  categoryLabel: string;
+  raw: NormalizedPlan | any;
+};
+
+type Bucket = { name: BundleCategoryName; packages: CategorizedPackage[] };
+
+const networks: NetworkProvider[] = [
+  { name: "Glo", logoSrc: "/assets/images/glo-logo.png" },
+  { name: "Airtel", logoSrc: "/assets/images/airtel-logo.png" },
+  { name: "MTN", logoSrc: "/assets/images/mtn-logo.png" },
+  { name: "9Mobile", logoSrc: "/assets/images/9mobile-logo.png" },
 ];
-const packageCategories = [
-  {
-    name: "daily",
-    packages: [
+
+/* --------------------------------- Utils --------------------------------- */
+
+const prettifyLabel = (label?: string) =>
+  label ? capitalise(label.replace(/_/g, " ")) : "";
+
+/** Turn my NormalizedPlan duration/tags into a short human label */
+const formatDurationLabel = (plan: NormalizedPlan) => {
+  if (!plan) return "";
+
+  if (plan.hours && plan.hours > 0) {
+    const hours = plan.hours;
+    return `${hours} hour${hours > 1 ? "s" : ""}`;
+  }
+
+  if (plan.days && plan.days > 0) {
+    // show weeks if divisible by 7
+    if (plan.days % 7 === 0 && plan.days >= 7) {
+      const weeks = plan.days / 7;
+      return `${weeks} week${weeks > 1 ? "s" : ""}`;
+    }
+    return `${plan.days} day${plan.days > 1 ? "s" : ""}`;
+  }
+
+  if (plan.tags.includes("always_on")) return "Always On";
+  if (plan.tags.includes("voice")) return "Voice Plan";
+  if (plan.tags.includes("night")) return "Night Plan";
+  if (plan.tags.includes("weekend")) return "Weekend Plan";
+  if (plan.tags.includes("sunday")) return "Sunday Plan";
+
+  return prettifyLabel(plan.category);
+};
+
+const formatAllocationLabel = (plan: NormalizedPlan) =>
+  // sizeLabel holds "1.5GB", "500MB" if we could parse it; otherwise show the title
+  plan.sizeLabel ?? plan.title;
+
+const formatCategoryLabel = (plan: NormalizedPlan) => {
+  if (plan.tags.length) {
+    return plan.tags.map((t) => prettifyLabel(t)).join(", ");
+  }
+  return prettifyLabel(plan.category);
+};
+
+/** Map the API list for a provider to UI buckets using my bucketizer */
+const deriveBucketsForProvider = (
+  providerKey: "glo" | "mtn" | "airtel" | "9mobile",
+  rawPlans: any[]
+): Bucket[] => {
+  if (!rawPlans?.length) return [];
+
+  // 9mobile not supported by the normalizer yet → dumb fallback
+  if (providerKey === "9mobile") {
+    return [
       {
-        id: 1,
-        amount: 50,
-        allocation: 45,
-        duration: 1, // in days
-        category: "Social",
+        name: "special",
+        packages: rawPlans.map((plan: any) => {
+          const amount = parseFloat(
+            String(plan.amount ?? 0).replace(/[^\d.]/g, "")
+          );
+          return {
+            id: plan.code ?? plan.name,
+            title: plan.name,
+            amount: Number.isFinite(amount) ? Math.round(amount) : 0,
+            durationLabel: plan.validity
+              ? prettifyLabel(String(plan.validity))
+              : "Special Plan",
+            allocationLabel: plan.name,
+            categoryLabel: "Special Plan",
+            raw: plan,
+          } as CategorizedPackage;
+        }),
       },
-      {
-        id: 2,
-        amount: 150,
-        allocation: 120,
-        duration: 1, // in days
-        category: "",
-      },
-      {
-        id: 3,
-        amount: 250,
-        allocation: 500,
-        duration: 1, // in days
-        category: "YouTube",
-      },
-      {
-        id: 4,
-        amount: 450,
-        allocation: 800,
-        duration: 1, // in days
-        category: "Social",
-      },
-      {
-        id: 5,
-        amount: 650,
-        allocation: 1200,
-        duration: 1, // in days
-        category: "",
-      },
-    ],
-  },
-  {
-    name: "weekly",
-    packages: [
-      {
-        id: 6,
-        amount: 500,
-        allocation: 1500,
-        duration: 2, // in days
-        category: "",
-      },
-      {
-        id: 7,
-        amount: 750,
-        allocation: 3000,
-        duration: 7, // in days
-        category: "YouTube",
-      },
-    ],
-  },
-  {
-    name: "monthly",
-    packages: [
-      {
-        id: 8,
-        amount: 5000,
-        allocation: 15000,
-        duration: 30, // in days
-        category: "Campus booster",
-      },
-      {
-        id: 9,
-        amount: 15000,
-        allocation: 60,
-        duration: 1, // in days
-        category: "YouTube",
-      },
-    ],
-  },
-];
+    ];
+  }
+
+  // Feed only the selected provider into the bucketizer
+  const { buckets } = bucketizeByCategory(
+    providerKey === "glo" ? rawPlans : [],
+    providerKey === "mtn" ? rawPlans : [],
+    providerKey === "airtel" ? rawPlans : []
+  );
+
+  // Buckets is a keyed object; project it into ordered UI buckets
+  return CATEGORY_ORDER.map((category) => {
+    const plans = ((buckets as any)[category] ?? []) as NormalizedPlan[];
+
+    return {
+      name: category,
+      packages: plans.map((plan) => ({
+        id: plan.code,
+        title: plan.title,
+        amount: plan.priceNaira,
+        durationLabel: formatDurationLabel(plan),
+        allocationLabel: formatAllocationLabel(plan),
+        categoryLabel: formatCategoryLabel(plan),
+        raw: plan,
+      })),
+    };
+  }).filter((b) => b.packages.length > 0);
+};
+
+/* --------------------------------- Form ---------------------------------- */
+
+const schema = z.object({
+  phoneNumber: ngPhoneNumberSchema,
+  amount: z.coerce
+    .number()
+    .refine((v) => Number.isFinite(v), { message: "Amount is required" })
+    .pipe(z.number().min(100, { message: "Min ₦100" })),
+});
+
+type BuyAirtimeForm = z.infer<typeof schema>;
+
+/* --------------------------------- View ---------------------------------- */
 
 export default function BuyDataModal({
   open,
   onOpenChange,
 }: BuyAirtimeModalProps) {
   const [step, setStep] = useState<Step>("browse");
-  const [selectedNetwork, setSelectedNetwork] = useState<Network | null>(
-    networks[0]
-  );
+  const [selectedProvider, setSelectedNetwork] = useState<
+    NetworkProvider | undefined
+  >(undefined);
   const [isSelectNetworkDropdownOpen, setIsSelectNetworkDropdownOpen] =
     useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(
-    packageCategories[0]
-  );
-  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Bucket | null>(null);
+  const [selectedPackage, setSelectedPackage] =
+    useState<CategorizedPackage | null>(null);
+  const [dataBundles, setDataBundles] = useState<Bucket[]>([]);
+  const [isLoadingBundles, setIsLoadingBundles] = useState(false);
 
-  // Reset selected package when selected category changes
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setValue,
+    control,
+  } = useForm<BuyAirtimeForm>({
+    defaultValues: { phoneNumber: "", amount: "" as unknown as number },
+    resolver: zodResolver(schema),
+    mode: "onChange",
+  });
+
+  const amount = useWatch({ control, name: "amount" }) as number;
+  const phone = useWatch({ control, name: "phoneNumber" }) as string;
+
+  // Reset package when category changes
   useEffect(() => {
     setSelectedPackage(null);
   }, [selectedCategory]);
 
-  console.log(open);
+  // Set amount when package changes
+  useEffect(() => {
+    if (selectedPackage) {
+      setValue("amount", selectedPackage.amount);
+    }
+  }, [selectedPackage, setValue]);
 
-  function handleSelectNetwork(n: Network) {
+  // Clear provider when modal toggles
+  useEffect(() => {
+    setSelectedNetwork(undefined);
+    setSelectedCategory(null);
+    setDataBundles([]);
+  }, [open]);
+
+  // Fetch bundles for the selected provider
+  useEffect(() => {
+    (async () => {
+      if (!selectedProvider) return;
+
+      try {
+        setIsLoadingBundles(true);
+        const key = selectedProvider.name.toLowerCase() as
+          | "glo"
+          | "mtn"
+          | "airtel"
+          | "9mobile";
+        const res = await getDataBundles(key); // expect { data: { data: any[] } }
+        const list: any[] = res?.data?.data ?? res?.data ?? [];
+        const buckets = deriveBucketsForProvider(key, list);
+        setDataBundles(buckets);
+      } catch (error: any) {
+        toast.error(error?.message ?? "Failed to load bundles");
+      } finally {
+        setIsLoadingBundles(false);
+      }
+    })();
+  }, [selectedProvider]);
+
+  // Pick first category automatically
+  useEffect(() => {
+    if (dataBundles.length > 0) {
+      setSelectedCategory((prev) => prev ?? dataBundles[0]!);
+    }
+  }, [dataBundles]);
+
+  function handleSelectNetwork(n: NetworkProvider) {
     setSelectedNetwork(n);
     setIsSelectNetworkDropdownOpen(false);
   }
+
+  function onSubmit(data: BuyAirtimeForm) {
+    if (!selectedProvider || !selectedPackage) return;
+    setStep("confirm");
+  }
+
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          {step === "browse" && (
-            <>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        {step === "browse" && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex flex-col gap-1">
               <DialogHeader>
                 <DialogTitle>Buy Data</DialogTitle>
               </DialogHeader>
               <DialogDescription className="text-sm">
                 Browse all packages
               </DialogDescription>
+            </div>
 
-              <div className="rounded-lg p-4 border space-y-6">
-                {/* Network and number selection */}
-                <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
-                  <div>
-                    <DropdownMenu
-                      open={isSelectNetworkDropdownOpen}
-                      onOpenChange={setIsSelectNetworkDropdownOpen}
-                    >
-                      <DropdownMenuTrigger>
-                        <div className="flex items-center gap-1">
-                          <div>
-                            {selectedNetwork ? (
-                              <Image
-                                src={selectedNetwork?.logoSrc}
-                                width={70}
-                                height={70}
-                                className="w-10 aspect-square"
-                                alt="Network logo"
-                              />
-                            ) : (
-                              "Select a network"
-                            )}
+            <div className="rounded-lg p-4 border space-y-6">
+              {/* Network + number */}
+              <div className="grid grid-cols-[auto_1fr] gap-5 items-center mb-8">
+                <div>
+                  <DropdownMenu
+                    open={isSelectNetworkDropdownOpen}
+                    onOpenChange={setIsSelectNetworkDropdownOpen}
+                  >
+                    <SelectNetworkProvider
+                      selectedProvider={selectedProvider as any}
+                    />
+                    <DropdownMenuContent>
+                      <div className="divide-y divide-neutral-200">
+                        {networks.map((n) => (
+                          <div
+                            key={n.name}
+                            onClick={() => handleSelectNetwork(n)}
+                            className="cursor-pointer hover:bg-neutral-200 p-2"
+                          >
+                            {n.name}
                           </div>
-                          <IoMdArrowDropdown />
-                        </div>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <div className="divide-y divide-neutral-200">
-                          {networks.map((n) => (
-                            <div
-                              key={n.name}
-                              onClick={() => handleSelectNetwork(n)}
-                              className="cursor-pointer hover:bg-neutral-200 p-2"
-                            >
-                              {n.name}
-                            </div>
-                          ))}
-                        </div>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                        ))}
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex flex-col">
                   <input
+                    {...register("phoneNumber")}
                     type="tel"
                     placeholder="Phone number"
                     className="border-b p-1.5 px-2 outline-none focus-visible:border-brandSec"
                   />
-                </div>
-                {/* Packages */}
-                <div className="space-y-6">
-                  <h4 className="mb-2 font-bold text-center">
-                    Choose a package
-                  </h4>
-                  <div>
-                    <h5 className="mb-2 font-bold text-xs">Categories</h5>
-                    <div className="flex">
-                      {packageCategories.map((cat) => (
-                        <div key={cat.name} className="">
-                          <Button
-                            onClick={() => setSelectedCategory(cat)}
-                            className="!text-brandSec !border-brandSec !text-sm"
-                            variant={
-                              selectedCategory.name === cat.name
-                                ? ButtonVariant.outline
-                                : ButtonVariant.link
-                            }
-                          >
-                            {capitalise(cat.name)}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h5 className="mb-2 font-bold text-xs">Packages</h5>
-                    <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {selectedCategory.packages.map((pkg, idx) => {
-                        const { duration, allocation, amount, category } = pkg;
-                        const isSelected = selectedPackage?.id === pkg.id;
-
-                        return (
-                          <div
-                            onClick={() => setSelectedPackage(pkg)}
-                            key={idx}
-                            className={cn(
-                              "bg-brandSecLight rounded-md text-sm text-center overflow-hidden cursor-pointer grid grid-rows-[1fr_auto] p-3 space-y-3",
-                              isSelected && "bg-brandSec text-white"
-                            )}
-                          >
-                            <div className="my-auto">
-                              <div>
-                                {duration} day{duration > 1 ? "s" : ""}
-                              </div>
-                              <div className="font-bold">{allocation}MB</div>
-                              {category && (
-                                <div className="opacity-75 text-xs font-medium">
-                                  ({category})
-                                </div>
-                              )}
-                            </div>
-                            <hr
-                              className={cn(
-                                "border-t",
-                                isSelected
-                                  ? "border-white/15"
-                                  : "border-[#f2844c]/15"
-                              )}
-                            />
-                            <div className="font-bold">
-                              {formatCurrency(amount)}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Prefilled Amount */}
-                <div className="grid grid-cols-[auto_1fr] items-center gap-2">
-                  <span>₦</span>
-                  <input
-                    disabled
-                    value={selectedPackage ? selectedPackage?.amount : ""}
-                    type="tel"
-                    placeholder="Amount"
-                    className="border-b p-1.5 px-2 outline-none focus-visible:border-brandSec disabled:cursor-not-allowed bg-transparent"
-                  />
+                  {errors.phoneNumber && (
+                    <span className="text-red-500 text-xs">
+                      {String(errors.phoneNumber.message)}
+                    </span>
+                  )}
                 </div>
               </div>
-              <Button
-                onClick={() => setStep("confirm")}
-                className="w-full"
-                variant={ButtonVariant.fill}
-                disabled={!selectedPackage}
-              >
-                Next
-              </Button>
-            </>
-          )}
-          {step === "confirm" && (
-            <ConfirmPurchaseContent
-              pkg={selectedPackage}
-              network={selectedNetwork as Network}
-              setStep={setStep}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+
+              {/* Categories + Packages */}
+              <div className="space-y-6">
+                <h4 className="mb-2 font-bold text-center">Choose a package</h4>
+
+                {isLoadingBundles && <DataFetchSpinner />}
+                {/* Categories */}
+                {!isLoadingBundles && dataBundles.length > 0 && (
+                  <div>
+                    <h5 className="mb-2 font-bold text-xs">Categories</h5>
+                    <div className="w-full max-w-full overflow-x-auto">
+                      <div className="flex w-max gap-1 p-1 bg-muted rounded-lg">
+                        {dataBundles.map((cat) => (
+                          <button
+                            key={cat.name}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={cn(
+                              "px-3 py-1 text-sm font-medium rounded-md transition-colors flex-shrink-0",
+                              selectedCategory?.name === cat.name
+                                ? "bg-background text-foreground shadow"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            {capitalise(cat.name)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <h5 className="mb-2 font-bold text-xs">Packages</h5>
+                  <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {selectedCategory?.packages.map((pkg) => {
+                      const isSelected = selectedPackage?.id === pkg.id;
+                      return (
+                        <div
+                          onClick={() => setSelectedPackage(pkg)}
+                          key={pkg.id}
+                          className={cn(
+                            "bg-brandSecLight rounded-md text-sm text-center overflow-hidden cursor-pointer grid grid-rows-[1fr_auto] p-3 space-y-3",
+                            isSelected && "bg-brandSec text-white"
+                          )}
+                        >
+                          <div className="my-auto">
+                            <div>{pkg.durationLabel}</div>
+                            <div className="font-bold">
+                              {pkg.allocationLabel}
+                            </div>
+                            {pkg.categoryLabel && (
+                              <div className="opacity-75 text-xs font-medium">
+                                ({pkg.categoryLabel})
+                              </div>
+                            )}
+                          </div>
+                          <hr
+                            className={cn(
+                              "border-t",
+                              isSelected
+                                ? "border-white/15"
+                                : "border-[#f2844c]/15"
+                            )}
+                          />
+                          <div className="font-bold">
+                            {formatCurrency(pkg.amount)}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Prefilled Amount */}
+              <div className="grid grid-cols-[auto_1fr] items-center gap-2">
+                <span>₦</span>
+                <input
+                  disabled
+                  value={selectedPackage ? selectedPackage.amount : ""}
+                  type="tel"
+                  placeholder="Amount"
+                  className="border-b p-1.5 px-2 outline-none focus-visible:border-brandSec disabled:cursor-not-allowed bg-transparent"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              variant={ButtonVariant.fill}
+              disabled={!selectedPackage}
+              onClick={() => {
+                if (selectedPackage) setStep("confirm");
+              }}
+            >
+              Next
+            </Button>
+          </form>
+        )}
+
+        {step === "confirm" && selectedProvider && selectedPackage && (
+          <ConfirmPurchaseContent
+            provider={selectedProvider}
+            pkg={selectedPackage}
+            recipient={phone}
+            setStep={setStep}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
+/* ---------------------------- Confirm Step View --------------------------- */
+
 function ConfirmPurchaseContent({
   setStep,
-  network,
+  provider,
   pkg,
+  recipient,
 }: {
   setStep: (step: Step) => void;
-  network?: Network;
-  pkg: any;
+  provider: NetworkProvider;
+  pkg: CategorizedPackage;
+  recipient: string;
 }) {
   const [balance, setBalance] = useState(0);
   const [isLoading, setisLoading] = useState(true);
-
-  const { amount } = pkg;
+  const amount = pkg.amount;
 
   useEffect(() => {
-    async function fetchUser() {
+    (async () => {
       const userRes = await getUser();
-
       setisLoading(false);
-
-      if (userRes.status === "success") {
+      if (userRes?.status === "success") {
         setBalance(userRes.user.balance);
-        return;
       } else {
-        toast.error(userRes.message);
+        toast.error(userRes?.message ?? "Could not fetch wallet");
       }
-    }
-    fetchUser();
+    })();
   }, []);
-
-  console.log(balance);
 
   return (
     <>
@@ -366,38 +487,43 @@ function ConfirmPurchaseContent({
         <>
           <div className="rounded-lg p-4 border space-y-6">
             <div className="text-xl text-brandSec font-bold text-center">
-              {formatCurrency(5000)}
+              {formatCurrency(amount)}
             </div>
+
             <div className="text-sm space-y-3">
               <div className="flex justify-between gap-5 items-center">
                 <h4 className="font-medium text-muted">Amount</h4>
                 <span className="font-medium">{formatCurrency(amount)}</span>
               </div>
+
               <div className="flex justify-between gap-5 items-center">
                 <h4 className="font-medium text-muted">Allocation</h4>
                 <span className="font-medium">
-                  {pkg.allocation}MB
-                  {pkg?.category && ` (${pkg?.category})`}
+                  {pkg.allocationLabel}
+                  {pkg?.categoryLabel && ` (${pkg?.categoryLabel})`}
                 </span>
               </div>
+
               <div className="flex justify-between gap-5 items-center">
                 <h4 className="font-medium text-muted">To</h4>
-                <span className="font-medium">08012345678</span>
+                <span className="font-medium">{recipient}</span>
               </div>
+
               <div className="flex justify-between gap-5 items-center">
                 <h4 className="font-medium text-muted">Provider</h4>
                 <div className="font-medium flex items-center gap-2">
-                  <span>Glo NG</span>
+                  <span>{provider?.name} NG</span>
                   <Image
                     width={50}
                     height={50}
-                    src={networks[0].logoSrc}
+                    src={provider?.logoSrc || ""}
                     alt="network"
                     className="w-6 aspect-square"
                   />
                 </div>
               </div>
             </div>
+
             <div className="bg-brandSecLight rounded-md p-3 text-sm">
               {amount > balance && (
                 <span className="text-red-500 text-xs font-bold block">
@@ -424,6 +550,7 @@ function ConfirmPurchaseContent({
               </div>
             </div>
           </div>
+
           <div className="flex justify-between gap-5">
             <Button
               className="w-full !border-brandSec !text-brandSec"
@@ -445,3 +572,13 @@ function ConfirmPurchaseContent({
     </>
   );
 }
+
+
+
+
+
+
+
+
+
+

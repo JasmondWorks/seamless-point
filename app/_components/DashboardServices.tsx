@@ -1,10 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Username from "@/app/_components/Username";
-import DashboardLayout from "@/app/_components/DashboardLayout";
-import { getUser } from "@/app/_lib/actions";
-import BalanceContainer from "@/app/_components/BalanceContainer";
 import { ArrowRight, Wifi } from "lucide-react";
 import { FaTruck } from "react-icons/fa";
 import { ComponentType, ReactNode, useState } from "react";
@@ -12,7 +8,6 @@ import { IoIosPhonePortrait } from "react-icons/io";
 import { BsCash } from "react-icons/bs";
 import { GrServices } from "react-icons/gr";
 import { cn } from "@/app/_lib/utils";
-import Button, { ButtonVariant } from "@/app/_components/Button";
 import BuyAirtimeModal from "@/app/_components/BuyAirtimeModal";
 import BuyDataModal from "@/app/_components/BuyDataModal";
 import PayBillsModal from "@/app/_components/PayBillsModal";

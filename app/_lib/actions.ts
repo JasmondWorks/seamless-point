@@ -5,6 +5,16 @@ import { revalidatePath } from "next/cache";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
+function buildHeaders() {
+  const token = getUserToken();
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
 // Create User function with proper error handling
 export async function signupUser(userDetails: any) {
   try {
@@ -437,15 +447,10 @@ export async function authenticateAdmin(token: string) {
 }
 
 export async function getUser() {
-  const token = getUserToken();
-
   try {
     const res = await fetch(`${URL}/users/me`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: buildHeaders(),
       cache: "no-store",
     });
     const data = await res.json();
@@ -678,7 +683,6 @@ export async function fetchDeliveries({
     const data = await res.json();
 
     console.log(data);
-    // const formattedData = formatDataDescending(data, "delivery");
 
     if (!res.ok) throw new Error(data.message);
 
@@ -1294,6 +1298,56 @@ export const getCategories = async () => {
     const data = await res.json();
 
     console.log("Data", data);
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const topUpAirtime = async ({
+  provider,
+  recipient,
+  amount,
+}: {
+  provider: string;
+  recipient: string;
+  amount: number;
+}) => {
+  try {
+    console.log(URL + "/v24u/topupAirtime");
+
+    const res = await fetch(`${URL}/v24u/topupAirtime`, {
+      method: "POST",
+      body: JSON.stringify({ provider, recipient, amount }),
+      headers: buildHeaders(),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+export const getDataBundles = async (networkProvider: string) => {
+  try {
+    const res = await fetch(
+      `${URL}/v24u/data/bundles?provider=${networkProvider}`,
+      {
+        method: "GET",
+        headers: buildHeaders(),
+      }
+    );
+    const data = await res.json();
 
     if (!res.ok) throw new Error(data.message);
 

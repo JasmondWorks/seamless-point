@@ -462,3 +462,32 @@ export const creditCardSchema = z
       path: ["expiryMonth", "expiryYear"],
     }
   );
+
+// Accepted core forms after stripping separators:
+//  - 10 digits (e.g. 8115543766)
+//  - 0XXXXXXXXXX (e.g. 08031234567)
+//  - 234XXXXXXXXXX / +234XXXXXXXXXX
+const NG_BARE = /^[7-9]\d{9}$/; // e.g. 8115543766
+const NG_LOCAL = /^0[7-9]\d{9}$/; // e.g. 08031234567
+const NG_INTL = /^(?:\+?234)[7-9]\d{9}$/; // e.g. +2348031234567 or 2348031234567
+
+export const ngPhoneNumberSchema = z
+  .string()
+  .transform((s) => s.trim().replace(/[\s\-().]/g, "")) // remove spaces/dashes/()
+  .superRefine((v, ctx) => {
+    if (NG_BARE.test(v) || NG_LOCAL.test(v) || NG_INTL.test(v)) return;
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid NG phone",
+    });
+  })
+  .transform((v) => {
+    // Normalize to 0XXXXXXXXXX
+    let x = v;
+    if (x.startsWith("+")) x = x.slice(1);
+    if (NG_BARE.test(x)) x = "234" + x; // 10-digit -> add country code
+    else if (x.startsWith("0"))
+      x = "234" + x.slice(1); // local 0XXXXXXXXXX -> strip 0, add 234
+    else if (!x.startsWith("234")) x = "234" + x; // safety for rare cases
+    return `0${x.slice(3)}`;
+  });
