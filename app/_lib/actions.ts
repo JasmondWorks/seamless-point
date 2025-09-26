@@ -1360,6 +1360,36 @@ export const getDataBundles = async (networkProvider: string) => {
   }
 };
 
+export const buyData = async ({
+  provider,
+  recipient,
+  bundleCode,
+  amount,
+}: {
+  provider: string;
+  recipient: string;
+  bundleCode: string;
+  amount: number;
+}) => {
+  try {
+    const res = await fetch(`${URL}/v24u/data/buy?type=sme`, {
+      method: "POST",
+      body: JSON.stringify({ provider, recipient, amount, bundleCode }),
+      headers: buildHeaders(),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+
 function formatDataDescending(data: any, resourceName: string) {
   const unformattedData = data.data[resourceName];
   const formattedList = unformattedData.sort(
