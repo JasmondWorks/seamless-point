@@ -365,6 +365,7 @@ export default function BuyDataModal({
                       <div className="flex w-max flex-nowrap gap-1 p-1 bg-muted rounded-lg">
                         {dataBundles.map((cat) => (
                           <button
+                            type="button"
                             key={cat.name}
                             onClick={() => setSelectedCategory(cat)}
                             className={cn(
@@ -385,7 +386,7 @@ export default function BuyDataModal({
                 <div>
                   <h5 className="mb-2 font-bold text-xs">Packages</h5>
                   {selectedCategory && (
-                    <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[450px] overflow-y-auto">
                       {selectedCategory?.packages.map((pkg) => {
                         const isSelected = selectedPackage?.id === pkg.id;
                         return (
@@ -604,7 +605,7 @@ function ConfirmPurchaseContent({
                   </div>
                 </h4>
                 <Button
-                  href="/deposit"
+                  href="/user/deposit"
                   variant={ButtonVariant.link}
                   className="!text-sm !p-0 !py-0"
                 >
