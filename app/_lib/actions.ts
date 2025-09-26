@@ -479,8 +479,6 @@ export async function getUser() {
 export async function getAdmin() {
   const token = getUserToken();
 
-  console.log(token);
-
   try {
     const res = await fetch(`${URL}/admins/me`, {
       method: "GET",
@@ -1405,3 +1403,5 @@ function formatDataDescending(data: any, resourceName: string) {
 
   return formattedData;
 }
+
+

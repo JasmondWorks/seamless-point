@@ -1,6 +1,9 @@
 import UserDetails from "@/app/_components/UserDetails";
 import { Suspense } from "react";
 import Loader from "@/app/loading";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 
 export default function Settings() {
   return (
