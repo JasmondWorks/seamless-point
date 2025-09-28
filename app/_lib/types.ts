@@ -137,3 +137,17 @@ export type TNotification = {
 };
 
 export type NetworkProvider = { name: string; logoSrc: string };
+export type TvProvider = {
+  name: "Dstv" | "Gotv" | "Showmax" | "Startimes";
+  logoSrc: string;
+};
+export type ElectricityProvider = {
+  name: "IKEDC" | "EKEDC" | "KEDCO" | "BEDC";
+  logoSrc: string;
+};
+export type TvPlan = {
+  code: string;
+  name: string;
+  amount: string;
+  fixedPrice: boolean;
+};

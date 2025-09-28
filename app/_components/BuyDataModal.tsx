@@ -221,7 +221,6 @@ export default function BuyDataModal({
     mode: "onChange",
   });
 
-  const amount = useWatch({ control, name: "amount" }) as number;
   const phone = useWatch({ control, name: "phoneNumber" }) as string;
 
   // Reset package when category changes
@@ -250,22 +249,22 @@ export default function BuyDataModal({
   const fetchBundles = async () => {
     if (!selectedProvider) return;
 
-    try {
-      setIsLoadingBundles(true);
-      const key = selectedProvider.name.toLowerCase() as
-        | "glo"
-        | "mtn"
-        | "airtel"
-        | "9mobile";
-      const res = await getDataBundles(key); // expect { data: { data: any[] } }
+    setIsLoadingBundles(true);
+    const key = selectedProvider.name.toLowerCase() as
+      | "glo"
+      | "mtn"
+      | "airtel"
+      | "9mobile";
+    const res = await getDataBundles(key);
+
+    if (res.status === "success") {
       const list: any[] = res?.data?.data ?? res?.data ?? [];
       const buckets = deriveBucketsForProvider(key, list);
       setDataBundles(buckets);
-    } catch (error: any) {
-      toast.error(error?.message ?? "Failed to load bundles");
-    } finally {
-      setIsLoadingBundles(false);
+    } else {
+      toast.error(res?.message ?? "Failed to load bundles");
     }
+    setIsLoadingBundles(false);
   };
 
   useEffect(() => {
@@ -313,7 +312,7 @@ export default function BuyDataModal({
 
             <div className="rounded-lg p-4 border space-y-6">
               {/* Network + number */}
-              <div className="grid grid-cols-[auto_1fr] gap-5 items-center mb-8">
+              <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
                 <div>
                   <DropdownMenu
                     open={isSelectNetworkDropdownOpen}
@@ -353,90 +352,96 @@ export default function BuyDataModal({
               </div>
 
               {/* Categories + Packages */}
-              <div className="space-y-6 min-w-0">
-                <h4 className="mb-2 font-bold text-center">Choose a package</h4>
+              {selectedProvider && (
+                <div className="mt-8 space-y-6 min-w-0">
+                  <h4 className="mb-2 font-bold text-center">
+                    Choose a package
+                  </h4>
 
-                {isLoadingBundles && <DataFetchSpinner />}
-                {/* Categories */}
-                {!isLoadingBundles && dataBundles.length > 0 && (
-                  <div>
-                    <h5 className="mb-2 font-bold text-xs">Categories</h5>
-                    <div className="w-full max-w-full overflow-x-auto min-w-0">
-                      <div className="flex w-max flex-nowrap gap-1 p-1 bg-muted rounded-lg">
-                        {dataBundles.map((cat) => (
-                          <button
-                            type="button"
-                            key={cat.name}
-                            onClick={() => setSelectedCategory(cat)}
-                            className={cn(
-                              "px-3 py-1 text-sm font-medium rounded-md transition-colors flex-shrink-0",
-                              selectedCategory?.name === cat.name
-                                ? "bg-background text-foreground shadow"
-                                : "text-muted-foreground hover:text-foreground"
-                            )}
-                          >
-                            {capitalise(cat.name)}
-                          </button>
-                        ))}
+                  {isLoadingBundles && <DataFetchSpinner />}
+                  {/* Categories */}
+                  {!isLoadingBundles && dataBundles.length > 0 && (
+                    <div>
+                      <h5 className="mb-2 font-bold text-xs">Categories</h5>
+                      <div className="w-full max-w-full overflow-x-auto min-w-0">
+                        <div className="flex w-max flex-nowrap gap-1 p-1 bg-muted rounded-lg">
+                          {dataBundles.map((cat) => (
+                            <button
+                              type="button"
+                              key={cat.name}
+                              onClick={() => setSelectedCategory(cat)}
+                              className={cn(
+                                "px-3 py-1 text-sm font-medium rounded-md transition-colors flex-shrink-0",
+                                selectedCategory?.name === cat.name
+                                  ? "bg-background text-foreground shadow"
+                                  : "text-muted-foreground hover:text-foreground"
+                              )}
+                            >
+                              {capitalise(cat.name)}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-
-                <div>
-                  <h5 className="mb-2 font-bold text-xs">Packages</h5>
-                  {selectedCategory && (
-                    <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[450px] overflow-y-auto">
-                      {selectedCategory?.packages.map((pkg) => {
-                        const isSelected = selectedPackage?.id === pkg.id;
-                        return (
-                          <div
-                            onClick={() => setSelectedPackage(pkg)}
-                            key={pkg.id}
-                            className={cn(
-                              "bg-brandSecLight rounded-md text-sm text-center overflow-hidden cursor-pointer grid grid-rows-[1fr_auto] p-3 space-y-3",
-                              isSelected && "bg-brandSec text-white"
-                            )}
-                          >
-                            <div className="my-auto">
-                              <div>{pkg.durationLabel}</div>
-                              <div className="font-bold">
-                                {pkg.allocationLabel}
-                              </div>
-                              {pkg.categoryLabel && (
-                                <div className="opacity-75 text-xs font-medium">
-                                  ({pkg.categoryLabel})
-                                </div>
-                              )}
-                            </div>
-                            <hr
-                              className={cn(
-                                "border-t",
-                                isSelected
-                                  ? "border-white/15"
-                                  : "border-[#f2844c]/15"
-                              )}
-                            />
-                            <div className="font-bold">
-                              {formatCurrency(pkg.amount)}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
                   )}
+
+                  <div>
+                    <h5 className="mb-2 font-bold text-xs">Packages</h5>
+                    {selectedCategory && (
+                      <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[450px] overflow-y-auto">
+                        {selectedCategory?.packages.map((pkg) => {
+                          const isSelected = selectedPackage?.id === pkg.id;
+                          return (
+                            <div
+                              onClick={() => setSelectedPackage(pkg)}
+                              key={pkg.id}
+                              className={cn(
+                                "bg-brandSecLight rounded-md text-sm text-center overflow-hidden cursor-pointer grid grid-rows-[1fr_auto] p-3 space-y-3",
+                                isSelected && "bg-brandSec text-white"
+                              )}
+                            >
+                              <div className="my-auto">
+                                <div>{pkg.durationLabel}</div>
+                                <div className="font-bold">
+                                  {pkg.allocationLabel}
+                                </div>
+                                {pkg.categoryLabel && (
+                                  <div className="opacity-75 text-xs font-medium">
+                                    ({pkg.categoryLabel})
+                                  </div>
+                                )}
+                              </div>
+                              <hr
+                                className={cn(
+                                  "border-t",
+                                  isSelected
+                                    ? "border-white/15"
+                                    : "border-[#f2844c]/15"
+                                )}
+                              />
+                              <div className="font-bold">
+                                {formatCurrency(pkg.amount)}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Prefilled Amount */}
-              <div className="grid grid-cols-[auto_1fr] items-center gap-2">
-                <span>₦</span>
-                {selectedPackage?.amount ? (
-                  <span>{selectedPackage.amount}</span>
-                ) : (
-                  <span className="text-muted">Amount</span>
-                )}
-              </div>
+              {selectedProvider && (
+                <div className="grid grid-cols-[auto_1fr] items-center gap-2">
+                  <span>₦</span>
+                  {selectedPackage?.amount ? (
+                    <span>{selectedPackage.amount}</span>
+                  ) : (
+                    <span className="text-muted">Amount</span>
+                  )}
+                </div>
+              )}
             </div>
 
             <Button
@@ -515,25 +520,20 @@ function ConfirmPurchaseContent({
     };
     console.log(payload);
 
-    try {
-      setIsSubmitting(true);
+    setIsSubmitting(true);
 
-      const response = await buyData(payload);
+    const response = await buyData(payload);
 
-      console.log(response);
+    setIsSubmitting(false);
 
-      setIsSubmitting(false);
-
-      if (response.status === "success") {
-        toast.success("Data purchase successful");
-        onCloseModal && onCloseModal();
-        return;
-      } else {
-        toast.error(response.message || "Data purchase failed");
-        // onCloseModal && onCloseModal();
-        return;
-      }
-    } catch (error) {}
+    if (response.status === "success") {
+      toast.success("Data purchase successful");
+      onCloseModal && onCloseModal();
+      return;
+    } else {
+      toast.error(response.message || "Data purchase failed");
+      return;
+    }
   }
 
   return (

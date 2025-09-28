@@ -1,17 +1,10 @@
-import Link from "next/link";
 import Username from "@/app/_components/Username";
 import DashboardLayout from "@/app/_components/DashboardLayout";
 import { getUser } from "@/app/_lib/actions";
 import BalanceContainer from "@/app/_components/BalanceContainer";
-import { ArrowRight, Wifi } from "lucide-react";
-import { FaTruck } from "react-icons/fa";
-import { ReactNode } from "react";
-import { IoIosPhonePortrait } from "react-icons/io";
-import { BsCash } from "react-icons/bs";
-import { GrServices } from "react-icons/gr";
-import { cn } from "@/app/_lib/utils";
-import Button, { ButtonVariant } from "@/app/_components/Button";
+import { Suspense } from "react";
 import DashboardServices from "@/app/_components/DashboardServices";
+import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 
 export const metadata = {
   title: "Dashboard",
@@ -35,7 +28,9 @@ export default async function Dashboard() {
         Let's get you started for today
       </h1>
       <div className="py-4">
-        <BalanceContainer balance={balance} />
+        <Suspense fallback={<DataFetchSpinner />}>
+          <BalanceContainer balance={balance} />
+        </Suspense>
       </div>
 
       <section>
@@ -48,4 +43,3 @@ export default async function Dashboard() {
     </DashboardLayout>
   );
 }
-
