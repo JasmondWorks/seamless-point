@@ -367,3 +367,16 @@ export function base64ToFile(
 
   return new File([fileBlob], fileName, { type: contentType });
 }
+
+export function searchArrayOfObjs<T extends Record<string, unknown>>(
+  items: T[],
+  term: string
+) {
+  const q = term.trim().toLowerCase();
+  if (!q) return items;
+  return items.filter((obj) =>
+    Object.values(obj).some(
+      (v) => typeof v === "string" && v.toLowerCase().includes(q)
+    )
+  );
+}

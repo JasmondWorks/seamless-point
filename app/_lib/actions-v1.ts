@@ -1431,64 +1431,6 @@ export const verifyTvCardDetails = async ({
     return { status: "error", message: error.message };
   }
 };
-export const verifyElectricityRecipient = async ({
-  provider,
-  recipient,
-  type,
-}: {
-  provider: string; //ikedc | ekedc | bedc | kedco and others;
-  recipient: string;
-  type: "prepaid" | "postpaid";
-}) => {
-  try {
-    const res = await fetch(`${URL}/v24u/electricity/recipient/verify`, {
-      method: "POST",
-      body: JSON.stringify({ provider, recipient, type }),
-      headers: buildHeaders(),
-    });
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message);
-
-    if (data.status === "fail") throw new Error(data.message);
-
-    return { status: "success", data };
-  } catch (error: any) {
-    console.log(error.message);
-    return { status: "error", message: error.message };
-  }
-};
-export const buyElectricity = async ({
-  provider,
-  recipient,
-  type,
-  amount,
-  phone,
-}: {
-  provider: string;
-  recipient: string;
-  type: string;
-  amount: number;
-  phone: string;
-}) => {
-  try {
-    const res = await fetch(`${URL}/v24u/electricity/purchase`, {
-      method: "POST",
-      body: JSON.stringify({ provider, recipient, type, amount, phone }),
-      headers: buildHeaders(),
-    });
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message);
-
-    if (data.status === "fail") throw new Error(data.message);
-
-    return { status: "success", data };
-  } catch (error: any) {
-    console.log(error.message);
-    return { status: "error", message: error.message };
-  }
-};
 export const buyTvPlan = async ({
   provider,
   cardNumber,

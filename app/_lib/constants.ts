@@ -1,9 +1,12 @@
+import { BillPaymentType } from "@/app/_components/PayBillsModal";
 import {
   Dispatch,
   DispatchEnum,
   ECurrency,
   EDeliveryStatus,
+  ElectricityProvider,
   NetworkProvider,
+  TvProvider,
 } from "@/app/_lib/types";
 
 export const deliveryStatus = [
@@ -79,6 +82,8 @@ export const paginationSearchParams = {
 
 export const commonAirtimeAmounts = [100, 200, 500, 1000, 2000, 5000];
 
+export const commonElectricityAmounts = [1000, 2000, 5000, 10000, 20000, 50000];
+
 export const networkProviders: NetworkProvider[] = [
   {
     name: "Glo",
@@ -97,3 +102,41 @@ export const networkProviders: NetworkProvider[] = [
     logoSrc: "/assets/images/9mobile-logo.png",
   },
 ];
+export const tvProviders: TvProvider[] = [
+  {
+    name: "Dstv",
+    logoSrc: "/assets/images/dstv-logo.png",
+  },
+  {
+    name: "Gotv",
+    logoSrc: "/assets/images/gotv-logo.png",
+  },
+  {
+    name: "Showmax",
+    logoSrc: "/assets/images/showmax-logo.png",
+  },
+  {
+    name: "Startimes",
+    logoSrc: "/assets/images/startimes-logo.png",
+  },
+];
+export const electricityProviders: ElectricityProvider[] = [
+  {
+    name: "IKEDC",
+    logoSrc: "/assets/images/ikedc-logo.png",
+  },
+  {
+    name: "EKEDC",
+    logoSrc: "/assets/images/ekedc-logo.jpg",
+  },
+  {
+    name: "KEDCO",
+    logoSrc: "/assets/images/kedco-logo.png",
+  },
+  {
+    name: "BEDC",
+    logoSrc: "/assets/images/bedc-logo.png",
+  },
+];
+
+export const billPaymentTabs: BillPaymentType[] = ["Electricity", "Tv"];

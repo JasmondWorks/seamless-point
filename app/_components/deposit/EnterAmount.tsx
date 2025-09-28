@@ -23,7 +23,7 @@ function EnterAmount({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
-      <h1 className="headline text-center">
+      <h1 className="text-3xl font-bold text-center">
         How much are you adding to your Account?
       </h1>
       <div className="flex flex-col gap-3">

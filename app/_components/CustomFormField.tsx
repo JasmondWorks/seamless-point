@@ -153,7 +153,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     case FormFieldType.SELECT:
       return (
         <Controller
-          name={props.name}
+          name={props.name!}
           control={props.control}
           render={({ field }) => (
             <SelectBox
@@ -190,7 +190,7 @@ const CustomFormField = (props: CustomProps) => {
   return (
     <FormField
       control={control}
-      name={name}
+      name={name!}
       render={({ field }) => (
         <FormItem className={`flex-1 ${className} !space-y-1`}>
           {props.fieldType !== FormFieldType.CHECKBOX && label && (
