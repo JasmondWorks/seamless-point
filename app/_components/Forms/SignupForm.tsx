@@ -135,16 +135,12 @@ export default function SignupForm() {
             />
           </div>
           <div>
-            <Button
-              type="submit"
-              variant={ButtonVariant.fill}
-              className="w-full h-14"
+            <ButtonFormSubmit
+              text={isLoading ? "Signing up" : "Sign up"}
+              isReversed
+              icon={<FaChevronRight />}
               isLoading={isLoading}
-              isRoundedLarge
-            >
-              {isLoading ? "Signing up" : "Sign up"}
-              <FaChevronRight />
-            </Button>
+            />
             <p className="mt-5 flex items-center justify-center leading-snug gap-2">
               Already have an account?{" "}
               <Link href="/auth/user/login">
