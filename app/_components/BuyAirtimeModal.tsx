@@ -87,7 +87,7 @@ export default function BuyAirtimeModal({
   function onSubmit(data: BuyAirtimeForm) {
     setData({
       provider: selectedProvider as NetworkProvider,
-      recipient: data.phoneNumber,
+      recipient: process.env.NEXT_PUBLIC_TEST_PHONE_NUMBER ?? data.phoneNumber,
       amount: data.amount,
     });
     setStep("confirm");

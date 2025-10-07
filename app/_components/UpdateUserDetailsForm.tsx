@@ -20,6 +20,7 @@ type User = {
   firstName: string;
   lastName: string;
   gender: string;
+  phoneNumber: string;
 };
 
 type UpdateUserDetailsFormProps = {
@@ -31,28 +32,25 @@ export default function UpdateUserDetailsForm({
 }: UpdateUserDetailsFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const defaultValues = {
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    gender: user.gender || "",
+    dob: user.dob ? new Date(user.dob) : new Date(),
+    email: user.email,
+    phoneNumber: user.phoneNumber || "",
+  };
+
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
-    defaultValues: {
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      gender: user.gender || "",
-      dob: user.dob ? new Date(user.dob) : new Date(),
-      email: user.email,
-    },
+    defaultValues,
   });
 
   const { reset } = form;
 
   useEffect(() => {
     if (user) {
-      reset({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        gender: user.gender || "",
-        dob: user.dob ? new Date(user.dob) : new Date(),
-        email: user.email,
-      });
+      reset(defaultValues);
     }
   }, [user, reset]);
 
@@ -112,13 +110,20 @@ export default function UpdateUserDetailsForm({
             ]}
           />
           <CustomFormField
-            className="col-span-2"
             label="Email"
             name="email"
             disabled
             control={form.control}
             fieldType={FormFieldType.INPUT}
             placeholder="you@company.com"
+          />
+          <CustomFormField
+            className="md:col-span-2"
+            label="Phone Number"
+            name="phoneNumber"
+            control={form.control}
+            fieldType={FormFieldType.PHONE_INPUT}
+            placeholder="Phone number"
           />
         </div>
         <Button

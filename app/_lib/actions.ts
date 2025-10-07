@@ -1536,3 +1536,52 @@ function formatDataDescending(data: any, resourceName: string) {
 
   return formattedData;
 }
+
+export const createVirtualAccount = async () => {
+  console.log("********");
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/transactions/virtual-account`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    console.log("*****");
+    console.log("data", data);
+    console.log("*****");
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
+};
+
+export const deleteVirtualAccount = async () => {
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/transactions/monnify/virtual-account`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
+};
