@@ -1,7 +1,7 @@
-// app/auth/callback/page.tsx
+﻿// app/auth/callback/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { signinAdmin, signinUser } from "@/app/_lib/actions";
@@ -12,27 +12,64 @@ const GoogleCallback = () => {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const { login } = useUserAuth();
+  const requestKeyRef = useRef<string | null>(null);
 
   const code = searchParams.get("code") ?? "";
   const state = searchParams.get("state") ?? "";
 
   useEffect(() => {
-    if (!state && !code) {
+    const requestKey = code && state ? `${code}:${state}` : "invalid";
+
+    if (requestKeyRef.current === requestKey) {
+      return;
+    }
+    requestKeyRef.current = requestKey;
+
+    if (!code || !state) {
       toast.error("Invalid request.");
       setLoading(false);
+      router.replace("/auth/user/login");
+      return;
     }
 
-    // Step 1: Extract userType from state (encoded JSON object)
-    const { userType }: { userType: "user" | "admin" } = JSON.parse(
-      decodeURIComponent(state)
-    );
+    let decodedState: string;
+    try {
+      decodedState = decodeURIComponent(state);
+    } catch {
+      toast.error("Invalid request.");
+      setLoading(false);
+      router.replace("/auth/user/login");
+      return;
+    }
 
-    console.log(userType);
+    let parsedState: { userType?: string };
+    try {
+      parsedState = JSON.parse(decodedState);
+    } catch {
+      toast.error("Invalid request.");
+      setLoading(false);
+      router.replace("/auth/user/login");
+      return;
+    }
 
-    // Step 2: Fetch tokens using the authorization code
+    const userType =
+      parsedState.userType === "admin"
+        ? "admin"
+        : parsedState.userType === "user"
+        ? "user"
+        : null;
+
+    if (!userType) {
+      toast.error("Invalid request.");
+      setLoading(false);
+      router.replace("/auth/user/login");
+      return;
+    }
+
+    // let isActive = true;
+
     const fetchTokens = async () => {
       try {
-        // Step 1: Exchange code for tokens
         const tokenResponse = await fetch("/api/google/token", {
           method: "POST",
           body: JSON.stringify({ code }),
@@ -42,7 +79,9 @@ const GoogleCallback = () => {
         let tokenData;
         try {
           tokenData = await tokenResponse.json();
-        } catch (jsonErr) {
+
+          console.log("token data", tokenData);
+        } catch {
           throw new Error("Invalid response from token API.");
         }
 
@@ -54,7 +93,6 @@ const GoogleCallback = () => {
           throw new Error("Access token not found in token response.");
         }
 
-        // Step 2: Get user info
         const userInfoResponse = await fetch(
           "https://www.googleapis.com/oauth2/v3/userinfo",
           {
@@ -67,6 +105,8 @@ const GoogleCallback = () => {
         let userInfo;
         try {
           userInfo = await userInfoResponse.json();
+
+          console.log("user", userInfo);
         } catch {
           throw new Error("Invalid user info response.");
         }
@@ -75,7 +115,6 @@ const GoogleCallback = () => {
           throw new Error("Failed to fetch user information.");
         }
 
-        // Step 3: Prepare login payload
         const userDetails = {
           email: userInfo.email,
           firstName: userInfo.given_name,
@@ -83,11 +122,12 @@ const GoogleCallback = () => {
           authType: "google",
         };
 
-        // Step 4: Log the user in
+        console.log("b4 api call");
         const userResponse =
           userType === "user"
             ? await signinUser(userDetails)
             : await signinAdmin(userDetails);
+        console.log("after api call");
 
         if (userResponse.status !== "success") {
           throw new Error(userResponse?.message || "Login failed.");
@@ -95,24 +135,45 @@ const GoogleCallback = () => {
 
         const { user, token } = userResponse;
 
+        console.log("logged in user", user);
+        console.log("logged in user's token", token);
+
+        return;
+        // if (!isActive) {
+        //   console.log("returned right here");
+        //   return;
+        // }
+
         login(user, token);
         toast.success("Successfully signed in");
         router.push(
           userType === "user" ? "/user/dashboard" : "/admin/dashboard"
         );
       } catch (error: any) {
+        // if (!isActive) {
+        //   return;
+        // }
+
         console.error("Login error:", error);
         toast.error(
           error?.message || "An unexpected error occurred during login."
         );
-        router.push(`/auth/${userType}/login`);
+        router.replace(
+          userType === "user" ? "/auth/user/login" : "/auth/admin/login"
+        );
       } finally {
+        // if (isActive) {
         setLoading(false);
+        // }
       }
     };
 
     fetchTokens();
-  }, [code, state, router]);
+
+    // return () => {
+    //   isActive = false;
+    // };
+  }, [code, state, router, login]);
 
   if (loading) {
     return (

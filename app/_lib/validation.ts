@@ -83,6 +83,15 @@ export const updateUserSchema = z.object({
     })
     .trim()
     .email("Please provide a valid email"),
+  phoneNumber: z
+    .string({
+      required_error: "Phone number is required",
+    })
+    .trim()
+    .min(10, { message: "Phone number must be at least 10 digits long" })
+    .regex(/^\+?\d{10,14}$/, {
+      message: "Phone number must be valid and can include a country code",
+    }),
   dob: z
     .date({
       required_error: "Please provide a date of birth",

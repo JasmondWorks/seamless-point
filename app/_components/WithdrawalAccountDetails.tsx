@@ -5,11 +5,11 @@ const WithdrawalAccountDetails = ({ onShowAddAccount, bankDetails }: any) => {
   console.log(bankDetails);
   return (
     <Card className="font-medium text-sm">
-      <h3 className="pb-1 mb-5 border-b font-bold">Bank details</h3>
+      <h3 className="pb-1 mb-3 border-b font-semibold">Bank details</h3>
       <div className="flex gap-2 items-end justify-between">
-        <div className="space-y-2">
+        <div className="space-y-1">
           <p>{bankDetails?.accountName}</p>
-          <p className="text-2xl font-bold">{bankDetails?.accountNumber}</p>
+          <p className="text-xl font-bold">{bankDetails?.accountNumber}</p>
           <p>{bankDetails?.bankName}</p>
         </div>
         <button onClick={onShowAddAccount}>

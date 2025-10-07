@@ -18,10 +18,16 @@ export default function DepositPage() {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(true);
   const [isInternational, setIsInternational] = useState(false);
+
+  console.log("amount", amount);
+
   const transactionFee = calculateTransactionFee(
     Number(amount),
     isInternational
   );
+
+  console.log("charge", transactionFee);
+
   useEffect(() => {
     async function getInternationalStatus() {
       // check if user is international
@@ -32,6 +38,13 @@ export default function DepositPage() {
         );
 
         console.log(response);
+        const data = await response.json();
+
+        if (!response.ok) return;
+
+        console.log(data);
+
+        setIsInternational(data?.isInternational || false);
 
         setLoading(false);
       } catch (error) {

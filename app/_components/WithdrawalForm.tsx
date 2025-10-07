@@ -9,15 +9,28 @@ import { Dialog, DialogContent } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import WithdrawalAccountDetails from "@/app/_components/WithdrawalAccountDetails";
+import { getUser } from "@/app/_lib/actions";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function WithdrawalForm({ onShowAddAccount, bankDetails }: any) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [amount, setAmount] = useState("");
+  const [balance, setBalance] = useState(0);
 
   const router = useRouter();
+
+  useEffect(() => {
+    async function getBalance() {
+      const res = await getUser();
+
+      console.log(res.user);
+
+      if (res.status === "success") setBalance(res?.user?.balance);
+    }
+    getBalance();
+  }, []);
 
   function handleSetAmount(e: any) {
     setAmount(e.target.value);
@@ -40,7 +53,7 @@ export default function WithdrawalForm({ onShowAddAccount, bankDetails }: any) {
   return (
     <div className="flex flex-col gap-y-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <BalanceDisplay className="!min-w-0 !w-full" />
+        <BalanceDisplay balance={balance} />
         <WithdrawalAccountDetails
           onShowAddAccount={onShowAddAccount}
           bankDetails={bankDetails}

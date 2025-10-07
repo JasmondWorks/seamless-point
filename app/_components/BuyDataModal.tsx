@@ -515,7 +515,7 @@ function ConfirmPurchaseContent({
     const payload = {
       amount,
       provider: providerName,
-      recipient: "08011111111", // change to actual recipient later
+      recipient: process.env.NEXT_PUBLIC_TEST_PHONE_NUMBER ?? recipient, // change to actual recipient later
       bundleCode: pkg.id,
     };
     console.log(payload);
