@@ -162,7 +162,7 @@ function Summary({
     if (response.status === "success") {
       setShowAccountModal(true);
       toast.success("Virtual account created successfully!");
-    }
+    } else toast.error(response.message);
 
     setIsLoadingAccountDetails(false);
   };

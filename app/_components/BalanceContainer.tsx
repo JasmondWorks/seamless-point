@@ -1,7 +1,12 @@
+"use client";
+
 import Button from "@/app/_components/Button";
+import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
+import { getUser } from "@/app/_lib/actions-v1";
 import { formatCurrency } from "@/app/_lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const actions = [
   {
@@ -46,7 +51,34 @@ const actions = [
   },
 ];
 
-export default function BalanceContainer({ balance }: { balance: number }) {
+export default function BalanceContainer() {
+  const {
+    data: userRes,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["balance"],
+    queryFn: () => getUser(),
+    refetchInterval: 10000, // Refetch every 60 seconds
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+
+  useEffect(() => {
+    (async () => {
+      const res = await getUser();
+
+      console.log(res.user);
+    })();
+  }, []);
+
+  let balance = userRes?.user?.balance ?? 0;
+
+  console.log(userRes);
+
+  if (isLoading) return <DataFetchSpinner />;
+
   return (
     <div className="shadow-sm rounded-xl p-5 space-y-6 w-full sm:w-fit sm:min-w-[300px] md:min-w-[400px] bg-brandSecLight">
       <div className="space-y-1">

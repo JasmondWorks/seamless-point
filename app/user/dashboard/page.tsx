@@ -16,8 +16,8 @@ export const revalidate = 0;
 
 export default async function Dashboard() {
   const res = await getUser();
-  const balance =
-    res?.status === "success" && res.user ? res.user.balance ?? 0 : 0;
+
+  res?.status === "success" && res.user ? res.user.balance ?? 0 : 0;
 
   return (
     <DashboardLayout isRightContained={true}>
@@ -29,7 +29,7 @@ export default async function Dashboard() {
       </h1>
       <div className="py-4">
         <Suspense fallback={<DataFetchSpinner />}>
-          <BalanceContainer balance={balance} />
+          <BalanceContainer />
         </Suspense>
       </div>
 
