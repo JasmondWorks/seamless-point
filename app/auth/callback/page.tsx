@@ -129,7 +129,7 @@ const GoogleCallback = () => {
             : await signinAdmin(userDetails);
         console.log("after api call");
 
-        if (userResponse.status !== "success") {
+        if (userResponse?.status !== "success") {
           throw new Error(userResponse?.message || "Login failed.");
         }
 
