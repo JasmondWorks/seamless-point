@@ -8,23 +8,17 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import Badge, { BadgeVariant } from "@/app/_components/Badge";
-import { deleteVirtualAccount } from "@/app/_lib/actions";
-import { useState } from "react";
+import { deleteVirtualAccount, getVirtualAccount } from "@/app/_lib/actions";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { formatCurrency } from "@/app/_lib/utils";
+import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
 
 interface VirtualAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
   amount: number;
-  virtualAccount: {
-    accountNumber: string;
-    accountName: string;
-    bankName: string;
-    bankCode: string;
-    createdAt: string;
-  } | null;
   onAccountDeleted?: () => void;
 }
 
@@ -32,11 +26,29 @@ export default function VirtualAccountModal({
   isOpen,
   onClose,
   amount,
-  virtualAccount,
   onAccountDeleted,
 }: VirtualAccountModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  if (!virtualAccount) return null;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [virtualAccount, setVirtualAccount] = useState<{
+    accountNumber: string;
+    accountName: string;
+    bankName: string;
+    bankCode: string;
+    createdAt: string;
+  } | null>(null);
+
+  useEffect(() => {
+    async function fetchVirtualAccount() {
+      setIsLoading(true);
+      const res = await getVirtualAccount();
+      setIsLoading(false);
+
+      if (res.status === "success") setVirtualAccount(res.data.data);
+    }
+    fetchVirtualAccount();
+  }, []);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -88,76 +100,65 @@ export default function VirtualAccountModal({
           {formatCurrency(amount)}
         </p>
 
-        <div className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600">
-                Account Number
-              </span>
-              <span className="font-mono text-lg font-bold">
-                {virtualAccount.accountNumber}
-              </span>
+        {isLoading && <DataFetchSpinner />}
+
+        {virtualAccount && (
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">
+                  Account Number
+                </span>
+                <span className="font-mono text-lg font-bold">
+                  {virtualAccount.accountNumber}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">
+                  Account Name
+                </span>
+                <span className="font-medium text-right">
+                  {virtualAccount.accountName}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">Bank</span>
+                <span className="font-medium">{virtualAccount.bankName}</span>
+              </div>
             </div>
 
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600">
-                Account Name
-              </span>
-              <span className="font-medium text-right">
-                {virtualAccount.accountName}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600">Bank</span>
-              <span className="font-medium">{virtualAccount.bankName}</span>
-            </div>
-
-            {/* <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600">
-                Bank Code
-              </span>
-              <span className="font-mono text-sm">
-                {virtualAccount.bankCode}
-              </span>
-            </div> */}
-
-            {/* <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600">
-                Created Date
-              </span>
-              <span className="text-sm text-gray-500">
-                {formatDate(virtualAccount.createdAt)}
-              </span>
-            </div> */}
-          </div>
-
-          {/* <div className="bg-blue-50 p-3 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Note:</strong> Funds transferred to this account will be
-              automatically credited to your wallet within 5-10 minutes.
-            </p>
-          </div> */}
-
-          {/* <div className="flex justify-end pt-4 border-t">
+            {/* <div className="flex justify-end pt-4 border-t">
             <button
-              onClick={handleDeleteAccount}
-              disabled={isDeleting}
-              className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleDeleteAccount}
+            disabled={isDeleting}
+            className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isDeleting ? "Deleting..." : "Delete Account"}
+            {isDeleting ? "Deleting..." : "Delete Account"}
             </button>
-          </div> */}
+            </div> */}
 
-          <div className="flex justify-center">
-            <Badge variant={BadgeVariant.red}>
-              Please send the exact amount
-            </Badge>
+            <div className="flex justify-center">
+              <Badge variant={BadgeVariant.red}>
+                Please send the exact amount
+              </Badge>
+            </div>
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> Funds transferred to this account will be
+                automatically credited to your wallet.
+              </p>
+            </div>
+            <Button
+              href="/user/dashboard"
+              className="w-full"
+              variant={ButtonVariant.fill}
+            >
+              I've transferred
+            </Button>
           </div>
-          <Button className="w-full" variant={ButtonVariant.fill}>
-            Verify transaction
-          </Button>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
