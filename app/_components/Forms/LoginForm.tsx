@@ -73,18 +73,18 @@ export default function LoginForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="px-10 sm:px-16 py-8 space-y-8"
+        className="px-6 sm:px-16 py-8 space-y-8"
       >
-        <div className="flex gap-4 justify-center flex-wrap lg:flex-nowrap">
+        <div className="flex gap-4 justify-center">
           <GoogleLoginButton userType={userType} />
 
           <Button
             disabled
             onClick={(e) => e.preventDefault()}
-            className="text-sm !px-3"
+            className="!text-xs !px-3"
             variant={ButtonVariant.neutralDark}
           >
-            <FaApple size="30" />
+            <FaApple size="22" />
             <span>Sign in with Apple</span>
           </Button>
         </div>

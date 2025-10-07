@@ -32,12 +32,12 @@ export const GoogleLoginButton = ({
         redirectToGoogleLogin();
       }}
       disabled={isLoading}
-      className="text-sm !px-3"
+      className="!text-xs !px-3"
       variant={ButtonVariant.neutralLight}
     >
       <svg
-        width={24}
-        height={24}
+        width={18}
+        height={18}
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
