@@ -122,22 +122,12 @@ export default function LoginForm({
           </Link>
         </div>
         <div>
-          {/* <ButtonFormSubmit
+          <ButtonFormSubmit
             text={isLoading ? "Signing in" : "Sign in"}
-            // isReversed
+            isReversed
             icon={<FaChevronRight />}
             isLoading={isLoading}
-          /> */}
-          <Button
-            type="submit"
-            variant={ButtonVariant.fill}
-            className="w-full h-14"
-            isLoading={isLoading}
-            isRoundedLarge
-          >
-            {isLoading ? "Signing in" : "Sign in"}
-            <FaChevronRight />
-          </Button>
+          />
           {userType === "user" && (
             <p className="mt-5 flex items-center justify-center leading-snug gap-2">
               Don't have an account?{" "}
