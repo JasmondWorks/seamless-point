@@ -1,10 +1,9 @@
 /**
- * Compute Paystack fee precisely (kobo-accurate), with gross-up when payer covers fees.
- * amount: in Naira (number). If payerCoversFee=true => desired NET to merchant.
- * isInternational: true for intl cards (3.9% + ₦100, no cap). false for local (1.5% + ₦100, waivers/caps apply).
- * payerCoversFee: if true, we gross-up so that NET==amount after fees.
- *
- * Returns fee, gross customer charge, and net to merchant (all in Naira, 2dp).
+ * Compute Paystack fee with integer kobo math to match webhook.
+ * amount:
+ *  - If payerCoversFee = true  => desired NET to merchant (₦)
+ *  - If payerCoversFee = false => GROSS charged to customer (₦)
+ * Returns fee, gross charge, and net to merchant (₦, 2dp).
  */
 export function computePaystackCharge(
   amount: number,
@@ -16,34 +15,36 @@ export function computePaystackCharge(
   const R_LOCAL = 0.015;
   const R_INTL = 0.039;
   const FLAT_NGN = 100;
-  const WAIVER_THRESHOLD_NGN = 2500; // ₦100 is waived below this (local only)
+  const WAIVER_THRESHOLD_NGN = 2500; // ₦100 flat is waived BELOW this for local
   const LOCAL_CAP_NGN = 2000;
 
   const toKobo = (n: number) => Math.round(n * 100);
   const toNaira = (k: number) => Number((k / 100).toFixed(2));
-  const r = isInternational ? R_INTL : R_LOCAL;
 
-  if (amount <= 0)
+  if (amount <= 0) {
     return {
       fee: 0,
       grossCharge: Math.max(0, amount),
       netToMerchant: Math.max(0, amount),
     };
+  }
 
+  // ---------------- International: 3.9% + ₦100 (no cap/waiver) ----------------
   if (isInternational) {
-    // INTL: 3.9% + ₦100, no cap, no waiver
+    const r = R_INTL;
+
     if (payerCoversFee) {
-      // net = G - (r*G + 100)  => G = (net + 100) / (1 - r)
+      // net = gross*(1 - r) - 100  => gross = ceil((net + 100)/ (1 - r))
       const netK = toKobo(amount);
-      const grossK = Math.round((netK + toKobo(FLAT_NGN)) / (1 - r));
-      const feeK = Math.round(grossK * r) + toKobo(FLAT_NGN);
+      const grossK = Math.ceil((netK + toKobo(FLAT_NGN)) / (1 - r));
+      const feeK = grossK - netK; // exact fee in kobo
       return {
         fee: toNaira(feeK),
         grossCharge: toNaira(grossK),
         netToMerchant: toNaira(grossK - feeK),
       };
     } else {
-      // Customer pays 'amount' (gross). Fee is r*G + 100
+      // Merchant absorbs: fee = round(gross*r) + 100
       const grossK = toKobo(amount);
       const feeK = Math.round(grossK * r) + toKobo(FLAT_NGN);
       const netK = grossK - feeK;
@@ -55,54 +56,53 @@ export function computePaystackCharge(
     }
   }
 
-  // LOCAL: 1.5% + ₦100, ₦100 waived under ₦2,500, cap ₦2,000
+  // ---------------- Local: 1.5% + ₦100 (waived < ₦2,500), cap ₦2,000 ----------------
+  const r = R_LOCAL;
+
   if (payerCoversFee) {
     const netK = toKobo(amount);
 
-    // First, try the "no-flat" case (waiver) and see if resulting gross stays below the waiver threshold.
-    const grossNoFlatK = Math.round(netK / (1 - R_LOCAL)); // G = net / (1 - r)
+    // Try waiver path first (no ₦100) and ensure gross remains BELOW threshold.
+    // gross = ceil(net / (1 - r))
+    const grossNoFlatK = Math.ceil(netK / (1 - r));
     if (grossNoFlatK < toKobo(WAIVER_THRESHOLD_NGN)) {
-      const feeK = Math.round(grossNoFlatK * R_LOCAL); // no flat
+      const feeK = grossNoFlatK - netK; // exact
       return {
         fee: toNaira(feeK),
         grossCharge: toNaira(grossNoFlatK),
-        netToMerchant: toNaira(grossNoFlatK - feeK),
+        netToMerchant: toNaira(netK),
       };
     }
 
-    // Flat ₦100 applies: G = (net + 100) / (1 - r)
-    const grossWithFlatK = Math.round(
-      (netK + toKobo(FLAT_NGN)) / (1 - R_LOCAL)
-    );
-    let feeRawK = Math.round(grossWithFlatK * R_LOCAL) + toKobo(FLAT_NGN);
+    // Otherwise, ₦100 flat applies:
+    // gross = ceil((net + 100) / (1 - r))
+    const grossWithFlatK = Math.ceil((netK + toKobo(FLAT_NGN)) / (1 - r));
+    let feeK = grossWithFlatK - netK; // exact fee before cap
 
-    // Apply local cap if needed
+    // Apply local cap (₦2,000)
     const capK = toKobo(LOCAL_CAP_NGN);
-    if (feeRawK <= capK) {
+    if (feeK <= capK) {
       return {
-        fee: toNaira(feeRawK),
+        fee: toNaira(feeK),
         grossCharge: toNaira(grossWithFlatK),
-        netToMerchant: toNaira(grossWithFlatK - feeRawK),
+        netToMerchant: toNaira(netK),
       };
     }
 
-    // If capped, the simplest way to guarantee NET==desired is: G = net + CAP
+    // If capped, choose gross so net == desired and fee == cap
     const grossCappedK = netK + capK;
-    const feeK = capK;
     return {
-      fee: toNaira(feeK),
+      fee: toNaira(capK),
       grossCharge: toNaira(grossCappedK),
-      netToMerchant: toNaira(grossCappedK - feeK),
+      netToMerchant: toNaira(netK),
     };
   } else {
-    // Merchant absorbs fee. Amount is gross charged to customer.
+    // Merchant absorbs: given gross, compute fee and cap
     const grossK = toKobo(amount);
-
-    // Decide if ₦100 flat is waived
     const flatK = grossK < toKobo(WAIVER_THRESHOLD_NGN) ? 0 : toKobo(FLAT_NGN);
-    let feeK = Math.round(grossK * R_LOCAL) + flatK;
+    let feeK = Math.round(grossK * r) + flatK;
 
-    // Apply local cap
+    // Apply cap
     const capK = toKobo(LOCAL_CAP_NGN);
     if (feeK > capK) feeK = capK;
 
@@ -116,9 +116,10 @@ export function computePaystackCharge(
 }
 
 /**
- * Backwards-compatible wrapper matching your original signature.
- * Returns just the fee (Naira, 2dp).
- * Convention: if payerCoversFee=true, amount is desired NET; else amount is GROSS charge.
+ * Backwards-compatible helper that returns only the fee (₦, 2dp).
+ * Convention:
+ *  - payerCoversFee=true  => amount is desired NET to merchant.
+ *  - payerCoversFee=false => amount is GROSS charge to customer.
  */
 export function calculatePaystackFee(
   amount: number,
