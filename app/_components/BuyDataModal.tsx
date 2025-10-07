@@ -177,7 +177,7 @@ const schema = z.object({
   amount: z.coerce
     .number()
     .refine((v) => Number.isFinite(v), { message: "Amount is required" })
-    .pipe(z.number().min(100, { message: "Min ?100" })),
+    .pipe(z.number()),
 });
 
 type BuyAirtimeForm = z.infer<typeof schema>;
@@ -284,12 +284,21 @@ export default function BuyDataModal({
     setIsSelectNetworkDropdownOpen(false);
   }
 
-  function onSubmit(formValues: BuyAirtimeForm) {
+  console.log(errors);
+
+  function onSubmit(data: BuyAirtimeForm) {
+    console.log(selectedProvider, selectedPackage);
+
     if (!selectedProvider || !selectedPackage) return;
+
+    const recipient =
+      process.env.NEXT_PUBLIC_TEST_PHONE_NUMBER ?? data.phoneNumber;
+
+    console.log(recipient);
 
     setPurchaseDetails({
       provider: selectedProvider as NetworkProvider,
-      recipient: formValues.phoneNumber,
+      recipient,
       pkg: selectedPackage,
     });
 
@@ -305,7 +314,7 @@ export default function BuyDataModal({
               <DialogHeader>
                 <DialogTitle>Buy Data</DialogTitle>
               </DialogHeader>
-              <DialogDescription className="text-sm">
+              <DialogDescription className="text-sm text-center">
                 Browse all packages
               </DialogDescription>
             </div>
@@ -497,6 +506,8 @@ function ConfirmPurchaseContent({
 
   const amount = pkg.amount;
 
+  console.log(recipient);
+
   useEffect(() => {
     (async () => {
       const userRes = await getUser();
@@ -541,7 +552,7 @@ function ConfirmPurchaseContent({
       <DialogHeader>
         <DialogTitle>Buy Data</DialogTitle>
       </DialogHeader>
-      <DialogDescription className="text-sm">
+      <DialogDescription className="text-sm text-center">
         Confirm purchase
       </DialogDescription>
 

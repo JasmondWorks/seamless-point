@@ -38,7 +38,7 @@ const schema = z.object({
   amount: z.coerce
     .number()
     .refine((v) => Number.isFinite(v), { message: "Amount is required" }) // handle "" -> NaN
-    .pipe(z.number().min(100, { message: "Min NGN 100" })),
+    .pipe(z.number().min(50, { message: "Min NGN 50" })),
 });
 
 type BuyAirtimeForm = z.infer<typeof schema>;
@@ -85,9 +85,14 @@ export default function BuyAirtimeModal({
   }
 
   function onSubmit(data: BuyAirtimeForm) {
+    const recipient =
+      process.env.NEXT_PUBLIC_TEST_PHONE_NUMBER ?? data.phoneNumber;
+
+    console.log(recipient);
+
     setData({
       provider: selectedProvider as NetworkProvider,
-      recipient: process.env.NEXT_PUBLIC_TEST_PHONE_NUMBER ?? data.phoneNumber,
+      recipient,
       amount: data.amount,
     });
     setStep("confirm");
@@ -102,7 +107,7 @@ export default function BuyAirtimeModal({
                 <DialogHeader>
                   <DialogTitle>Buy Airtime</DialogTitle>
                 </DialogHeader>
-                <DialogDescription className="text-sm">
+                <DialogDescription className="text-sm text-center">
                   Browse all packages
                 </DialogDescription>
               </div>
@@ -262,7 +267,7 @@ function ConfirmPurchaseContent({
     const payload = {
       amount,
       provider: providerName,
-      recipient: "08011111111", // change to actual recipient later
+      recipient,
     };
     console.log(payload);
 
@@ -292,7 +297,7 @@ function ConfirmPurchaseContent({
       <DialogHeader>
         <DialogTitle>Buy Airtime</DialogTitle>
       </DialogHeader>
-      <DialogDescription className="text-sm">
+      <DialogDescription className="text-sm text-center">
         Confirm purchase
       </DialogDescription>
 
