@@ -1563,6 +1563,32 @@ export const createVirtualAccount = async () => {
     return { status: "error", message: error.message };
   }
 };
+export const getVirtualAccount = async () => {
+  console.log("********");
+  try {
+    const token = getUserToken();
+
+    const res = await fetch(`${URL}/transactions/virtual-account`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    console.log("*****");
+    console.log("data", data);
+    console.log("*****");
+
+    if (!res.ok) throw new Error(data.error);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    return { status: "error", message: error.message };
+  }
+};
 
 export const deleteVirtualAccount = async () => {
   try {

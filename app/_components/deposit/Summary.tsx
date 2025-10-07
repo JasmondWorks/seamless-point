@@ -36,24 +36,38 @@ function Summary({
   transactionFee: number;
   selectedPaymentMethod: string;
 }) {
-  const [user, setUser] = useState<any | null>(null);
   const router = useRouter();
 
   const [isLoadingProcessingPayment, setIsLoadingProcessingPayment] =
     useState(false);
   const [isLoadingAccountDetails, setIsLoadingAccountDetails] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const searchParams = useSearchParams();
   const [redirect, setRedirect] = useState("");
+  const [user, setUser] = useState<{
+    email: string;
+    virtualAccount: {
+      accountNumber: string;
+      accountName: string;
+      customerCode: string;
+    };
+  } | null>(null);
+
+  console.log(user);
 
   useEffect(() => {
     async function fetchUser() {
+      setIsLoadingUser(true);
       const res = await getUser();
+      setIsLoadingUser(false);
 
       if (res.status === "success") setUser(res.user);
     }
+
     fetchUser();
   }, []);
+
   useEffect(() => {
     // Get the raw redirect string from the URL
     const rawRedirect = searchParams.get("redirect");
@@ -73,15 +87,13 @@ function Summary({
       // Store amount in localStorage for verification later
       localStorage.setItem("totalAmount", totalAmount.toString());
 
-      // Initialize payment with Paystack
       const response = await initiatePayment({
-        email: user.email,
+        email: user?.email!,
         amount: totalAmount * 100, // Convert to kobo
         metadata: {
           redirectAfterPayment: redirect,
         },
       });
-
       if (response?.status === "success" && response.data) {
         // Redirect to Paystack checkout page
         router.push(`${response.data}`);
@@ -98,8 +110,8 @@ function Summary({
 
   const handleShowAccount = async () => {
     // Check if user already has a virtual account
-    console.log("user", user);
 
+    console.log("user state", user);
     if (
       user?.virtualAccount &&
       user?.virtualAccount?.accountNumber &&
@@ -107,48 +119,52 @@ function Summary({
       user?.virtualAccount?.customerCode
     ) {
       setShowAccountModal(true);
+      setIsLoadingAccountDetails(false);
       return;
     }
 
-    if (!user?.phoneNumber) {
-      showToast(
-        "Kindly update your phone number in the profile page. Redirecting to profile page...",
-        "info"
-      ),
-        setTimeout(() => router.push("/user/settings"), 3000);
-      return;
-    }
-
-    // Generate virtual account if not exists
     setIsLoadingAccountDetails(true);
-    console.log("b4 api call");
-    const response: any = await createVirtualAccount();
-    console.log("after api call");
-    setIsLoadingAccountDetails(false);
+    const res = await getUser();
 
-    console.log(response);
+    if (res.status === "success") {
+      const user = res.user;
+      console.log("user", user);
 
-    if (response.status === "success") {
-      // Update user state with new virtual account
-      const updatedUser = { ...user, virtualAccount: response.data };
-      setUser(updatedUser);
-      setShowAccountModal(true);
-      toast.success("Virtual account created successfully!");
-    } else {
-      console.error("Virtual account creation error:", response.message);
-      toast.error(response.message || "Failed to create virtual account");
-      if (
-        (response.message.includes("phone") &&
-          response.message.includes("required")) ||
-        (response.message.includes("mobile") &&
-          response.message.includes("required"))
-      )
+      // if (
+      //   user?.virtualAccount &&
+      //   user?.virtualAccount?.accountNumber &&
+      //   user?.virtualAccount?.accountName &&
+      //   user?.virtualAccount?.customerCode
+      // ) {
+      //   setShowAccountModal(true);
+      //   setIsLoadingAccountDetails(false);
+      //   return;
+      // }
+
+      if (!user?.phoneNumber) {
         showToast(
           "Kindly update your phone number in the profile page. Redirecting to profile page...",
           "info"
         ),
           setTimeout(() => router.push("/user/settings"), 3000);
+        setIsLoadingAccountDetails(false);
+        return;
+      }
     }
+
+    // Generate virtual account if not exists
+    console.log("b4 api call");
+    const response: any = await createVirtualAccount();
+    console.log("after api call");
+
+    console.log(response);
+
+    if (response.status === "success") {
+      setShowAccountModal(true);
+      toast.success("Virtual account created successfully!");
+    }
+
+    setIsLoadingAccountDetails(false);
   };
   return (
     <>
@@ -199,7 +215,7 @@ function Summary({
                 ? "Generating account..."
                 : "Show account details"
             }
-            disabled={isLoadingAccountDetails}
+            disabled={isLoadingAccountDetails || isLoadingUser}
           />
         )}
 
@@ -207,13 +223,6 @@ function Summary({
           amount={totalAmount}
           isOpen={showAccountModal}
           onClose={() => setShowAccountModal(false)}
-          virtualAccount={user?.virtualAccount || null}
-          onAccountDeleted={() => {
-            // Update user state to remove virtual account
-            if (user) {
-              setUser({ ...user, virtualAccount: null });
-            }
-          }}
         />
       </div>
     </>
