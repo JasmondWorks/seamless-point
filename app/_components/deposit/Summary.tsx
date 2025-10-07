@@ -219,11 +219,13 @@ function Summary({
           />
         )}
 
-        <VirtualAccountModal
-          amount={totalAmount}
-          isOpen={showAccountModal}
-          onClose={() => setShowAccountModal(false)}
-        />
+        {showAccountModal && (
+          <VirtualAccountModal
+            amount={totalAmount}
+            isOpen={showAccountModal}
+            onClose={() => setShowAccountModal(false)}
+          />
+        )}
       </div>
     </>
   );

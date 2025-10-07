@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { formatCurrency } from "@/app/_lib/utils";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
+import { getUser } from "@/app/_lib/actions-v1";
 
 interface VirtualAccountModalProps {
   isOpen: boolean;
@@ -29,7 +30,6 @@ export default function VirtualAccountModal({
   onAccountDeleted,
 }: VirtualAccountModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [virtualAccount, setVirtualAccount] = useState<{
     accountNumber: string;
@@ -42,10 +42,10 @@ export default function VirtualAccountModal({
   useEffect(() => {
     async function fetchVirtualAccount() {
       setIsLoading(true);
-      const res = await getVirtualAccount();
+      const res = await getUser();
       setIsLoading(false);
 
-      if (res.status === "success") setVirtualAccount(res.data.data);
+      if (res.status === "success") setVirtualAccount(res.user.virtualAccount);
     }
     fetchVirtualAccount();
   }, []);
@@ -84,6 +84,8 @@ export default function VirtualAccountModal({
     }
   };
 
+  if (isLoading) return;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -96,68 +98,61 @@ export default function VirtualAccountModal({
             Transfer money to this account to fund your wallet instantly
           </DialogDescription>
         </DialogHeader>
-        <p className="font-bold text-3xl my-2 text-center">
-          {formatCurrency(amount)}
-        </p>
 
         {isLoading && <DataFetchSpinner />}
 
-        {virtualAccount && (
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">
-                  Account Number
-                </span>
-                <span className="font-mono text-lg font-bold">
-                  {virtualAccount.accountNumber}
-                </span>
+        {!isLoading && (
+          <>
+            <p className="font-bold text-3xl my-2 text-center">
+              {formatCurrency(amount)}
+            </p>
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">
+                    Account Number
+                  </span>
+                  <span className="font-mono text-lg font-bold">
+                    {virtualAccount?.accountNumber}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">
+                    Account Name
+                  </span>
+                  <span className="font-medium text-right">
+                    {virtualAccount?.accountName}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">
+                    Bank
+                  </span>
+                  <span className="font-medium">
+                    {virtualAccount?.bankName}
+                  </span>
+                </div>
               </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">
-                  Account Name
-                </span>
-                <span className="font-medium text-right">
-                  {virtualAccount.accountName}
-                </span>
+              <div className="flex justify-center">
+                <Badge variant={BadgeVariant.red}>
+                  Please send the exact amount
+                </Badge>
               </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-600">Bank</span>
-                <span className="font-medium">{virtualAccount.bankName}</span>
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> Funds transferred to this account will
+                  be automatically credited to your wallet.
+                </p>
               </div>
+              <Button
+                href="/user/dashboard"
+                className="w-full"
+                variant={ButtonVariant.fill}
+              >
+                I've transferred
+              </Button>
             </div>
-
-            {/* <div className="flex justify-end pt-4 border-t">
-            <button
-            onClick={handleDeleteAccount}
-            disabled={isDeleting}
-            className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-            {isDeleting ? "Deleting..." : "Delete Account"}
-            </button>
-            </div> */}
-
-            <div className="flex justify-center">
-              <Badge variant={BadgeVariant.red}>
-                Please send the exact amount
-              </Badge>
-            </div>
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> Funds transferred to this account will be
-                automatically credited to your wallet.
-              </p>
-            </div>
-            <Button
-              href="/user/dashboard"
-              className="w-full"
-              variant={ButtonVariant.fill}
-            >
-              I've transferred
-            </Button>
-          </div>
+          </>
         )}
       </DialogContent>
     </Dialog>
