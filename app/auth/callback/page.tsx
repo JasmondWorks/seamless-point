@@ -138,7 +138,6 @@ const GoogleCallback = () => {
         console.log("logged in user", user);
         console.log("logged in user's token", token);
 
-        return;
         // if (!isActive) {
         //   console.log("returned right here");
         //   return;
