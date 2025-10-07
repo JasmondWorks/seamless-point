@@ -134,7 +134,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
     case FormFieldType.CHECKBOX:
       return (
         <FormControl>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Checkbox
               disabled={props.disabled}
               id={props.name}
