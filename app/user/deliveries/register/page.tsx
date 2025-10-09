@@ -533,7 +533,7 @@ function Payment({
                         className="p-1.5 text-brandSec border border-brandSec rounded-md text-opacity-80"
                       />
                     </button>
-                    <Dialog
+                    {/* <Dialog
                       open={isTopUpDialogOpen}
                       onOpenChange={setIsTopUpDialogOpen}
                     >
@@ -620,7 +620,7 @@ function Payment({
                           </Button>
                         </DialogFooter>
                       </DialogContent>
-                    </Dialog>
+                    </Dialog> */}
                   </div>
                   <div className="flex gap-4 items-center">
                     <p className="text-xl font-bold leading-none whitespace-normal">
