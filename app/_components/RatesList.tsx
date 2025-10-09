@@ -79,6 +79,8 @@ const RatesList = ({
     setSelectedCourier(foundCourier);
   }, [couriers]);
 
+  console.log(couriers);
+
   async function fetchRates() {
     const pickupAddress = {
       country: sender!.country,

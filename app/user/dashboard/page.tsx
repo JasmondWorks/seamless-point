@@ -1,6 +1,6 @@
 import Username from "@/app/_components/Username";
 import DashboardLayout from "@/app/_components/DashboardLayout";
-import { getUser } from "@/app/_lib/actions";
+import { getCountries, getUser } from "@/app/_lib/actions";
 import BalanceContainer from "@/app/_components/BalanceContainer";
 import { Suspense } from "react";
 import DashboardServices from "@/app/_components/DashboardServices";

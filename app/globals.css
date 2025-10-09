@@ -367,7 +367,7 @@ body {
 
   /* =====  REACT PHONE NUMBER INPUT OVERRIDES */
   .input-phone {
-    @apply mt-2 h-11 text-sm border bg-white placeholder:text-neutral-600 border-neutral-300 relative rounded-md !important;
+    @apply mt-2 h-11 border bg-white placeholder:text-neutral-600 border-neutral-300 relative rounded-md !important;
   }
   .input-phone input {
     @apply rounded-md px-3 pl-14 h-full  outline-none w-full !important;
@@ -632,7 +632,7 @@ h2.react-datepicker__current-month {
 }
 
 .shad__control {
-  font-size: 0.875rem !important;
+  /* font-size: 0.875rem !important; */
   padding-block: 0.25rem !important;
   box-shadow: none !important;
 }
