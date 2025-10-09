@@ -105,6 +105,8 @@ export default function DeliverySourceForm({
       dispatch({ type: "countries/loading" });
       const res = await getCountries();
 
+      console.log(res?.data);
+
       if (res.status === "success")
         dispatch({ type: "countries/fetched", payload: res.data });
     }

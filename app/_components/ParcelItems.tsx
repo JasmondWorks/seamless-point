@@ -230,6 +230,10 @@ function ItemParcelForm({
   });
   const { setValue } = form;
 
+  const errors = form.formState.errors;
+
+  console.log(errors);
+
   console.log(selectedParcelItem);
 
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
@@ -255,6 +259,8 @@ function ItemParcelForm({
     setIsLoadingCategories(true);
 
     const res = await getCategories();
+
+    console.log(res);
 
     if (res.status === "success" && res.data?.data?.categories) {
       setCategories(res.data.data.categories);

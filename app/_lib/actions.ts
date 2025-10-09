@@ -1285,6 +1285,10 @@ export const getAllHsCodes = async () => {
 export const getCategories = async () => {
   const token = getUserToken();
 
+  // http://localhost:5000/api/v1
+
+  console.log(`${URL}/terminal/categories`);
+
   try {
     // Create packaging
     const res = await fetch(`${URL}/terminal/categories`, {
@@ -1325,6 +1329,8 @@ export const topUpAirtime = async ({
       headers: buildHeaders(),
     });
     const data = await res.json();
+
+    console.log(data);
 
     if (!res.ok) throw new Error(data.message);
 

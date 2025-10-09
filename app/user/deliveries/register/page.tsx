@@ -541,7 +541,7 @@ function Payment({
                         <Button
                           variant={ButtonVariant.fill}
                           isRoundedLarge
-                          className="!h-auto !p-3 !py-2 text-brandSec border-brandSec text-xs"
+                          className="!h-auto !p-3 !py-2 text-white border-brandSec text-xs"
                           disabled={isRefreshingBal}
                           type="button"
                         >
