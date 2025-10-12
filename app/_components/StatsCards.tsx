@@ -7,10 +7,10 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import React from "react";
 
 let initialStats = [
-  { name: "today's sales", percentDiff: -34 },
-  { name: "total sales", percentDiff: 28, isPrice: true },
-  { name: "total shipments", percentDiff: 22 },
-  { name: "total customers", percentDiff: -16 },
+  { name: "today's sales", percentDiff: -34, amount: 0 },
+  { name: "total sales", percentDiff: 28, isPrice: true, amount: 0 },
+  { name: "total shipments", percentDiff: 22, amount: 0 },
+  { name: "total customers", percentDiff: -16, amount: 0 },
 ];
 
 export default function StatsCards({

@@ -1,5 +1,6 @@
+import Badge, { BadgeVariant } from "@/app/_components/Badge";
 import Card from "@/app/_components/Card";
-import { formatCurrency } from "@/app/_lib/utils";
+import { capitalise, cn, formatCurrency } from "@/app/_lib/utils";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -8,11 +9,12 @@ export default function RecentEntityData({ data, entity }: any) {
   return (
     <Card className="bg-white">
       <div className="space-y-7 flex flex-col justify-between h-full overflow-x-auto">
-        <div className="flex-1 space-y-7">
+        <div className="flex-1 space-y-8">
           <div>
             <h3 className="font-bold text-xl capitalize">Recent {entity}</h3>
           </div>
-          <div className="text-sm space-y-5">
+          <div className="text-sm space-y-6">
+            {!data?.length && <p>You have no recent {entity}</p>}
             {data?.map((obj: any) => (
               <div
                 style={{
@@ -36,13 +38,15 @@ export default function RecentEntityData({ data, entity }: any) {
             ))}
           </div>
         </div>
-        <Link
-          href={`/admin/${entity}`}
-          className="gap-1 text-xs tracking-wider font-bold text-light inline-flex items-center"
-        >
-          <span className="uppercase">SEE ALL {entity}</span>
-          <ChevronRight className="w-5" />
-        </Link>
+        {!!data.length && (
+          <Link
+            href={`/admin/${entity}`}
+            className="gap-1 text-xs tracking-wider font-bold text-light inline-flex items-center"
+          >
+            <span className="uppercase">SEE ALL {entity}</span>
+            <ChevronRight className="w-5" />
+          </Link>
+        )}
       </div>
     </Card>
   );
@@ -65,10 +69,32 @@ function RecentEntityDesc({ entity, obj }: { entity: any; obj: any }) {
         </div>
       );
     case "transactions":
+      console.log(obj);
+      const transactionType = obj.type.toLowerCase();
+      const formattedTransactionType = capitalise(
+        transactionType.split("_").join(" ")
+      );
       return (
-        <div>
-          <p>{formatCurrency(obj.amount)}</p>
-          <p className="text-muted capitalize">{obj.transactionType}</p>
+        <div className="flex flex-col gap-1 items-end">
+          <Badge
+            className="text-xs"
+            variant={
+              obj.status === "pending"
+                ? BadgeVariant.orange
+                : obj.status === "failed"
+                ? BadgeVariant.red
+                : obj.status === "completed"
+                ? BadgeVariant.blue
+                : BadgeVariant.green
+            }
+          >
+            {capitalise(obj.status)}
+          </Badge>
+
+          <div>
+            <span className="font-bold">{formatCurrency(obj.amount)}</span> (
+            {formattedTransactionType})
+          </div>
         </div>
       );
 

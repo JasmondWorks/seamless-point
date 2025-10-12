@@ -476,6 +476,36 @@ export async function getUser() {
     };
   }
 }
+export async function getUserById(id: string) {
+  try {
+    const res = await fetch(`${URL}/users/${id}`, {
+      method: "GET",
+      headers: buildHeaders(),
+      cache: "no-store",
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    const {
+      data: { user },
+    } = data;
+
+    return {
+      status: "success",
+      message: "User fetched successfully",
+      user,
+    };
+  } catch (error: any) {
+    return {
+      status: "error",
+      message:
+        error.message.includes("fetch") || error.message.includes("failed")
+          ? "Check your internet connection"
+          : error.message,
+    };
+  }
+}
 export async function getAdmin() {
   const token = getUserToken();
 
@@ -757,6 +787,21 @@ export async function fetchLatestCustomers() {
   try {
     const token = getUserToken();
     const res = await fetch(`${URL}/users/latest`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (err: any) {
+    return { status: "error", message: err.message };
+  }
+}
+export async function fetchLatestTransactions() {
+  try {
+    const token = getUserToken();
+    const res = await fetch(`${URL}/transactions/latest`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -1512,6 +1557,25 @@ export const buyTvPlan = async ({
     const res = await fetch(`${URL}/v24u/tv/subscribe`, {
       method: "POST",
       body: JSON.stringify({ provider, cardNumber, planCode, amount, phone }),
+      headers: buildHeaders(),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+
+    if (data.status === "fail") throw new Error(data.message);
+
+    return { status: "success", data };
+  } catch (error: any) {
+    console.log(error.message);
+    return { status: "error", message: error.message };
+  }
+};
+
+export const getTransactions = async () => {
+  try {
+    const res = await fetch(`${URL}/transactions`, {
+      method: "GET",
       headers: buildHeaders(),
     });
     const data = await res.json();

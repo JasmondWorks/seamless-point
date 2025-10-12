@@ -74,11 +74,10 @@ export const getTransactionsColumns = (): ColumnDef<Transaction>[] => {
 
         return (
           <div className="flex items-center gap-10">
-            <span className="font-medium">{formattedAmount}</span>
+            <span className="font-medium min-w-[100px]">{formattedAmount}</span>
             <Badge variant={variant} className="capitalize">
               {status}
             </Badge>
-            ;
           </div>
         );
       },
@@ -88,7 +87,7 @@ export const getTransactionsColumns = (): ColumnDef<Transaction>[] => {
       accessorKey: "id",
       header: "ID",
       cell: ({ row }) => {
-        const id = row.getValue("id");
+        const id = row.original._id;
         return (
           <div className="flex gap-2 items-center">
             <span>{id}</span>
@@ -99,16 +98,21 @@ export const getTransactionsColumns = (): ColumnDef<Transaction>[] => {
     },
     // COURIER
     {
-      accessorKey: "paymentType",
+      accessorKey: "type",
       header: "PAYMENT TYPE",
-      cell: ({ row }) => <span>{row.getValue("paymentType")}</span>,
+      cell: ({ row }) => (
+        <span>
+          {String(row.getValue("type")).split("_").join(" ")[0].toUpperCase() +
+            String(row.getValue("type")).split("_").join(" ").slice(1)}
+        </span>
+      ),
     },
     // DATE
     {
-      accessorKey: "date",
       header: "DATE",
       cell: ({ row }) => {
-        return <span>{formatDateTime(row.getValue("date"))}</span>;
+        console.log(row);
+        return <span>{formatDateTime(row.original.createdAt)}</span>;
       },
     },
   ];

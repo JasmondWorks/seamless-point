@@ -11,6 +11,8 @@ import {
   getTransactionsColumns,
   Transaction,
 } from "@/app/_components/table/transactions";
+import { useQuery } from "@tanstack/react-query";
+import { getTransactions } from "@/app/_lib/actions";
 
 export const initialTransactionsData: Transaction[] = [
   {
@@ -86,10 +88,19 @@ export const initialTransactionsData: Transaction[] = [
 ];
 
 export function TransactionsTable() {
-  // Data variables
-  const [data, setData] = React.useState<Transaction[]>(
-    initialTransactionsData
-  );
+  const {
+    data: transactionsResponse,
+    isLoading,
+    // isError,
+  } = useQuery({
+    queryKey: ["transactions"],
+    queryFn: () => getTransactions(),
+    refetchInterval: 15000, // Refetch every 60 seconds
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+  const data = transactionsResponse?.data?.data?.transactions ?? [];
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Table layout variables
