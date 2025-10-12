@@ -133,11 +133,11 @@ export default function VirtualAccountModal({
                   </span>
                 </div>
               </div>
-              <div className="flex justify-center">
+              {/* <div className="flex justify-center">
                 <Badge variant={BadgeVariant.red}>
                   Please send the exact amount
                 </Badge>
-              </div>
+              </div> */}
               <div className="bg-blue-50 p-3 rounded-lg">
                 <p className="text-sm text-blue-800">
                   <strong>Note:</strong> Funds transferred to this account will
