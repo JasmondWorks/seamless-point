@@ -21,10 +21,11 @@ export default function DepositPage() {
 
   console.log("amount", amount);
 
-  const transactionFee = calculateTransactionFee(
-    Number(amount),
-    isInternational
-  );
+  // Remove transaction fee for amount <= 5000
+  const transactionFee =
+    Number(amount) > 5000
+      ? calculateTransactionFee(Number(amount), isInternational)
+      : 0;
 
   console.log("charge", transactionFee);
 
