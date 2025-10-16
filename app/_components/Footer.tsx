@@ -52,10 +52,10 @@ export default function Footer() {
             <div>
               <h4 className="mb-8 font-bold">Help</h4>
               <nav className="gap-y-4 flex flex-col">
-                <Link href="#">Customer Support</Link>
-                <Link href="#">Delivery Details</Link>
-                <Link href="#">Terms & Conditions</Link>
-                <Link href="#">Privacy Policy</Link>
+                <Link href="#/">Customer Support</Link>
+                <Link href="/">Delivery Details</Link>
+                <Link href="https://docs.google.com/document/d/1XGXV0SeAZ39c0TNhjQT1LH7vc2ogaFhs/edit?usp=sharing&ouid=104226322400225256457&rtpof=true&sd=true ">Terms & Conditions</Link>
+                <Link href="https://docs.google.com/document/d/1XGXV0SeAZ39c0TNhjQT1LH7vc2ogaFhs/edit?usp=sharing&ouid=104226322400225256457&rtpof=true&sd=true ">Privacy Policy</Link>
               </nav>
             </div>
           </div>

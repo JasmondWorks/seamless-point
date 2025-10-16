@@ -64,10 +64,13 @@ export default function Home() {
                   />
                 </div>
                 <p className="text-lg">
-                  Equipping business owners, eCommerce merchants, and
+                  {/* Equipping business owners, eCommerce merchants, and
                   individuals with a platform to send and receive items{" "}
                   <span className="text-brandSec font-bold">globally </span>
-                  (We are not limited to the local environment.)
+                  (We are not limited to the local environment.) */}
+                  SeamlessPoint is a cutting-edge software technology platform that offers comprehensive shipping solutions to individuals, businesses, and third-party logistics providers. 
+                  Our platform also enables users to conveniently buy airtime,mobile data, and pay utility bills. 
+                  Additionally, we facilitate connections between users and essential service providers, such as technicians, making it a one-stop solution for diverse needs
                 </p>
                 <Link href="/user/dashboard" className="inline-block">
                   <Button
