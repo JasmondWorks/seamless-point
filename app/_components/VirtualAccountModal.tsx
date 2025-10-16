@@ -14,7 +14,6 @@ import toast from "react-hot-toast";
 import Button, { ButtonVariant } from "@/app/_components/Button";
 import { formatCurrency } from "@/app/_lib/utils";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
-import { getUser } from "@/app/_lib/actions-v1";
 
 interface VirtualAccountModalProps {
   isOpen: boolean;
@@ -42,11 +41,25 @@ export default function VirtualAccountModal({
   useEffect(() => {
     async function fetchVirtualAccount() {
       setIsLoading(true);
-      const res = await getUser();
-      setIsLoading(false);
-
-      if (res.status === "success") setVirtualAccount(res.user.virtualAccount);
+      try {
+        const res = await getVirtualAccount();
+        if (res?.status === "success") {
+          // API might return account nested inside data.data or data
+          const d = res.data ?? null;
+          const nested = d?.data ?? d;
+          const va = nested?.virtualAccount ?? nested;
+          if (va && typeof va === "object") setVirtualAccount(va as any);
+        } else {
+          toast.error(res?.message || "Failed to load virtual account");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load virtual account");
+      } finally {
+        setIsLoading(false);
+      }
     }
+
     fetchVirtualAccount();
   }, []);
 
@@ -84,7 +97,14 @@ export default function VirtualAccountModal({
     }
   };
 
-  if (isLoading) return;
+  if (isLoading)
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DataFetchSpinner />
+        </DialogContent>
+      </Dialog>
+    );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -138,12 +158,12 @@ export default function VirtualAccountModal({
                   Please send the exact amount
                 </Badge>
               </div> */}
-              <div className="bg-blue-50 p-3 rounded-lg">
+              {/* <div className="bg-blue-50 p-3 rounded-lg">
                 <p className="text-sm text-blue-800">
                   <strong>Note:</strong> Funds transferred to this account will
                   be automatically credited to your wallet.
                 </p>
-              </div>
+              </div> */}
               <Button
                 href="/user/dashboard"
                 className="w-full"

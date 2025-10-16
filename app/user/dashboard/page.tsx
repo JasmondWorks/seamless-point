@@ -5,6 +5,7 @@ import BalanceContainer from "@/app/_components/BalanceContainer";
 import { Suspense } from "react";
 import DashboardServices from "@/app/_components/DashboardServices";
 import DataFetchSpinner from "@/app/_components/DataFetchSpinner";
+import BankDetailsDisplay from "@/app/_components/BankDetailsDisplay";
 
 export const metadata = {
   title: "Dashboard",
@@ -26,6 +27,7 @@ export default async function Dashboard() {
           Hey <Username /> -{" "}
         </strong>{" "}
         Let's get you started for today
+        <BankDetailsDisplay />
       </h1>
       <div className="py-4">
         <Suspense fallback={<DataFetchSpinner />}>
