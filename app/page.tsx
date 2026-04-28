@@ -18,68 +18,57 @@ export default function Home() {
     <div className="flex flex-col h-screen">
       <Navbar />
       <main className="h-full flex-1 overflow-auto">
-        <section id="home" className="py-20">
+        <section id="home" className="py-24">
           <div className="container-custom">
-            <div className="grid gap-10 gap-y-5 lg:grid-cols-2 items-center">
+            <div className="grid gap-16 lg:grid-cols-2 items-center">
               <div className="space-y-8">
-                <div className="relative">
-                  <h1
-                    style={{ fontSize: "2.85rem" }}
-                    className="headline !text-left"
-                  >
-                    Providing <span className="text-brandPry">seamless, </span>
-                    simplified and efficient logistics processes
+                <span className="inline-block bg-[#f0f9ff] text-brandPry text-sm font-semibold px-4 py-1.5 rounded-full">
+                  All-in-One Platform
+                </span>
+
+                <div className="space-y-4">
+                  <h1 className="text-[2.6rem] md:text-[3.2rem] font-bold leading-[1.15] tracking-tight text-gray-900">
+                    One Platform,{" "}
+                    <span className="text-brandPry">Endless</span>{" "}
+                    Possibilities
                   </h1>
-                  {/* <svg
-                  className="absolute bottom-0 right-0"
-                    width="167"
-                    height="167"
-                    viewBox="0 0 167 167"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_655_4099)">
-                      <path
-                        d="M27.124 57.2965L57.1962 83.3876L57.9042 83.7178L58.2344 83.0097L126.005 68.925L114.255 73.7898L48.564 100.051L39.4147 123.369L70.5137 110.286L71.5156 146.958L166.826 53.4796L27.124 57.2965Z"
-                        fill="#F2844C"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_655_4099">
-                        <rect
-                          width="125"
-                          height="125"
-                          fill="white"
-                          transform="translate(53.5376 0.652283) rotate(25)"
-                        />
-                      </clipPath>
-                    </defs>
-                  </svg> */}
-                  <Image
-                    className="float-right w-32 md:w-40 object-contain"
-                    src="/assets/images/vaadin_paperplane.png"
-                    alt="airplane"
-                    width={100}
-                    height={100}
-                  />
+                  <p className="text-lg text-gray-500 leading-relaxed max-w-lg">
+                    Ship packages, pay utility bills, buy airtime & data, and
+                    connect with skilled technicians — all from one place.
+                  </p>
                 </div>
-                <p className="text-lg">
-                  {/* Equipping business owners, eCommerce merchants, and
-                  individuals with a platform to send and receive items{" "}
-                  <span className="text-brandSec font-bold">globally </span>
-                  (We are not limited to the local environment.) */}
-                  SeamlessPoint is a cutting-edge software technology platform that offers comprehensive shipping solutions to individuals, businesses, and third-party logistics providers. 
-                  Our platform also enables users to conveniently buy airtime,mobile data, and pay utility bills. 
-                  Additionally, we facilitate connections between users and essential service providers, such as technicians, making it a one-stop solution for diverse needs
-                </p>
-                <Link href="/user/dashboard" className="inline-block">
-                  <Button
-                    variant={ButtonVariant.fill}
-                    isPrimary
-                    text="Start Shipping"
-                    isRoundedLarge
-                  />
-                </Link>
+
+                <ul className="space-y-3">
+                  {[
+                    { icon: "📦", label: "Nationwide & international shipping" },
+                    { icon: "⚡", label: "Instant airtime, data & bill payments" },
+                    { icon: "🔧", label: "Vetted technicians, on demand" },
+                  ].map(({ icon, label }) => (
+                    <li key={label} className="flex items-center gap-3 text-gray-700 text-[0.95rem]">
+                      <span className="flex-shrink-0 w-8 h-8 bg-[#f0f9ff] rounded-full flex items-center justify-center text-base">
+                        {icon}
+                      </span>
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <Link href="/user/dashboard" className="inline-block">
+                    <Button
+                      variant={ButtonVariant.fill}
+                      isPrimary
+                      text="Get Started"
+                      isRoundedLarge
+                    />
+                  </Link>
+                  <Link
+                    href="#services"
+                    className="inline-flex items-center gap-2 text-brandPry font-semibold hover:underline text-sm"
+                  >
+                    See our services →
+                  </Link>
+                </div>
               </div>
               <svg
                 className="hidden ml-auto lg:block w-full h-auto max-w-md scale-x-[-1] lg:scale-x-100"
